@@ -1,0 +1,7 @@
+
+FUNCTION ${1:function_name}
+RETURN BOOLEAN
+IS
+BEGIN
+    RETURN ($0);
+END;

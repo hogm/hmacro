@@ -1,0 +1,108 @@
+
+//MultiDic v0.2 - 補完辞書の切り替え
+
+//辞書を切り替えると現在の辞書は破棄されますが、設定は一時的なものです。
+
+//MultiDic.mac
+
+//v0.2  2007.11.01  ・ファイルタイプ別の設定を復帰するメニュー項目を追加。
+//                  ・一行辞書として扱うファイルを指定可能にする。
+//v0.1  2007.10.26
+
+	//初期設定//////////////////////////////////////////////////////
+
+	//設定ファイル所在
+	$inifile=currentmacrodirectory+"\\MultiDic\\MultiDic.ini";
+
+	////////////////////////////////////////////////////////////////
+
+	$MergeDic=currentmacrodirectory + "\\MultiDic\\Merge.txt";
+
+	$chk[0]="-";
+	$chk[1]="◎";
+
+	call GetList;
+	#chksum=##return;
+	$menu[#chksum]="&M 辞書併合";
+	$menu[#chksum+1]="&R ファイルタイプ別の設定を復帰";
+	$menu[#chksum+2]="&Q 終了";
+
+	while(1){
+		menuarray $menu, #chksum+3;
+		#sw=result-1;
+		if(#sw < 0 || #sw > #chksum+1) endmacro;
+		else if(#sw == #chksum) call MergeDic;
+		else if(#sw == #chksum+1){
+			if((configstate & 0x01) == 1){
+				configset currentconfigset, 1;
+			}
+			endmacro;
+		}else{
+			if(#onoff[#sw] == 1) #onoff[#sw]=0;
+			else #onoff[#sw]=1;
+			$menu[#sw]=$dic[#sw]+"\t"+$chk[#onoff[#sw]];
+		}
+	}
+	endmacro;
+
+GetList://一覧を取得
+	##i=0;
+	while(1){
+		$dic[##i]=getinistr($inifile, "Dic", str(##i));
+		if($dic[##i] == "") break;
+		if(!existfile(currentmacrodirectory+"\\MultiDic\\"+$dic[##i])){
+			if(!existfile($dic[##i])){
+				message $dic[##i]+" は存在しません。";
+				endmacro;
+			}
+		}
+		$menu[##i]=$dic[##i]+"\t"+$chk[#onoff[##i]];
+		##i=##i+1;
+	}
+	return ##i;
+
+MergeDic://辞書併合
+	disabledraw;
+	disableinvert;
+	$$linedic=","+getinistr($inifile, "LineDic", "num")+",";
+	##i=0;
+	while(##i < #chksum){
+		if(#onoff[##i] == 1){
+			$dic[##j]=getinistr($inifile, "Dic", str(##i));
+			##dicnum=##i;
+			if(strstr($$linedic, ","+str(##dicnum)+",") != -1) ##k=##k+1;
+			##j=##j+1;
+		}
+		##i=##i+1;
+	}
+	##sum=##j;
+	if(##sum == 0){
+		message "辞書が選択されていません。";
+	}else{
+		openfile "/h "+$MergeDic;
+		selectall;
+		delete;
+		##i=0;
+		while(##i < ##sum){
+			insertfile $dic[##i];
+			##i=##i+1;
+		}
+		saveas $MergeDic;
+		setactivehidemaru 1;
+		closehidemaru 1;
+
+		config "xAutocompDic:"+"("+$MergeDic+")";
+		if(##j == ##k){
+			if(strstr($$linedic, ","+str(##dicnum)+",") != -1){
+				##n=getconfig("AutocompFlag1");
+				if(##n & 0x00000004 != 4){
+					##n=##n | 0x00000004;
+					config "xAutocompFlag1:"+str(##n);
+				}
+			}
+		}
+	}
+	enabledraw;
+	enableinvert;
+	endmacro;
+	return;

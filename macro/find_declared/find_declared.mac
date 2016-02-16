@@ -1,0 +1,16 @@
+
+// 検索バッファの保持
+$searchBuffer = searchbuffer;
+#searchOption = searchoption;
+
+selectword;
+copy;
+beginclipboardread;
+$searchBuffer = "^[\\t ]*" + getclipboard + "[\\t ]+[a-zA-Z0-9_. ]*(BINARY_INTEGER|INTEGER|NUMBER|PLS_INTEGER|CHAR|LONG|LONG RAW|NCHAR|NVARCHAR2|RAW|ROWID|VARCHAR2|BOOLEAN|RECORD|TABLE|VARRAY|BFILE|BLOB|CLOB|NCLOB|DATE|%TYPE|%ROWTYPE)(\\([,0-9]+\\)){0,1}.*";
+searchup2 $searchBuffer, nocasesense, regular, hilight;
+
+// 検索バッファの復元
+setsearch $searchBuffer, #searchOption;
+
+// 編集エリアにフォーカスを設定
+setfocus 

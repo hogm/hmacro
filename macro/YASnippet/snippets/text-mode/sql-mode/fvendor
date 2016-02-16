@@ -1,0 +1,21 @@
+
+l_po_vendors po_vendors%ROWTYPE;
+
+FUNCTION find_vendor(
+    p_vendor_id IN po_vendors.vendor_id%TYPE
+)
+RETURN po_vendors%ROWTYPE
+IS
+    l_result po_vendors%ROWTYPE;
+BEGIN
+    SELECT  *
+    INTO    l_result
+    FROM    po_vendors
+    WHERE   vendor_id = p_vendor_id
+    ;
+
+    RETURN l_result;
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

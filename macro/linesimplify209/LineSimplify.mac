@@ -1,0 +1,151 @@
+//-------- LineSimplify.mac -----------------------------------------//
+
+//       重複行を削除する簡易マクロ  Ver.2.09
+
+//                                山紫水明      2006年11月1日
+
+$inifile = currentmacrodirectory + "\\MyMacro.ini";
+#sort = getininum($inifile, "LineSimplify", "sort");
+#delete = getininum($inifile, "LineSimplify", "delete");
+#delspc = getininum($inifile, "LineSimplify", "delspc");
+$sort[1] = "する";
+$sort[0] = "しない";
+$delete[1] = "する";
+$delete[0] = "しない";
+$delspc[1] = "する";
+$delspc[0] = "しない";
+while( 1 ) {
+    menu "&E 実　行",
+         "&S ソート：" + $sort[#sort],
+         "&D 重複行の削除：" + $delete[#delete],
+         "&N 空白行の削除：" + $delspc[#delspc];
+    #r = result;
+    if( #r == 0 ) endmacro;
+    else if( #r == 1 ) break;
+    else if( #r == 2 ) #sort = !#sort;
+    else if( #r == 3 ) #delete = !#delete;
+    else if( #r == 4 ) #delspc = !#delspc;
+}
+disabledraw;
+#starttime = tickcount;
+if( selecting ) {
+    #handle1 = hidemaruhandle(0);
+    cut;
+    openfile "/h";
+    paste;
+    #handle2 = hidemaruhandle(0);
+    #select = 1;
+}
+if( #delspc ) {
+    replaceallfast "^[ \t　]*\\n", "", regular;
+    #delspcnum = result;
+    if( #delspcnum ) $delspcnum = "空白行削除：" + str( #delspcnum ) + "\n";
+    #ex = #ex + #delspcnum;
+}
+if( #sort == 0 && #delete == 0 ) goto End;
+if( #sort ) call Sort;
+else call NoSort;
+if( #select ) {
+    selectall;
+    copy;
+    setactivehidemaru #handle1;
+    paste;
+    closehidemaruforced #handle2;
+    #ex = #ex + 2;
+}
+gofiletop;
+
+End:
+title 0;
+enabledraw;
+if( #sort && #delete == 0 && #delspc == 0 ) $sorted = "ソートしました。\n";
+if( #count ) $dellinenum = "重複行削除：" + str( #count ) + "\n";
+#time = tickcount - #starttime;
+#minute = #time / 60000;
+#second =  #time / 1000 - #minute * 60;
+if( #minute > 0 ) $minute = str( #minute ) + "分";
+question $dellinenum + $delspcnum + $sorted + "所 要 時 間：" +
+        $minute + str(#second) + "秒" + str( #time % 1000 ) +
+        "\n\n確定しますか？";
+if( result == no ) call Cancel;
+writeininum $inifile, "LineSimplify", "sort", #sort;
+writeininum $inifile, "LineSimplify", "delete", #delete;
+writeininum $inifile, "LineSimplify", "delspc", #delspc;
+endmacro;
+
+Sort:
+title "ソート中";
+selectall;
+if( existfile( hidemarudir + "\\Sort.hmf " ) ) filter "Sort.hmf", "sort", "0000";
+else run "sort /rec 8200 < con > con";
+#ex = #ex + 2;
+escape;
+if( !#delete ) return;
+
+SortDelete:
+gofiletop;
+while ( code == 0x0d ) down;
+while( code != eof ) {
+    $s1 = gettext2( 0, lineno, linelen2, lineno );
+    movetolineno 1, lineno + 1;
+    while( 1 ) {
+        $s2 = gettext2( 0, lineno, linelen2, lineno );
+        if( $s1 == $s2 ) {
+            selectline;
+            delete;
+            #count = #count + 1;
+        } else break;
+    }
+    #i = #i + 1;
+    if( #i % 20 == 0 ) title "削除中 " + str( #i );
+}
+#ex = #ex + #count;
+return;
+
+NoSort:
+gofiletop;
+title "削除中";
+disabledraw;
+$sb = searchbuffer;
+#so = searchoption;
+while( code != eof ) {
+    $s1 = gettext2( 0, lineno, linelen2, lineno );
+    if( $s1 == "" ) {    //空行の場合
+        movetolineno 1, lineno + 1;
+        continue;
+    }
+    movetolineno 1, lineno + 1;
+    #line = lineno;
+    while( 1 ) {
+        searchdown2 $s1;
+        if( !result ) break;
+        if( return ) {//折り返している場合
+                //長い場合，検索バッファに入りきれないので，文字列を直接比較
+            $s2 = gettext2( 0, lineno, linelen2, lineno );
+            if( $s1 != $s2 ) break;
+        }
+        selectline;
+        delete;
+        #count = #count + 1;
+    }
+    movetolineno 1, #line;
+    if( lineno == linecount2 ) break;
+    #i = #i + 1;
+    if( #i % 20 == 0 ) title "削除中 " + str( #i );
+}
+#ex = #ex + #count;
+setsearch $sb, #so;
+return;
+
+Cancel:
+disabledraw;
+##u = 0;
+while( 1 ) {
+    undo;
+    ##u = ##u + 1;
+    if( ##u >= #ex ) break;
+    if( !updated ) break;
+}
+return;
+
+//------------------------------------------------------//

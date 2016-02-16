@@ -1,0 +1,25 @@
+
+	$dicfile=currentmacrodirectory + "\\OracleDic\\OracleDic.dic";
+	$exefile=currentmacrodirectory + "\\OracleDic\\OracleDic.exe";
+	
+	runsync2 $exefile;
+
+	call strreplace $dicfile,"\\","\\\\"; $config_value=$$return;
+
+	config "xAutocompDic:"+"("+$config_value+")";
+
+	endmacro;
+
+strreplace:		// •¶š—ñ’uŠ·
+	// $$1 = ‘ÎÛ•¶š—ñ
+	// $$2 = ŒŸõ•¶š—ñ
+	// $$3 = ’uŠ·•¶š—ñ
+	$$s = $$1;
+	while (true) {
+		##p = strstr($$s, $$2);
+		if (##p < 0) break;
+		$$r = $$r + leftstr($$s, ##p) + $$3;
+		$$s = midstr($$s, ##p + strlen($$2), 8192);
+	}
+	return $$r + $$s;
+

@@ -1,0 +1,23 @@
+
+l_mtl_system_items_b mtl_system_items_b%ROWTYPE;
+
+FUNCTION find_item(
+    p_inventoy_item_id IN mtl_system_items_b.inventory_item_id%TYPE,
+    p_organization_id IN mtl_system_items_b.organization_id%TYPE
+)
+RETURN mtl_system_items_b%ROWTYPE
+IS
+    l_result mtl_system_items_b%ROWTYPE;
+BEGIN
+    SELECT  *
+    INTO    l_result
+    FROM    mtl_system_items_b
+    WHERE   inventory_item_id = p_inventoy_item_id
+        AND organization_id = p_organization_id
+    ;
+
+    RETURN l_result;
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

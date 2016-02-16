@@ -1,0 +1,21 @@
+//BOX選択時は貼り付けのみ
+if (rectselecting == 1){
+    paste;
+    endmacro;
+}
+
+if (selecting == 1){
+    //範囲選択時は先頭行を取得
+    #starty = seltopy;
+}
+else{
+    #starty = y;
+}
+paste;
+#endy = y;
+
+//範囲選択
+moveto 0, #starty;
+beginlinesel;
+moveto 0, #endy;
+endsel;

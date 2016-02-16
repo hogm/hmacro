@@ -1,0 +1,53 @@
+//検索バッファの保持
+$replacebuffer  = replacebuffer;
+#searchOption   = searchoption;
+
+begingroupundo;
+
+if (rectselecting == 1){
+    #seltopx = seltopx;
+    #selendx = selendx;
+    #seltopy = seltopy;
+    #selendy = selendy;
+    
+    disabledraw;
+
+    #line = #seltopy;
+    while( #line <= #selendy ) {
+        golineend;
+        #endx = x;
+        moveto #seltopx, #line;
+        while( #seltopx <= #endx ) {
+            $checkstr = gettext(#seltopx, #line, #seltopx + 1, #line);
+            //矩形選択時は半角スペースのみ対応
+            if ($checkstr == " " ){
+                moveto #seltopx + 1, #line;
+                backspace;
+            }
+            else{
+                break;
+            }
+        }
+        #line = #line + 1;
+    }
+
+    #strsize = strlen($str) ;
+    #seltopx = #seltopx + #strsize;
+    #selendx = #selendx + #strsize;
+
+    //矩形選択復元
+    moveto #seltopx,#seltopy;
+    beginrect;
+    moveto #selendx,#selendy;
+    
+    endgroupundo;
+    enabledraw;
+}
+else{
+    replaceallfast "^[ 　\\t]+" , "" , regular, nocasesense, inselect, nohilight;
+}
+
+endgroupundo;
+
+//検索バッファの復元
+setsearch $replacebuffer, #searchOption;

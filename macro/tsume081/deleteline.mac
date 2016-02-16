@@ -1,0 +1,216 @@
+//┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+//┃秀丸エディタ空白行削除マクロ「つめ太郎」                  ┃
+//┃                                                          ┃
+//┃                           By かず@踊る大捜査線FANSITE    ┃
+//┃                                   http://www.odoru.org/  ┃
+//┃[改版履歴]                                                ┃
+//┃Ver0.50     作成                                          ┃
+//┃Ver0.60     範囲選択内での作業を可能にした                ┃
+//┃Ver0.70     キーボードだけで操作可能にした                ┃
+//┃            削除行数表示がおかしくなる可能性があったので  ┃
+//┃            潰した                                        ┃
+//┃Ver0.80     行頭のスペース・タブを削除するモードを付けた  ┃
+//┃Ver0.81     マクロ終了後範囲選択状態になることがある不具合┃
+//┃            を潰した。                                    ┃
+//┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+$version = "0.81";
+
+
+title "★★★つめ太郎起動★★★";
+
+mousemenu "(&1) 行頭改行のみ削除", 
+          "(&2) 半角スペースのみの行も削除", 
+          "(&3) 半角・全角スペースのみの行も削除", 
+          "(&4) 半角・全角スペース・タブのみの行も削除", 
+          "(&5) 行頭の半角・全角スペース・タブを削除。",
+          "(&0) 何もせずに終了";
+
+	if( result == 0 ) goto macroend;
+	else if( result == 1 ) {
+		#rule = 1;
+	} else if( result == 2 ) {
+		#rule = 2;
+	} else if( result == 3 ) {
+		#rule = 3;
+	} else if( result == 4 ) {
+		#rule = 4;
+	} else if( result == 5 ) {
+		#rule = 5;
+	}
+
+
+	if (updated){
+		question "このファイルはまだセーブされていません。\nセーブしますか？\n\n(セーブすることを推奨いたします)";
+		if( result == yes ) {
+		save;
+		}
+	}
+
+disabledraw;
+
+// ---------------------------------- 削除中
+
+
+	#delete = 0;
+	#line = 1;
+	#code = 0;
+	#linec = linecount2;
+	#select = false;
+
+	if (selecting){
+		#select = true;
+		#start = seltopy;
+		#end   = selendy;
+
+		moveto 0,#start;
+		#start_gyou = lineno;
+		moveto 0,#end;
+		#end_gyou = lineno;
+		
+		#linec = #end_gyou - #start_gyou +1;
+
+		if (#rule == 5){question "選択範囲内の行頭の\n・改行\n・全角スペース\n・半角スペース\n・タブ\nを削除します。\n宜しいですか？";}
+		else {question "選択範囲内で空行を削除します。\n宜しいですか？\n\n選択行数=" + str(#linec) + "行\n(行=論理行)";}
+
+		if (result == no){
+			goto badfinish;
+		}
+		
+		moveto 0,#start;
+
+	}else{
+
+		if (#rule == 5){question "全ての行頭の\n・改行\n・全角スペース\n・半角スペース\n・タブ\nを削除します。\n宜しいですか？";}
+		else {question "ファイル全体の空行を削除します。\n宜しいですか？\n";}
+
+		if (result == no){
+			goto badfinish;
+		}
+		
+		gofiletop;
+	}
+
+    golinetop;
+
+	title "★★★つめ太郎作業中  ("+ str(#line)+ "/"+ str(#linec)+ ")★★★";
+
+while(1){
+
+	while(1){
+		#next= false;
+
+		if (code == eof){			// カーソル位置がEOFならおしまい
+			goto finish;
+		}
+		else if (#line > #linec){			// カーソル位置が選択範囲をはみ出たらおしまい
+			goto finish;
+		}
+		else if( code == 0x0D){		// カーソル位置が改行コードかな
+
+			
+			golinetop2;
+			beginsel;
+			golineend2;
+			down;
+			golinetop;
+			#line = #line +1;
+			if (#line > #linec){			// カーソル位置が選択範囲をはみ出たらおしまい
+				goto finish;
+			}
+			delete;
+			#delete = #delete +1;
+
+			title "★★★つめ太郎作業中  ("+ str(#line)+ "/"+ str(#linec)+ ")★★★";
+			golinetop;
+			break;
+		}
+		else if( code == 0x09){		// カーソル位置がタブだった場合
+			if (#rule == 5){
+				delete;
+			}
+			else if (#rule == 4){
+				right;
+				break;
+			}else{
+				#next= true;
+			}
+		}
+		else if( code == 0x8140){	// カーソル位置が全角スペースだった場合
+			if (#rule == 5){
+				delete;
+			}
+			else if (#rule >= 3){
+				right;
+				break;
+			}else{
+				#next= true;
+			}
+		}
+		else if( code == 0x20){		// カーソル位置が半角スペースだった場合
+			if (#rule == 5){
+				delete;
+			}
+			else if (#rule >= 2){
+				right;
+				break;
+			}else{
+				#next= true;
+			}
+		}
+		else {
+			golineend2;
+			down;
+			#line = #line +1;
+			 if (#line >  #linec){			// カーソル位置が選択範囲をはみ出たらおしまい
+				goto finish;
+			}
+			title "★★★つめ太郎作業中  ("+ str(#line)+ "/"+ str(#linec)+ ")★★★";
+			golinetop;
+			break;
+		}
+
+		if (#next){
+			golineend2;
+			down;
+			#line = #line +1;
+			 if (#line >  #linec){			// カーソル位置が選択範囲をはみ出たらおしまい
+				goto finish;
+			}
+			title "★★★つめ太郎作業中  ("+ str(#line)+ "/"+ str(#linec)+ ")★★★";
+			golinetop;
+		}
+		
+
+	}
+}	
+
+
+END:
+
+
+
+// ---------------------------------- 作業終了ルーチン
+finish:
+	escape;
+	enabledraw;
+	if (#rule == 5){$gyoutou = "\n\n行頭の空白を削除しました。";}
+	else {$gyoutou ="";}
+	message "つめ太郎 Ver" + $version + $gyoutou + "\n\n全" + str(#linec) + "行中" + str(#delete) + "行を削除しました。\n(行=論理行)";
+	goto macroend;
+END:
+
+// ---------------------------------- 作業中断ルーチン
+badfinish:
+	escape;
+	enabledraw;
+	message "つめ太郎 Ver" + $version + "\n\n作業を中断しました。";
+	goto macroend;
+END:
+
+// ---------------------------------- マクロ終了ルーチン
+macroend:
+	enabledraw;
+	title 0;
+	endmacro;
+END:
+

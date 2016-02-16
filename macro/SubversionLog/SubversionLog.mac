@@ -1,0 +1,2 @@
+//SVN‹N“®
+run "TortoiseProc.exe /command:log /path:" + filename2;

@@ -1,0 +1,23 @@
+
+
+l_hr_locations_all hr_locations_all%ROWTYPE;
+
+FUNCTION find_location(
+    p_location_id IN hr_locations_all.location_id%TYPE
+)
+RETURN hr_locations_all%ROWTYPE
+IS
+    l_result hr_locations_all%ROWTYPE;
+BEGIN
+    SELECT  *
+    INTO    l_result
+    FROM    hr_locations_all
+    WHERE   location_id = p_location_id
+         AND (inactive_date < SYSDATE OR inactive_date IS NULL)
+    ;
+
+    RETURN l_result;
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

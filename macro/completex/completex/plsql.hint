@@ -1,0 +1,184 @@
+DECLARE\n    宣言\nBEGIN\n    処理\nEND;\n
+EXCEPTION\nWHEN 例外 THEN\n    処理\n
+BEGIN\n    処理\nEND;\n
+FUNCTION ファンクション名\nRETURN データ型\nIS\n    l_result データ型;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION ファンクション名\nRETURN TYPE\nIS\n    l_result TYPE;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION ファンクション名\nRETURN BOOLEAN\nIS\n    l_result BOOLEAN;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION ファンクション名\nRETURN DATE\nIS\n    l_result DATE;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION ファンクション名\nRETURN NUMBER\nIS\n    l_result NUMBER;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION ファンクション名\nRETURN VARCHAR2\nIS\n    l_result VARCHAR2;\nBEGIN\n    RETURN l_result;\nEND;\n
+PROCEDURE 関数名\nIS\nBEGIN\n    処理\nEND;\n
+IF 条件 THEN\n    処理\nEND IF;\n
+IF 条件 THEN\n    処理\nELSE\n    処理\nEND IF;\n
+IF 条件 THEN\n    処理\nELSIF 条件 THEN\n    処理\nELSE\n    処理\nEND IF;\n
+CASE [式]\nWHEN 比較値 THEN 戻り値;\nWHEN 比較値 THEN 戻り値;\nELSE 戻り値;\nEND;\n
+CASE [式]\nWHEN 比較値 THEN 処理\nWHEN 比較値 THEN 処理\nELSE 処理;\nEND CASE;\n
+LOOP\n    EXIT WHEN 条件;\n    処理\nEND LOOP;\n\n    
+WHILE (条件) LOOP\n    処理\nEND LOOP;\n
+FOR カウンタ IN 開始値..終了値 LOOP\n    処理\nEND LOOP;\n
+LOOP\n    IF condition THEN\n        GOTO continue_loop;\n    END IF;\n    <<continue_loop>>\n    NULL;\nEND LOOP;\n
+DECLARE\n    declarations;\nBEGIN\n    FOR cursor_record IN (select_statement) LOOP\n        sequence_of_statements;\n    END LOOP;\nEND;\n
+DECLARE\n    CURSOR cursor_name\n    (    parameter1 NUMBER\n    ,    parameter2 VARCHAR2\n    )\n    IS\n    select_statement;\nBEGIN\n    OPEN cursor_name(parameter_value1,parameter_value2);\n    LOOP\n        FETCH cursor_name INTO cursor_record;\n        EXIT WHEN cursor_name%NOTFOUND;\n        sequence_of_statements;\n    END LOOP;\n    CLOSE cursor_name;\nEND;\n
+DECLARE\n    CURSOR cursor_name\n    (    parameter1 NUMBER\n    ,    parameter2 VARCHAR2\n    )\n    IS\n    select_statement;\nBEGIN\n    FOR cursor_record IN cursor_name(parameter_value1,parameter_value2) LOOP\n        sequence_of_statements;\n    END LOOP;\nEND;\n
+PROCEDURE utl_file-file_write_sample\nIS\n    CURSOR cursor_name\n    IS\n    select_statement;\n\n    c_dir CONSTANT VARCHAR2(1024) := utl_file_directory;\n    c_file CONSTANT VARCHAR2(1024) := 'file_name.dat';\n    l_file_handle UTL_FILE.file_type;\n    l_put_line VARCHAR2(32767);\nBEGIN\n    l_file_handle := UTL_FILE.fopen(c_dir,c_file,'w',32767);\n    FOR cursor_record IN cursor_name LOOP\n        sequence_of_statements;\n        UTL_FILE.put_line(l_file_handle,l_put_line);\n    END LOOP;\n    UTL_FILE.fclose(l_file_handle);\nEXCEPTION\nWHEN OTHERS THEN\n    IF UTL_FILE.is_open(l_file_handle) THEN\n        UTL_FILE.fclose(l_file_handle);\n    END IF;\nEND;\n
+PROCEDURE utl_file-file_read_sample\nIS\n    l_buffer VARCHAR2(32767);\n    l_file_handle UTL_FILE.FILE_TYPE;\n    l_exists BOOLEAN;\n    l_file_length NUMBER;\n    l_blocksize NUMBER;\n    l_buf VARCHAR2(4000);\n    l_dir CONSTANT VARCHAR2(1024) := utl_file_directory;\n    l_file CONSTANT VARCHAR2(1024) := 'file_name.dat';\n\n    FUNCTION get_string(i_string IN VARCHAR2)\n    RETURN VARCHAR2\n    IS\n    BEGIN\n        RETURN RTRIM(i_string);\n    END;\n\n    FUNCTION get_date(    i_string IN VARCHAR2\n                    ,    i_format IN VARCHAR2 DEFAULT 'YYYYMMDD')\n    RETURN DATE\n    IS\n    BEGIN\n        RETURN TO_DATE(LTRIM(RTRIM(i_string, ' 　'), ' 　'),i_format);\n    END;\n\n    FUNCTION get_number(i_string IN VARCHAR2)\n    RETURN NUMBER\n    IS\n    BEGIN\n        RETURN TO_NUMBER(LTRIM(RTRIM(i_string, ' 　'), ' 　'));\n    END;\nBEGIN\n    UTL_FILE.fgetattr (l_dir,l_file,l_exists,l_file_length,l_blocksize);\n    IF NOT l_exists THEN\n        GOTO end_function;\n    END IF;\n\n    l_file_handle := UTL_FILE.FOPEN(l_dir,l_file,'r',32767);\n    BEGIN\n        LOOP\n            UTL_FILE.get_line(l_file_handle,l_buffer);\n            IF l_buffer IS NULL THEN\n                GOTO continue_loop;\n            END IF;\n\n            sequence_of_statements;\n            \n            --sample\n            BEGIN\n                read_number_value1 := get_number(SUBSTRB(l_buffer, 001, 005));\n                read_string_value2 := get_string(SUBSTRB(l_buffer, 006, 005));\n                read_date_value3   := get_date    (SUBSTRB(l_buffer, 011, 008)[,'YYYYMMDD']);\n            EXCEPTION\n            WHEN OTHERS THEN\n                exception_of_statements;\n            END;\n\n            <<continue_loop>>\n            NULL;\n        END LOOP;\n    EXCEPTION\n        WHEN NO_DATA_FOUND THEN\n            NULL;\n    END;\n    UTL_FILE.fclose(l_file_handle);\n\n    <<end_function>>\n    NULL;\nEND;\n
+DECLARE\n    TYPE NumList IS TABLE OF NUMBER;\n    num_tab NumList := NumList(10,0,11,12,30,0,20,199,2,0,9,1);\n    errors NUMBER;\n    dml_errors EXCEPTION;\n    PRAGMA exception_init(dml_errors, -24381);\nBEGIN\n    FORALL i IN num_tab.FIRST..num_tab.LAST SAVE EXCEPTIONS\n        DELETE FROM emp WHERE sal > 500000/num_tab(i);\nEXCEPTION\nWHEN dml_errors THEN\n    errors := SQL%BULK_EXCEPTIONS.COUNT;\n    dbms_output.put_line('Number of errors is ' || errors);\n    FOR i IN 1..errors LOOP\n        dbms_output.put_line('Error ' || i || ' occurred during '|| 'iteration ' || SQL%BULK_EXCEPTIONS(i).ERROR_INDEX);\n        dbms_output.put_line('Oracle error is ' || SQLERRM(-SQL%BULK_EXCEPTIONS(i).ERROR_CODE));\n    END LOOP;\nEND;\n
+FUNCTION find_table_name(\n    p_column_name IN table_name.column_name%TYPE\n)\nRETURN table_name%ROWTYPE\nIS\n    l_result table_name%ROWTYPE;\nBEGIN\n    SELECT  *\n    INTO    l_result\n    FROM    table_name\n    WHERE   column_name = p_column_name\n    ;\n    RETURN l_result;\nEXCEPTION \nWHEN NO_DATA_FOUND OR TOO_MANY_ROWS THEN\n    zn_helper.raise_warn(\n        'table_name.column_name => [ ' || p_column_name || ' ] :' ||\n        SQLERRM\n    );\nEND;\n\nl_table_name table_name%ROWTYPE;\n\nl_table_name := \n    find_table_name(\n        p_column_name => l_column_name\n    );\n
+【 ABS 】\n数値 n の絶対値を求める\n\nABS ( n )\n戻り値：数値型\n\n\n
+【 ACOS 】\n数値 n のアークコサイン(逆余弦)を求める\n\nACOS ( n )\n戻り値：数値型\n\n\n
+【 ADD_MONTHS 】\n日時 d に月数 n を加減算する\n\nADD_MONTHS ( d, n )\n戻り値：日付型\n\n\n
+【 ASCII 】\n文字列 c の先頭バイトの文字コードを返す\nASCII ( c )\n戻り値：数値型 ( ASCII 値または EBCDIC 値を返す )\n\n\n
+【 ASCIISTR 】\n任意のキャラクタセット文字列 c の先頭バイトの文字コードを返す\nASCIISTR ( c )\n戻り値：数値型 ( データベースキャラクタセットでの ASCII 値を返す )\n\n\n
+【 ASIN 】\n数値 n のアークサイン(逆正弦)を求める\n\nASIN ( n )\n戻り値：数値型\n\n\n
+【 ATAN 】\n数値 n のアークタンジェント(逆正接)を求める\n\nATAN ( n )\n戻り値：数値型\n\n\n
+【 ATAN2 】\n数値 n1, n2 のアークタンジェント(逆正接)を求める\n\nATAN ( n1, n2 )\n戻り値：数値型\n\n\n
+【 AVG 】\n数値 n の平均値を求めるグループ関数 ( NULL 値は無視される )\n\nAVG ( [ DISTINCT | ALL ] n ) [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  DISTINCT : 重複した値は１つだけ対象とする                     ］\n［  ALL      : 重複した値も含めて全ての値を対象とする(デフォルト) ］\n\n\n
+【 BFILENAME 】\nBFILE 列 c1 と物理ファイル名 c2 を関連付ける\n\nBFILENAME ( c1, c2 )\n戻り値：BFILE\n\n\n
+【 BIN_TO_NUM 】\nビットベクトル n を同等の数値に変換する\n\nBIN_TO_NUM ( ┬ n  ─┬ )\n             └ ← , ┘\n戻り値：数値型\n\n\n
+【 BITAND 】\n数値 n1 と n2 の AND を求める\n\nBITAND ( n1, n2 )\n戻り値：数値型\n\n\n
+【 CAST 】\nある組み込みデータ型を別のデータ型に変換する\n\nCAST ( ┬ 式  ─────────┬ AS データ名 )\n       ├ ( 副問合せ )  ────┤\n       └ MULTISET ( 副問合せ ) ┘\n戻り値：AS で指定したデータ型\n\n\n
+【 CEIL 】\n数値 n 以上の最も小さい整数を求める\n\nCEIL ( n )\n戻り値：数値型\n\n\n
+【 CHARTOROWID 】\n文字列 c を ROWID 型に変換する\n\nCHARTOROWID ( c )\n戻り値：ROWID型\n\n\n
+【 CHR 】\n文字コード n に対応する文字を求める\n\nCHR ( n )\n戻り値：文字型\n\n\n
+【 COALESCE 】\n指定された式の中で、最初に NULL でない式を求める\n\nCOALESCE ( ┬ 式 ─┬ )\n           └ ← , ┘\n戻り値：最初に NULL でない式の結果\n\n\n
+【 COMPOSE 】\n任意の文字列 c を Unicode に変換する\nCOMPOSE ( c )\n戻り値：文字型(Unicode)\n\n\n
+【 CONCAT 】\n文字列 c1 と c2 を連結する ( 連結演算子 || と同様 )\n\nCONCAT ( c1, c2 )\n戻り値：文字型\n\n\n
+【 CONVERT 】\n文字列 c の文字セットを変更する\n\nCONVERT ( c , 変換後文字セット [ , 変換前文字セット ] )\n戻り値：文字型\n\n\n
+【 CORR 】\n数値の集合に対する相関関係を戻す\n\nCORR ( 式1 , 式2 )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 COS 】\n数値 n のコサイン(余弦)を求める\n\nCOS ( n )\n戻り値：数値型\n\n\n
+【 COSH 】\n数値 n の双曲線余弦を求める\n\nCOSH ( n )\n戻り値：数値型\n\n\n
+【 COUNT 】\n行数を求めるグループ関数\n\nCOUNT ( { * | [ DISTINCT | ALL ] expr } )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  *    : 全ての行数を戻す ( NULL 値も含む )                     ］\n［  expr : 指定した式の行数を戻す ( NULL 値は無視される )         ］\n［  DISTINCT : 重複した値は１つだけ対象とする                     ］\n［  ALL      : 重複した値も含めて全ての値を対象とする(デフォルト) ］\n\n\n
+【 COVAR_POP 】\n数値の集合に対する母集団共分散を戻す\n\nCOVAR_POP ( 式1 , 式2 )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 COVAR_SAMP 】\n数値の集合に対する標本共分散を戻す\n\nCOVAR_SAMP ( 式1 , 式2 )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 CUBE_TABLE 】\nデータを抽出し、2次元形式のリレーショナル表に戻す\nCUBE_TABLE (' スキーマ . →\n┬ キューブ ┬ [ { HIERARCHY | HRR } ディメンション ヒエラルキー]  ┬──┬→\n│          └ ← ,  ───────────────────────┘    │\n└ ディメンション [ { HIERARCHY | HRR } [ ディメンション ] ヒエラルキー] ┘\n戻り値：キューブ表、ディメンション表または階層表\n\n\n
+【 CURRENT_DATE 】\nセッション・タイム・ゾーンを考慮した現在の日付を戻す\n\nCURRENT_DATE\n戻り値：日付型\n\n\n
+【 CURRENT_TIMESTAMP 】\nセッション・タイム・ゾーンを考慮した現在の日付を戻す\n\nCURRENT_TIMESTAMP\n戻り値：TIMESTAMP WITH TIME ZONE 型\n\n\n
+【 DBTIMEZONE 】\nデータベース・タイム・ゾーンの値を戻す\n\nDBTIMEZONE\n戻り値：文字型\n\n\n
+【 DECODE 】\n\n式と比較値を順番に比較していき、最初に一致した比較値と対になった値を戻す。\n全ての比較値と一致しなかった場合は省略値(もしくはNULL)を戻す。\n\nDECODE ( 式 , ┬ 比較値 , 値 ┬ [ , 省略値 ] )\n              └ ← ,  ───┘\n戻り値：CHAR, VARCHAR2, NCHAR, NVARCHAR2 のいずれか\n\n\n
+【 DECOMPOSE 】\n任意の文字列 c を Unicode に変換する\nDECOMPOSE ( c )\n戻り値：文字型(Unicode)\n\n\n
+【 DEREF 】\nref の参照を解除する\n\nDEREF ( ref )\n戻り値：オブジェクト型\n\n\n
+【 DUMP 】\nexpr の型、長さ、内部表現を求める\n\nDUMP ( expr [ , fmt [ , s [ , l ] ] ] )\n戻り値：文字型\n［   fmt : 戻り値の書式を指定する                                    ］\n［         8: 8進数表記, 10: 10進数表記, 16: 16進数表記, 17:文字表記 ］\n［   s   : 対象の開始位置を指定する                                  ］\n［   l   : 対象の長さを指定する                                      ］\n\n\n
+【 EMPTY_BLOB, EMPTY_CLOB 】\nLOB を初期化する為の空の LOB を求める\n\nEMPTY_BLOB ( )\nEMPTY_CLOB ( )\n戻り値：空の BLOB または CLOB\n\n\n
+【 EXISTSNODE 】\nXMLドキュメントにノードが存在するかを判断する\nEXISTSNODE ( XMLドキュメント, XMLパス )\n\n\n
+【 EXP 】\n自然対数の底 e ( = 2.71828183... ) を n 乗した値を求める\n\nEXP ( n )\n戻り値：数値型\n\n\n
+【 FLOOR 】\n数値 n 以下の最も大きい整数を求める\n\nFLOOR ( n )\n戻り値：数値型\n\n\n
+【 FROM_TZ 】\n指定したタイムゾーンを元にタイムスタンプを再計算する\n\nFROM_TZ ( タイムスタンプ , タイムゾーン )\n戻り値：タイムスタンプ型\n\n\n
+【 GREATEST 】\n指定された式の中で最も大きな値を求める\n\nGREATEST ( 式1 [ , 式2 ... ] )\n戻り値：式 の型による\n\n\n
+【 GROUP_ID 】\nGROUP BY の結果から、重複するグループを識別する\n\nGROUP_ID ( )\n戻り値：数値型\n\n\n
+【 GROUPING 】\n通常のグループ化された行と超集合行を区別する\n\nGROUPING ( 式 )\n戻り値：数値型\n\n\n
+【 GROUPING_ID 】\nGROUPING ビットベクトルに対応する数値を戻す\n\nGROUPING_ID ( ┬ 式 ─┬ )\n              └ ← , ┘\n戻り値：数値型\n\n\n
+【 HEXTORAW 】\n16進表記の文字列 c を RAW 型に変換する\n\nHEXTORAW ( c )\n戻り値：RAW 型\n\n\n
+【 INITCAP 】\n文字列 c 中の各単語の先頭を大文字に、他を小文字に変換した値を求める\n\nINITCAP ( c )\n戻り値：文字型\n\n\n
+【 INSTR 】\n文字列 c1 中の c2 の位置を求める(文字基準)\n\nINSTR ( c1 , c2 [ , n1 [ , n2 ] ] )\n戻り値：数値型(見つからない場合は 0 )\n［   n1 : 検索開始位置(文字数)を指定する(負数を指定した場合は逆から検索) ］\n［   n2 : 出現回数を指定する( 3 を指定した場合は 3 番目に見つかった位置) ］\n\n\n
+【 INSTRB 】\n文字列 c1 中の c2 の位置を求める(バイト基準)\n\nINSTRB ( c1 , c2 [ , n1 [ , n2 ] ] )\n戻り値：数値型(見つからない場合は 0 )\n［   n1 : 検索開始位置(バイト)を指定する(負数を指定した場合は逆から検索) ］\n［   n2 : 出現回数を指定する( 3 を指定した場合は 3 番目に見つかった位置) ］\n\n\n
+【 INSTRC 】\n文字列 c1 中の c2 の位置を求める(Unicode基準)\n\nINSTRC ( c1 , c2 [ , n1 [ , n2 ] ] )\n戻り値：数値型(見つからない場合は 0 )\n［   n1 : 検索開始位置(バイト)を指定する(負数を指定した場合は逆から検索) ］\n［   n2 : 出現回数を指定する( 3 を指定した場合は 3 番目に見つかった位置) ］\n\n\n
+【 INSTR2 】\n文字列 c1 中の c2 の位置を求める(UCS2基準)\n\nINSTR2 ( c1 , c2 [ , n1 [ , n2 ] ] )\n戻り値：数値型(見つからない場合は 0 )\n［   n1 : 検索開始位置(バイト)を指定する(負数を指定した場合は逆から検索) ］\n［   n2 : 出現回数を指定する( 3 を指定した場合は 3 番目に見つかった位置) ］\n\n\n
+【 INSTR4 】\n文字列 c1 中の c2 の位置を求める(UCS4基準)\n\nINSTR4 ( c1 , c2 [ , n1 [ , n2 ] ] )\n戻り値：数値型(見つからない場合は 0 )\n［   n1 : 検索開始位置(バイト)を指定する(負数を指定した場合は逆から検索) ］\n［   n2 : 出現回数を指定する( 3 を指定した場合は 3 番目に見つかった位置) ］\n\n\n
+【 LAST_DAY 】\n日時 d の月末日を求める\n\nLAST_DAY ( d )\n戻り値：日付型\n\n\n
+【 LEAST 】\n指定された式の中で最も小さな値を求める\n\nLEAST ( 式1 [ , 式2 ... ] )\n戻り値：式の型による\n\n\n
+【 LENGTH 】\n文字列 c の文字数を求める\n\nLENGTH ( c )\n戻り値：数値型\n\n\n
+【 LENGTHB 】\n文字列 c のバイト数を求める\n\nLENGTHB ( c )\n戻り値：数値型\n\n\n
+【 LENGTHC 】\nUnicode文字列 c の文字数を求める\n\nLENGTHC ( c )\n戻り値：数値型\n\n\n
+【 LENGTH2 】\nUNS2文字列 c の文字数を求める\n\nLENGTH2 ( c )\n戻り値：数値型\n\n\n
+【 LENGTH4 】\nUCS4文字列 c の文字数を求める\n\nLENGTH4 ( c )\n戻り値：数値型\n\n\n
+【 LN 】\n n の自然対数を求める\n\nLN ( n )\n戻り値：数値型\n\n\n
+【 LOCALTIMESTAMP 】\n現在の日時をセッションタイムゾーンを考慮して取得する\n\nLOCALTIMESTAMP [ ( タイムゾーン ) ]\n戻り値：タイムスタンンプ型\n\n\n
+【 LOG 】\nn2 を基底とした n1 の対数を求める\n\nLOG ( n1, n2 )\n戻り値：数値型\n\n\n
+【 LOWER 】\n文字列 c を全て小文字に変換した文字列を求める\n\nLOWER ( c )\n戻り値：文字型\n\n\n
+【 LPAD 】\n結果が n バイトになるように文字列 c1 の左に c2 を埋め込んだ値を求める\n\nLPAD ( c1, n [ , c2 ] )\n戻り値：文字型\n［ c2 : 未指定時は１バイトスペース ］\n\n\n
+【 LTRIM 】\nc2 に指定された全ての文字を c1 の左側から取り除いた値を求める\n\nLTRIM ( c1 [ , c2 ] )\n戻り値：文字型\n［ c2 : 未指定時は１バイトスペース ］\n\n\n
+【 MAKE_REF 】\nオブジェクトビューの行に対する REF を作成する\n\nMAKE_REF ( table, key [ , key ... ] )\n戻り値 REF 型\n［ table : オブジェクトビュー名を指定する     ］\n［ key   : 主キーとして使用する列名を指定する ］\n\n\n
+【 MAX 】\n数値 n の最大値を求めるグループ関数 ( NULL 値は無視される )\n\nMAX ( [ DISTINCT | ALL ] n )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  DISTINCT, ALL は文法上指定可能だが結果に影響はない ］\n\n\n
+【 MIN 】\n数値 n の最小値を求めるグループ関数 ( NULL 値は無視される )\n\nMIN ( [ DISTINCT | ALL ] n )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  DISTINCT, ALL は文法上指定可能だが結果に影響はない ］\n\n\n
+【 MOD 】\n n1 ÷ n2 の余りを求める(n1 が 0 の場合は n2 を返す)\n\nMOD ( n1, n2 )\n戻り値：数値型\n\n\n
+【 MONTHS_BETWEEN 】\n日時 d1 と d2 の間の月数を求める\n\nMONTHS_BETWEEN ( d1, d2 )\n戻り値：数値型\n\n\n
+【 NCHAR 】\n各国語キャラクタセットの文字コード n に対応する文字を戻す\n\nNCHAR ( n )\n戻り値：文字型\n\n\n
+【 NEW_TIME 】\n地域 z1 の日時が d の時の地域 z2 の日時を求める\n\nNEW_TIME ( d, z1, z2 )\n戻り値：日付型\n\n\n
+【 NEXT_DAY 】\n日時 d 以降の c で指定した曜日の日時を求める\n\nNEXT_DAY ( d, c )\n戻り値：日付型\n\n\n
+【 NLS_CHARSET_DECL_LEN 】\nNCHAR の宣言の長さ(文字数)を求める\n\nNLS_CHARSET_DECL_LEN ( n1, n2 ) \n戻り値：数値型\n［ n1 : バイト単位の長さを指定する ］\n［ n2 : NCHAR列の文字セットID を指定する ］\n\n\n
+【 NLS_CHARSET_ID 】\n文字列 c に対応する文字セット ID を求める\n\nNLS_CHARSET_ID ( c )\n戻り値：数値型 ( 文字セット ID ) \n\n\n
+【 NLS_CHARSET_NAME 】\n文字セットID n に対応する文字セット名を求める\n\nNLS_CHARSET_NAME ( n )\n戻り値：文字型\n\n\n
+【 NLS_INITCAP 】\n指定した文字セットに応じた INITCAP 関数の結果を求める\n\nNLS_INITCAP ( c [ , ' NLS_SORT = sort ' ] )\n戻り値：文字型\n［   sort : 文字セット名、もしくは BINARY と指定する ］\n参考：<INITCAP>\n\n\n
+【 NLS_LOWER 】\n指定した文字セットに応じた LOWER 関数の結果を求める\n\nNLS_LOWER ( c [ , ' NLS_SORT = sort ' ] )\n戻り値：文字型\n［   sort : 文字セット名、もしくは BINARY と指定する ］\n参考：<LOWER>\n\n\n
+【 NLS_UPPER 】\n指定した文字セットに応じた UPPER 関数の結果を求める\n\nNLS_UPPER ( c [ , ' NLS_SORT = sort ' ] )\n戻り値：文字型\n［   sort : 文字セット名、もしくは BINARY と指定する ］\n参考：<UPPER>\n\n\n
+【 NLSSORT 】\n文字列 c を言語ソート用に変換した文字列を求める\n\nNLSSORT ( c )\n戻り値：文字型\n\n\n
+【 NULLIF 】\n式1 と式2 を比較し、同じ場合は NULL を、異なる場合は式1 の結果を返す\n\nNULLIF ( 式1, 式2 )\n戻り値：式1 の型による\n\n\n
+【 NUMTODSINTERVAL 】\n数値 n を INTERVAL DAY TO SECOND 型に変換する\nNUMTODSINTERVAL ( n , { 'DAY' | 'HOUR' | 'MINUTE' | 'SECOND' } )\n戻り値：INTERVAL DAY TO SECOND 型\n\n\n
+【 NUMTOYMINTERVAL 】\n数値 n を INTERVAL YEAR TO MONTH 型に変換する\nNUMTOYMINTERVAL ( n , { 'YEAR' | 'MONTH' } )\n戻り値：INTERVAL YEAR TO MONTH 型\n\n\n
+【 NVL 】\n式1 が NULL の場合に 式2 を返す\n\nNVL ( 式1, 式2 )\n戻り値：式1 の型による\n\n\n
+【 NVL2 】\n式1 が NULL 以外の場合に 式2 を、NULL の場合には 式3 を戻す\n\nNVL2 ( 式1, 式2, 式3 )\n戻り値：式2 の型による\n\n\n
+【 POWER 】\n数値 n1 を n2 乗した値を求める\n\nPOWER ( n1, n2 )\n戻り値：数値型\n\n\n
+【 PREDICTION 】\nモデルの最適な予測を戻す\n\nPREDICTION ( [ スキーマ . ] モデル →\n→ [ COST ┬ MODEL [ AUTO ] ─────────────────┬ ] →\n          │［ コスト・マトリックスが存在するかどうか ］      │\n          │［ わからない場合に指定する               ］      │\n          └ ( ┬ 引数 ┬ ) VALUES ( ┬ ( ┬ コスト ┬ ) ┬ ) ┘\n               └ ← , ─┘          │   └ ← , ─┘   │\n                                     └ ← , ──────┘\n［ スコアリングを実行する必要があることを示す ］\n→ USING ┬ *  ───────────────┬ ) →\n         └┬┬ [ スキーマ . ] 表名 . *  ┬┬┘\n           │└ 式 [ AS 別名 ] ─────┘│\n           └ ← , ────────────┘\n［ 取り出すことができる列と式にすべての予測子をマップする ］\n戻り値：モデル作成中に使用するターゲット値の型による\n\n\n
+【 PREDICTION_BOUNDS 】\nLOWER,UPPERの2つのNUMBERフィールドを持つオブジェクトを戻す\n\nPREDICTION_BOUNDS ( [ スキーマ . ] モデル [ , 数値(0～1) [ , 引数 ] ] →\n→ USING ┬ *  ───────────────┬ ) →\n         └┬┬ [ スキーマ . ] 表名 . *  ┬┬┘\n           │└ 式 [ AS 別名 ] ─────┘│\n           └ ← , ────────────┘\n［ 取り出すことができる列と式にすべての予測子をマップする ］\n戻り値：LOWERとUPPERの2つのNUMBERフィールドを持つオブジェクト\n\n\n
+【 PREDICTION_COST 】\n指定した予測のコストのメジャーをNUMBERとして戻す\n\nPREDICTION_COST ( [ スキーマ . ] モデル →\n→ [ COST ┬ MODEL [ AUTO ] ─────────────────┬ ] →\n          │［ コスト・マトリックスが存在するかどうか ］      │\n          │［ わからない場合に指定する               ］      │\n          └ ( ┬ 引数 ┬ ) VALUES ( ┬ ( ┬ コスト ┬ ) ┬ ) ┘\n               └ ← , ─┘          │   └ ← , ─┘   │\n                                     └ ← , ──────┘\n［ スコアリングを実行する必要があることを示す ］\n→ USING ┬ *  ───────────────┬ ) →\n         └┬┬ [ スキーマ . ] 表名 . *  ┬┬┘\n           │└ 式 [ AS 別名 ] ─────┘│\n           └ ← , ────────────┘\n［ 取り出すことができる列と式にすべての予測子をマップする ］\n戻り値：数値型\n\n\n
+【 PREDICTION_SET 】\nすべてのクラスを含むオブジェクトのVARRAYを戻す\n\nPREDICTION_SET ( [ スキーマ . ] モデル [ , 正の整数 [ , NUMBER値 ] ] →\n→ [ COST ┬ MODEL [ AUTO ] ─────────────────┬ ] →\n          │［ コスト・マトリックスが存在するかどうか ］      │\n          │［ わからない場合に指定する               ］      │\n          └ ( ┬ 引数 ┬ ) VALUES ( ┬ ( ┬ コスト ┬ ) ┬ ) ┘\n               └ ← , ─┘          │   └ ← , ─┘   │\n                                     └ ← , ──────┘\n［ スコアリングを実行する必要があることを示す ］\n→ USING ┬ *  ───────────────┬ ) →\n         └┬┬ [ スキーマ . ] 表名 . *  ┬┬┘\n           │└ 式 [ AS 別名 ] ─────┘│\n           └ ← , ────────────┘\n［ 取り出すことができる列と式にすべての予測子をマップする ］\n戻り値：VARRAY型\n\n\n
+【 RATIO_TO_REPORT 】\n集合の合計に対する比率を求める\n\nRATIO_TO_REPORT ( 式 ) OVER ( [ query_partition句 ] ) \n戻り値：数値型\n\n\n
+【 RAWTOHEX 】\nRAW値を 16 進表記の文字列に変換する\n\nRAWTOHEX ( raw )\n戻り値：文字型\n\n\n
+【 RAWTONHEX 】\nRAW値を 16 進表記の NVARCHAR2 文字列に変換する\n\nRAWTONHEX ( raw )\n戻り値：NVARCHAR2 型\n\n\n
+【 REFTOHEX 】\nref を 16 進表記の文字列に変換する\n\nREFTOHEX ( ref )\n戻り値：文字型\n\n\n
+【 REGEXP_COUNT 】\n文字列 c に対して、正規表現パターンの繰返し回数をカウントする\n\nREGEXP_COUNT ( c , 正規表現 [ , 位置 [ , テキスト・リテラル ] ] )\n戻り値：数値型\n\n\n
+【 REGEXP_INSTR 】\n正規表現パターンで文字列 c を検索し、位置を返す\n\nREGEXP_INSTR ( c , 正規表現\n   [ , 位置 [ , オカレンス [ , 返り値の指定 [ , テキスト・リテラル [ , 部分正規表現 ] ] ] ] ] )\n戻り値：数値型\n\n\n
+【 REGEXP_SUBSTR 】\n正規表現パターンで文字列 c を検索し、文字列を返す\n\nREGEXP_SUBSTR ( c , 正規表現\n   [ , 位置 [ , オカレンス [ , テキスト・リテラル [ , 部分正規表現 ] ] ] ] )\n戻り値：文字型\n\n\n
+【 REPLACE 】\n文字列 c1 に含まれる c2 を c3 に置き換えた文字列を求める\n\nREPLACE ( c1 , c2 [ , c3 ] )\n［   c3 : 未指定時は c1 中の c2 を全て取り除く ］\n\n\n
+【 ROUND 】\n数値型、日付型の値を丸めた値を求める\n\n数値 n1 を 小数点以下 n2 桁で丸めた値を求める\nROUND ( n1 [ , n2 ] )\n戻り値：数値型\n［   n2 : 未指定時は小数点以下を丸める ］\n\n日付 d を書式 fmt で指定した単位に丸めた値を求める\nROUND ( d [ , fmt ] )\n戻り値：日付型\n［   fmt : 未指定時は最も近い日付に丸める ］\n\n\n
+【 ROWIDTOCHAR 】\nROWID値を文字列に変換する\n\nROWIDTOCHAR ( rowid )\n戻り値：文字型\n\n\n
+【 ROWIDTONCHAR 】\nROWID値をNVARCHAR2文字列に変換する\n\nROWIDTONCHAR ( rowid )\n戻り値：NVARCHAR2 型\n\n\n
+【 RPAD 】\n結果が n バイトになるように文字列 c1 の右に c2 を埋め込んだ値を求める\n\nRPAD ( c1, n [ , c2 ] )\n戻り値：文字型\n［ c2 : 未指定時は１バイトスペース ］\n\n\n
+【 RTRIM 】\nc2 に指定された全ての文字を c1 の右側から取り除いた値を求める\n\nRTRIM ( c1 [ , c2 ] )\n戻り値：文字型\n［ c2 : 未指定時は１バイトスペース ］\n\n\n
+【 SESSIONTIMEZONE 】\n現行セッションのタイムゾーン値を求める\nSESSIONTIMEZONE\n戻り値：文字型\n\n\n
+【 SIGN 】\n数値 n の符号を求める ( 1:正 -1:負 0:ゼロ )\n\nSIGN ( n )\n戻り値：数値型\n\n\n
+【 SIN 】\n数値 n のサイン(正弦)を求める\n\nSIN ( n )\n戻り値：数値型\n\n\n
+【 SINH 】\n数値 n の双曲線正弦を求める\n\nSINH ( n )\n戻り値：数値型\n\n\n
+【 SOUNDEX 】\n文字列 c と同じ発音を持つ文字列を求める(英語のみ)\n\nSOUNDEX ( c )\n戻り値：文字型\n\n\n
+【 SQRT 】\n数値 n の平方根を求める\n\nSQRT ( n )\n戻り値：数値型\n\n\n
+【 STDDEV 】\n標準偏差を求めるグループ関数 ( NULL 値は無視される )\n\nSTDDEV ( [ DISTINCT | ALL ] 式 ) [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  DISTINCT : 重複した値は１つだけ対象とする                     ］\n［  ALL      : 重複した値も含めて全ての値を対象とする(デフォルト) ］\n\n\n
+【 STDDEV_POP 】\n母集団標準偏差を求めるグループ関数 ( NULL 値は無視される )\n\nSTDDEV_POP ( 式 ) [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 STDDEV_SAMP 】\n標本累積標準偏差を求めるグループ関数 ( NULL 値は無視される )\n\nSTDDEV_SAMP ( 式 ) [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 SUBSTR 】\n文字列 c の n1 番目の文字から n2 文字分の文字列を求める\n\nSUBSTR ( c , n1 [ , n2 ] )\n［ n2 : 未指定時は c の終わりまでを対象とする ］\n\n\n
+【 SUBSTRB 】\n文字列 c の n1 バイト目から n2 バイト文の文字列を求める\n\nSUBSTRB ( c , n1 [ , n2 ] )\n［ n2 : 未指定時は c の終わりまでを対象とする ］\n\n\n
+【 SUBSTRC 】\nUnicode文字列 c の n1 バイト目から n2 バイト文の文字列を求める\n\nSUBSTRC ( c , n1 [ , n2 ] )\n［ n2 : 未指定時は c の終わりまでを対象とする ］\n\n\n
+【 SUBSTR2 】\nUCS2文字列 c の n1 バイト目から n2 バイト文の文字列を求める\n\nSUBSTR2 ( c , n1 [ , n2 ] )\n［ n2 : 未指定時は c の終わりまでを対象とする ］\n\n\n
+【 SUBSTR4 】\nUCS4文字列 c の n1 バイト目から n2 バイト文の文字列を求める\n\nSUBSTR4 ( c , n1 [ , n2 ] )\n［ n2 : 未指定時は c の終わりまでを対象とする ］\n\n\n
+【 SUM 】\n数値 n の合計を求めるグループ関数 ( NULL 値は無視される )\n\nSUM ( [ DISTINCT | ALL ] n ) [ OVER ( 分析方法 ) ]\n戻り値：数値型\n［  DISTINCT : 重複した値は１つだけ対象とする                     ］\n［  ALL      : 重複した値も含めて全ての値を対象とする(デフォルト) ］\n\n\n
+【 SYS_CONNECT_BY_PATH 】\nルートからノードへのパスを戻す(階層問合せでのみ有効)\n\nSYS_CONNECT_BY_PATH ( 列 , 区切り文字 )\n戻り値：文字型\n\n\n
+【 SYS_CONNECT 】\nコンテキスト c1 に対応付けられたパラメータ c2 の値を戻す\n\nSYS_CONNECT ( c1 , c2 [ , 長さ ] )\n戻り値：文字型\n\n\n
+【 SYS_DBURIGEN 】\nDBUriTypeデータ型の URL を生成する\n\nSYS_DBURIGEN ( ┬ { 列 | 属性 } [ rowid ]  ┬  [ , ' 文字列 ( ) ' ] )\n               └ ← , ──────────┘\n戻り値：DBUriType 型\n\n\n
+【 SYS_EXTRACT_UTC 】\n日時から UTC を抽出する\n\nSYS_EXTRACT_UTC ( 日時 )\n戻り値：日付型\n\n\n
+【 SYS_GUID 】\nGUID を生成する\n\nSYS_GUID (  )\n戻り値：16バイトRAW型\n\n\n
+【 SYS_TYPEID 】\nオペランドで最も指定される型のID を求める\n\nSYS_TYPEID ( オブジェクト型値 )\n戻り値：ID\n\n\n
+【 SYS_XMLAGG 】\n式が示す XML ドキュメントを集約し、単一の XML ドキュメントを生成する\n\nSYS_XMLAGG ( 式 , [ 書式 ] )\n\n\n
+【 SYS_XMLGEN 】\n式を元に XMLType 型のインスタンスを戻す\n\nSYS_XMLGEN ( 式 , [ 書式 ] )\n戻り値：XMLType 型\n\n\n
+【 SYSDATE 】\n現在の日時を求める\n\nSYSDATE\n戻り値：日付型\n\n\n
+【 SYSTIMESTAMP 】\n現在の日時を求める\n\nSYSTIMESTAMP\n戻り値：タイムスタンプ型\n\n\n
+【 TAN 】\n数値 n のタンジェント(正接)を求める\n\nTAN ( n ) \n戻り値：数値型\n\n\n
+【 TANH 】\n数値 n の双曲線正接を求める\n\nTANH ( n ) \n戻り値：数値型\n\n\n
+【 TO_CHAR 】\n数値、日付、MLSLABEL 値を文字型に変換する\n\n数値 n を fmt で指定した書式で文字列に変換する\nTO_CHAR ( n [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：文字型\n\n日付 d を fmt で指定した書式で文字列に変換する\nTO_CHAR ( n [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：文字型\n\nMLSLABEL を fmt で指定した書式で文字列に変換する\nTO_CHAR ( label [ , fmt ] )\n戻り値：文字型\n\n\n
+【 TO_CLOB 】\nNLOB値 c を CLOB値 に変換する\n\nTO_CLOB ( { LOB列 | NLOB値 } )\n戻り値：CLOB型\n\n\n
+【 TO_DATE 】\n文字列 c を fmt で指定した書式で日付型に変換する\n\nTO_DATE ( c [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：日付型\n\n\n
+【 TO_DSINTERVAL 】\n文字列 c を INTERVAL DAY TO SECOND 型に変換する\n\nTO_DSINTERVAL ( c [ , ' nlsparams ' ] )\n戻り値：INTERVAL DAY TO SECOND 型\n\n\n
+【 TO_LOB 】\nLONG / LONG RAW 値 c を LOB値 に変換する\n\nTO_LOB ( LONG列 )\n戻り値：CLOB型\n\n\n
+【 TO_MULTI_BYTE 】\n文字列 c 中の１バイト文字を２バイト文字に変換する\n\nTO_MULTI_BYTE ( c )\n戻り値：文字型\n\n\n
+【 TO_NCHAR 】\n数値、日付、MLSLABEL 値を各国語キャラクタセットに変換する\n\n数値 n を fmt で指定した書式で文字列に変換する\nTO_CHAR ( n [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：NVARCHAR2型\n\n日付 d を fmt で指定した書式で文字列に変換する\nTO_CHAR ( n [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：NVARCHAR2型\n\nMLSLABEL を fmt で指定した書式で文字列に変換する\nTO_CHAR ( label [ , fmt ] )\n戻り値：NVARCHAR2型\n\n\n
+【 TO_NLOB 】\nCLOB値 c を NLOB値 に変換する\n\nTO_NLOB ( { LOB列 | CLOB値 } )\n戻り値：NLOB型\n\n\n
+【 TO_NUMBER 】\nfmt で指定した書式の文字列 c を数値型に変換する\n\nTO_NUMBER ( c [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：数値型\n\n\n
+【 TO_SINGLE_BYTE 】\n文字列 c 中の２バイト文字を１バイト文字に変換する\n\nTO_SINGLE_BYTE ( c )\n戻り値：文字型\n\n\n
+【 TO_TIMESTAMP 】\n文字列 c をタイムスタンプ型に変換する\n\nTO_TIMESTAMP ( c [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：タイムスタンプ型\n\n\n
+【 TO_TIMESTAMP_TZ 】\n文字列 c を TIMESTAMP WITH TIME ZONE 型に変換する\n\nTO_TIMESTAMP_TZ ( c [ , fmt [ , ' nlsparams ' ] ] )\n戻り値：TIMESTAMP WITH TIME ZONE 型\n\n\n
+【 TO_YMINTERVAL 】\n文字列 c を INTERVAL YEAR TO MONTH 型に変換する\n\nTO_YMINTERVAL ( c )\n戻り値：INTERVAL YEAR TO MONTH 型\n\n\n
+【 TRANSLATE 】\nc1 内に含まれている文字 c2 を c3 に変換した文字列を求める\n\nTRANSLATE ( c1 , c2 , c3 )\n［ c2, c3 には同じ長さの文字列を指定し、c1 中に c2 の n 文字目と同じ文字が ］\n［ 見つかった場合は c3 の n 文字目と置き換える                             ］\n\n\n
+【 TRANSLATE USING 】\n文字列 c 文字セット、各国文字セットに応じた値に変換する\n\nTRANSLATE ( c USING { CHAR_CS | NCHAR_CS } )\n\n\n
+【 TRUNC 】\n数値型、日付型の値を切り捨てた値を求める\n\n数値 n1 を 小数点以下 n2 桁で切り捨てた値を求める\nTRUNC ( n1 [ , n2 ] )\n戻り値：数値型\n［   n2 : 未指定時は小数点以下を切り捨てる ］\n\n日付 d を書式 fmt で指定した単位に切り捨てた値を求める\nTRUNC ( d [ , fmt ] )\n戻り値：日付型\n［   fmt : 未指定時は最も近い日付に切り捨てる ］\n\n\n
+【 UID 】\n現行ユーザーの識別子を求める\n\nUID\n戻り値：数値型\n\n
+【 UINSTR 】\nUnicode キャラクタ文字列を求める\n\nUINSTR ( c )\n戻り値：UCS2型\n\n\n
+【 UPPER 】\n文字列 c を全て大文字に変換した文字列を求める\n\nUPPER ( c )\n戻り値：文字型\n\n\n
+【 USER 】\n現行ユーザーの名前を求める\n\nUSER\n戻り値：文字型\n\n\n
+【 USERENV 】\n現行セッションの情報を求める\n\nUSERENV ( c )\n戻り値：パラメータ値による\n［ c : 情報の種類を指定する ］\n［   'ISDBA'     : 現行セッションが ISDBAロールを持っている場合は TRUE を返す ］\n［   'LANGUAGE'  : 言語、地域、文字セットを返す                               ］\n［   'TERMINAL'  : OS 識別子を返す                                            ］\n［   'SESSIONID' : 監査セッション識別子を返す                                 ］\n［   'ENTRYID'   : 使用可能監査エントリ識別子を返す                           ］\n［   'CLIENT_INFO' : client_info フィールドの値を返す                         ］\n［   'LANG'      : 言語名の ISO 略称を返す                                    ］\n\n\n
+【 VALUE 】\nオブジェクト表のインスタンスを求める\n\nVALUE ( オブジェクト表 )\n戻り値：TYPE型\n\n\n
+【 VAR_POP 】\nNULL を除いた数値の集合に対する母集団共分散を戻す\n\nVAR_POP ( 式 )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 VAR_SAMP 】\nNULL を除いた数値の集合に対する標本共分散を戻す\n\nVAR_SAMP ( 式 )  [ OVER ( 分析方法 ) ]\n戻り値：数値型\n\n\n
+【 VARIANCE 】\nx の分散を求めるグループ関数 ( NULL 値は無視される )\n\nVARIANCE ( [ DISTINCT | ALL ] x )\n戻り値：数値型\n［  DISTINCT : 重複した値は１つだけ対象とする                     ］\n［  ALL      : 重複した値も含めて全ての値を対象とする(デフォルト) ］\n\n\n
+【 VSIZE 】\n式の内部表現におけるバイト数を求める\n\nVSIZE ( 式 )\n戻り値：数値型\n\n\n
+【 XMLCAST 】\nスカラーSQLデータ型にキャストする\n\nXMLCAST ( 式 AS データ型 )\n戻り値：スカラーSQLデータ型\n［ データ型 : NUMBER、VARCHAR2および任意の日時データ型を指定する ］\n\n\n
+【 XMLDIFF 】\n2つのXML文書を比較し、Xdiffスキーマに基づいたXMLの差異を取得する\n\nXMLDIFF ( arg1 , arg2 [ , n , c ] )\n戻り値：XML文書\n［ arg1, arg2 : XML文書名を指定する                  ］\n［ n          : ハッシュレベルを示す数値             ］\n［ c          : ファンクションの動作を制御するフラグ ］\n\n\n
+【 XMLEXISTS 】\n空でないXQueryシーケンスが戻されるかどうかをチェックする\n\nXMLEXISTS ( c [ PASSING [ BY VALUE ] ┬ 式 [ AS identifier ] ┬ ] )\n                                     └ ← , ────────┘\n\n
+【 XMLPATCH 】\n指定された変更を適用してXML文書を修正する\n\nXMLPATCH ( arg1 , arg2 )\n戻り値：XML文書\n［ arg1 : 入力XML文書名                     ］\n［ arg2 : arg1に適用する変更を含むXML文書名 ］\n\n

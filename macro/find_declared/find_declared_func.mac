@@ -1,0 +1,89 @@
+loaddll "hmjre.dll";
+if(!result){
+  message "DLLのロードに失敗しました。";
+  endmacro;
+}
+
+selectword;
+$word = gettext(seltopx,seltopy,selendx,selendy);
+
+if(strlen($word) == 0){
+    endmacro;
+}
+
+// "FUNCTION "か"PROCEDURE "がある場合はBEGIN検索マクロを実行
+#funcpos = dllfunc("FindRegularNoCaseSense", "(FUNCTION|PROCEDURE)[\\s\\t]+", gettext(0, seltopy, linelen2, selendy), 0);
+if(#funcpos >= 0){
+    execmacro macrodir + "\\find_declared\\find_declared_begin.mac";
+    endmacro;
+}
+
+// "RAISE "がある場合はEXCEPTIONの位置を検索
+#funcpos = dllfunc("FindRegularNoCaseSense", "^[\\s\\t]*RAISE[\\s\\t]+", gettext(0, seltopy, linelen2, selendy), 0);
+if(#funcpos >= 0){
+    call SearchExceptionSub;
+    call TerminateSub;
+}
+
+// 別パッケージの関数の場合は別ファイルを開く
+if(gettext(seltopx-1,seltopy,seltopx,selendy) == "."){
+    call FileOpenSub;
+}
+
+call SearchSub;
+call TerminateSub;
+
+
+FileOpenSub:
+    moveto seltopx-2,seltopy;
+    selectword;
+    $filename = gettext(seltopx,seltopy,selendx,selendy) + "B.pls";
+
+    if(existfile($filename) == 1){
+        // "/m3"：既に開いている場合、ファイルにジャンプする
+        openfile "/m3 " + $filename;
+    }
+    else{
+        endmacro;
+    }
+    
+    return;
+
+SearchSub:
+    $search_buffer = searchbuffer;
+    #search_option = searchoption;
+
+    $buffer = "^[\\t ]*(FUNCTION|PROCEDURE|CURSOR)[\\t ]+" + $word + "($|\\(.*|[ \n]+.*)";
+
+    searchup2 $buffer, nocasesense, regular, nohilight, loop, maskcomment;
+    if(result){
+        call TerminateSub;
+    }
+    searchup2 $buffer, nocasesense, regular, nohilight, loop;
+    if(result){
+        call TerminateSub;
+    }
+    return;
+
+SearchExceptionSub:
+    $search_buffer = searchbuffer;
+    #search_option = searchoption;
+
+    $buffer = "^[\\t ]*WHEN[\\t ]+" + $word + "[\\t ]+THEN";
+
+    searchdown2 $buffer, nocasesense, regular, nohilight, loop, maskcomment;
+    if(result){
+        call TerminateSub;
+    }
+    searchdown2 $buffer, nocasesense, regular, nohilight, loop;
+    if(result){
+        call TerminateSub;
+    }
+    return;
+
+TerminateSub:
+    setsearch $search_buffer, #search_option;
+
+    setfocus;
+
+    endmacro;

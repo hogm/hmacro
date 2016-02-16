@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--#include virtual="/~fujiwara/ikki/admin/ashiato/record.cgi?Wisteria" -->
+<HTML lang="ja">
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>Wisteria - 秀丸マクロ - Snippet.mac</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+</UL>
+
+<H2 class="pagetop">Snippet.mac</H2>
+
+<DIV class="abst"><P>コードスニペット挿入マクロ　（<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> 用プラグイン）</P></DIV>
+
+<DIV class="date" align="right">Version 3.02　2007/02/07</DIV>
+
+<DIV class="layout">
+	<TABLE width="98%">
+	<TR><TD class="subindex" valign="top">
+	<H4 class="top">目次</H4>
+	<UL>
+		<LI><A href="#download">ダウンロード</A>
+		<LI><A href="#outline">概要</A>
+		<LI><A href="#setup">セットアップ</A>
+		<LI><A href="#usage">使い方</A>
+		<LI><A href="#option">設定</A>
+		<LI><A href="#dic">スニペット辞書の作り方</A>
+		<LI><A href="#statements">お約束</A>
+		<LI><A href="#history">バージョン履歴</A>
+		<LI><A href="#feedback">フィードバック</A>
+	</UL>
+</TD><TD class="body">
+	<DIV class="img"><IMG src="snippet.png" width="680" height="200" alt="スクリーンショット"></DIV>
+</TD></TR></TABLE></DIV>
+
+
+<H3><A name="download" id="download">ダウンロード</A></H3>
+
+<UL class="files">
+	<LI class="mac"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/Snippet.mac">Snippet.mac</A>　Version 3.02　(2007/02/07)
+</UL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="outline" id="outline">概要</A></H3>
+
+<UL class="sect">
+	<LI>秀丸エディタ用補完マクロ <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> のプラグインです。
+	<LI>プログラミングに便利なコードスニペット（定型コード）挿入機能を提供します。〈→<A href="http://www.atmarkit.co.jp/fdotnet/vb2005/vb2005_07/vb2005_07_01.html" target="_blank">参考</A>〉
+	<UL class="p">
+		<LI>複数行の文字列（コード片）を挿入できます。
+		<LI>確定後、コード片の中の指定した位置（複数可）にカーソルを移動できます。
+		<LI>コード片の中に説明文や記述例など（複数可）を埋め込んでおき、順にジャンプしながら書き換えていくことができます。
+	</UL>
+</UL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="setup" id="setup">セットアップ</A></H3>
+
+<OL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> ver 5.18 以降と <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> v3.00β4 以降をお使いですね？
+	<LI>ダウンロードしたマクロファイルを CompleteX のベースフォルダに置きます。
+	<LI>CompleteX の設定でプラグインとして Snippet.mac を指定します。
+	<LI>スニペット辞書を用意し、設定ファイルにスニペット辞書ファイル名を指定します。〈→<A href="#usage">使い方</A>〉
+</OL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="usage" id="usage">使い方</A></H3>
+
+<P>通常の辞書とは別にスニペット辞書を用意します。スニペット辞書は次のようなファイルです。</P>
+<PRE>
+[snippet]
+<VAR>単語</VAR>=<VAR>コード片</VAR>
+<VAR>単語</VAR>=<VAR>コード片</VAR>
+…
+</PRE>
+<P>CompleteX で確定した単語がスニペット辞書に見つかると、 Snippet.mac は単語をコード片に置き換えて挿入します。スニペット辞書にない場合は確定した単語がそのまま挿入されます。以下に例を挙げて説明します。</P>
+
+<H4>例1</H4>
+
+<DIV class="samptitle">例：config.txt</DIV>
+<PRE>
+[.sh]
+plugin=snippet.mac
+dic=bash.dic            … 単語辞書
+snippet.dic=bash.sub    … スニペット辞書
+</PRE>
+<DIV class="samptitle">例：bash.dic</DIV>
+<PRE>
+case
+echo
+for
+while
+</PRE>
+<DIV class="samptitle">例：bash.sub</DIV>
+<PRE>
+[snippet]
+while=while [  ]; do\n\t\ndone
+</PRE>
+<P>上記の設定で <SAMP>while</SAMP> を確定すると</P>
+<PRE>
+while [  ]; do
+<I>&lt;tab&gt;</I>
+done
+</PRE>
+<P>が挿入されます。このように、 <CODE>\n</CODE> で改行、 <CODE>\t</CODE> でタブを記述できます。確定時のカーソル行のインデントに合わせて次行以降もインデントされます<!--{footnote|秀丸エディタのファイルタイプ別の設定で「自動インデント」が ON になっている場合。--><SUP class="footmark"><A href="#foottext:4.1" name="footmark:4.1" id="footmark:4.1" title="秀丸エディタのファイルタイプ別の設定で「自動インデント」が ON になっている場合。">*1</A></SUP><!--}-->。</P>
+
+<H4>例2</H4>
+
+<DIV class="samptitle">例：bash.sub</DIV>
+<PRE>
+[snippet]
+echo=echo "\v"
+</PRE>
+<P>上記の設定で <SAMP>echo</SAMP> を確定すると</P>
+<PRE>
+echo ""
+</PRE>
+<P>が挿入され、<SAMP>""</SAMP> の間にカーソルが移動します。このように、 <CODE>\v</CODE> で確定後のカーソル位置を指定できます。 <CODE>\v</CODE> が複数ある場合は例3と同様の動作になります。</P>
+
+
+<H4>例3</H4>
+
+<DIV class="samptitle">例：bash.sub</DIV>
+<PRE>
+[snippet]
+case="case \v変数\f in\n\v条件1\f)\n\t\v処理1\f;;\n\v条件2\f)\n\t\v処理2\f;;\n*)\n\t\vデフォルト処理\f;;\nesac"
+</PRE>
+<P>上記の設定で <SAMP>case</SAMP> を確定すると</P>
+<PRE>
+case 変数 in
+条件1)
+	処理1;;
+条件2)
+	処理2;;
+*)
+	デフォルト処理;;
+esac
+</PRE>
+<P>が挿入され、<SAMP>変数</SAMP> が範囲選択されます<!--{footnote|秀丸エディタの動作環境で「検索での表示」が「範囲選択」になっている場合。--><SUP class="footmark"><A href="#foottext:4.2" name="footmark:4.2" id="footmark:4.2" title="秀丸エディタの動作環境で「検索での表示」が「範囲選択」になっている場合。">*2</A></SUP><!--}--><!--{footnote|実際には範囲選択される文字列の前後に目印となる制御コードが付いています。このページ一番上のスクリーンショットを参照。--><SUP class="footmark"><A href="#foottext:4.3" name="footmark:4.3" id="footmark:4.3" title="実際には範囲選択される文字列の前後に目印となる制御コードが付いています。このページ一番上のスクリーンショットを参照。">*3</A></SUP><!--}-->。ここで下候補（デフォルトのキー割り当てなら [F3]）を実行すると <SAMP>条件1</SAMP>、 <SAMP>処理1</SAMP>、 <SAMP>条件2</SAMP>、 <SAMP>処理2</SAMP>、 <SAMP>デフォルト処理</SAMP> が順に範囲選択されます。このように、 <CODE>\v ～ \f</CODE> で囲んで記述例や説明文を書いておくと確定後に検索することができます。</P>
+
+<!--{foottext-->
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:4.1" name="foottext:4.1" id="foottext:4.1">*1</A></DT>
+	<DD>秀丸エディタのファイルタイプ別の設定で「自動インデント」が ON になっている場合。</DD>
+	<DT><A href="#footmark:4.2" name="foottext:4.2" id="foottext:4.2">*2</A></DT>
+	<DD>秀丸エディタの動作環境で「検索での表示」が「範囲選択」になっている場合。</DD>
+	<DT><A href="#footmark:4.3" name="foottext:4.3" id="foottext:4.3">*3</A></DT>
+	<DD>実際には範囲選択される文字列の前後に目印となる制御コードが付いています。このページ一番上のスクリーンショットを参照。</DD>
+</DL></DIV>
+<!--}-->
+
+<H3><A name="option" id="option">設定</A></H3>
+
+<P>設定は CompleteX の設定ファイル config.txt に追記します。〈→<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/reference.shtml#inifile">CompleteX リファレンス：設定ファイルの書き方</A>〉</P>
+<DL class="sect">
+	<DT>snippet.dic<DD>
+	スニペット辞書ファイルを指定します。ファイル名は任意です。
+<PRE>
+snippet.dic=<VAR>bash.sub</VAR>
+</PRE>
+	<P>上記のほか、 CompleteX の各設定が有効です。</P>
+</DL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="dic" id="dic">スニペット辞書の作り方</A></H3>
+
+<P>スニペット辞書は INI ファイル形式です。セクション名は <SAMP>[snippet]</SAMP> です。各エントリの左辺は CompleteX で確定される文字列、右辺はそれを置き換えるコード片です。<!--{footnote|コード片の最初か最後に空白を入れたいときは、コード片全体をダブルクオートで囲む必要があります。このとき、コード片の中のダブルクオートをエスケープする必要はありません。（INI ファイル形式の仕様）--><SUP class="footmark"><A href="#foottext:6.1" name="footmark:6.1" id="footmark:6.1" title="コード片の最初か最後に空白を入れたいときは、コード片全体をダブルクオートで囲む必要があります。このとき、コード片の中のダブルクオートをエスケープする必要はありません。（INI ファイル形式の仕様）">*1</A></SUP><!--}--></P>
+<DIV class="samptitle">例</DIV>
+<PRE>
+[snippet]
+case=case \v変数\f in\n\v条件1\f)\n\t\v処理1\f;;\n\v条件2\f)\n\t\v処理2\f;;\n*)\n\t\vデフォルト処理\f;;\nesac
+echo=echo "\v"
+for=for \v in \vリスト\f; do\n\t\ndone
+if=if [ \v ]; then\n\t\nelif\n\t\nelse\n\t\nfi
+while=while [ \v ]; do\n\t\ndone
+</PRE>
+<P>コード片は以下のエスケープシーケンスを含むことができます。</P>
+<PRE>
+\n	… 改行
+\t	… タブ
+\v	… 確定後のカーソル位置／選択範囲の始まり
+\f	… 選択範囲の終わり
+\\	… \ という文字そのもの
+</PRE>
+
+<!--{foottext-->
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:6.1" name="foottext:6.1" id="foottext:6.1">*1</A></DT>
+	<DD>コード片の最初か最後に空白を入れたいときは、コード片全体をダブルクオートで囲む必要があります。このとき、コード片の中のダブルクオートをエスケープする必要はありません。（INI ファイル形式の仕様）</DD>
+</DL></DIV>
+<!--}-->
+
+<H3><A name="statements" id="statements">お約束</A></H3>
+
+<H4>動作環境</H4>
+<UL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> v6.00β5 以降 + HMJRE.DLL で動作するはずです。
+	<LI>秀丸エディタ v6.06 + HMJRE.DLL v1.80 で動作確認しました。
+	<LI>JRE32.DLL では使えません。
+</UL>
+
+<H4>ライセンス</H4>
+<UL class="sect">
+	<LI>このマクロはフリーウェアです。自由に利用、改変、再配布することができます。
+	<LI>改変したものを公に再配布するときは次のことを明記してください。
+	<UL class="p">
+		<LI>改変したものである旨（できれば改変内容も）
+		<LI>改変元の名称、バージョン、一次配布場所
+	</UL>
+</UL>
+
+<H4>配布場所</H4>
+<P>一次配布場所は <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/snippet.shtml">Wisteria - 秀丸マクロ - Snippet.mac</A> です。二次配布は次のところで行われています。</P>
+<UL>
+	<LI><A href="http://hide.maruo.co.jp/lib/macro/">秀丸エディタのマクロライブラリ</A>
+	<LI><A href="http://www.vector.co.jp/vpack/filearea/win95/writing/edit/hm/">Vector - Windows95/98/Me &gt; 文書作成 &gt; テキストエディタ &gt; 秀丸エディタ</A>
+</UL>
+
+<H4>謝辞</H4>
+<UL class="sect">
+	<LI>このマクロは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> の Rue さんと t さんの書き込みをきっかけとして作り始めました。ご意見ありがとうございました。
+	<LI>プックンさん作 <A href="http://hide.maruo.co.jp/lib/macro/completex_kwdchg_p_201.html">KWDCHG_P</A> の仕様を一部参考にさせていただきました。プックンさんに敬意を表します。
+</UL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="history" id="history">バージョン履歴</A></H3>
+<DL class="history">
+	<DT>Version 3.02 <SMALL>(2007/02/07)</SMALL><DD>
+	<UL>
+		<LI>CompleteX v3.04 対応
+	</UL>
+	<DT>Version 3.01 <SMALL>(2006/11/17)</SMALL><DD>
+	<UL>
+		<LI>CompleteX v3.0 正式版との組み合わせで自動インデントがうまくいかないバグ修正
+	</UL>
+	<DT>Version 3.0  <SMALL>(2006/08/06)</SMALL><DD>
+	<UL>
+		<LI>正式版
+		<LI>カーソル位置マークを <CODE>\a</CODE> から <CODE>\v</CODE> に変更（垂直タブは大抵のプログラミング言語で空白類文字として扱われるので、削除し忘れても影響が少ない）
+		<LI>範囲選択機能を追加
+		<LI>CompleteX のオプション <CODE>source=self</CODE>, <CODE>source=mix</CODE>, <CODE>source=list</CODE> に対応
+	</UL>
+	<DT>Version 3.0 beta 4 <SMALL>(2006/08/01)</SMALL><DD>
+	<UL>
+		<LI>スニペット辞書を分離
+		<LI>複数のカーソル位置指定に対応
+	</UL>
+	<DT>Version 3.0 beta 3 <SMALL>(2006/08/01)</SMALL><DD>
+	<UL>
+		<LI>名前を Snippet.mac に変更
+		<LI>カーソル移動機能を追加
+	</UL>
+	<DT>Version 3.0 beta 2 <SMALL>(2006/08/01)</SMALL><DD>
+	<UL>
+		<LI>自動インデント対応
+	</UL>
+	<DT>Version 3.0 beta 1 <SMALL>(2006/08/01)</SMALL><DD>
+	<UL>
+		<LI>談話室で公開
+	</UL>
+</DL>
+
+<!--{foottext--><!--}-->
+
+<H3><A name="feedback" id="feedback">フィードバック</A></H3>
+
+<P>ご意見、ご感想、バグ報告、ツッコミなどは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> へどうぞ。</P>
+
+<!--{foottext--><!--}-->
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_snippet.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" border="0" alt="">
+	<ADDRESS>(C) IKKI &lt;<A href="mailto:fujiwara@big.or.jp">fujiwara@big.or.jp</A>&gt; 2006</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

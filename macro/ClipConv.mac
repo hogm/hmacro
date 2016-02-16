@@ -1,0 +1,56 @@
+beginclipboardread;
+
+if (!getclipboardinfo(0)) {
+    endmacro;
+}
+
+if (getclipboardinfo(1)) {
+    endmacro;
+}
+
+$string = getclipboard;
+
+$results[0] = filter("HmFilter.hmf", "ToLower", "1", $string);
+$results[1] = filter("HmFilter.hmf", "ToUpper", "1", $string);
+$results[2] = filter("HmFilter.hmf", "ToHankaku", "1", $string);
+$results[3] = filter("HmFilter.hmf", "ToZenkakuHira", "1", $string);
+$results[4] = filter("HmFilter.hmf", "ToZenkakuKata", "1", $string);
+$results[5] = filter("HmFilter.hmf", "ToHankakuAlnum", "1", $string);
+$results[6] = filter("HmFilter.hmf", "ToZenkakuAlnum", "1", $string);
+$results[7] = filter("HmFilter.hmf", "ToHankakuKataOnly", "1", $string);
+$results[8] = filter("HmFilter.hmf", "ToZenkakuKataOnly", "1", $string);
+
+$menus[0] = $results[0] + "：小文字";
+$menus[1] = $results[1] + "：大文字";
+$menus[2] = $results[2] + "：ハンカク";
+$menus[3] = $results[3] + "：全角ひらがな";
+$menus[4] = $results[4] + "：全角カタカナ";
+$menus[5] = $results[5] + "：英数字/記号/空白のみ半角に";
+$menus[6] = $results[6] + "：英数字/記号/空白のみ全角に";
+$menus[7] = $results[7] + "：カタカナのみ半角に";
+$menus[8] = $results[8] + "：カタカナのみ全角に";
+
+menuarray $menus, 9;
+if( result == 0 ) {
+    endmacro;
+} else {
+    #i = result - 1;
+    // Ctrlキー押下は挿入
+    if (iskeydown(0x11)) {
+        insert $results[#i];
+    }
+    setclipboard $results[#i];
+}
+
+// ToUpper UPPER CASE
+// ToLower lower case 
+// ToHankaku ハンカク 
+// ToZenkakuHira 全角ひらがな 
+// ToZenkakuKata 全角カタカナ 
+// ToSpace TAB -> 空白 (※注) 
+// ToTab 空白 -> TAB (※注) 
+// ToHankakuAlnum 英数字/記号/空白のみ半角に
+// ToZenkakuAlnum 英数字/記号/空白のみ全角に 
+// ToHankakuKataOnly カタカナのみ半角に 
+// ToZenkakuKataOnly カタカナのみ全角に 
+

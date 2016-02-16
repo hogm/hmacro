@@ -1,0 +1,192 @@
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>秀丸マクロ - CompleteX</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex">CompleteX</A> &gt; 
+</UL>
+
+<H2 class="pagetop">v2 → v3</H2>
+
+<DIV class="abst"><P>CompleteX 2.48 から v3.01 への変更点</P></DIV>
+
+<UL class="subindex">
+	<LI><A href="#new">新機能</A> |
+	<LI><A href="#change">仕様変更</A> |
+	<LI><A href="#purge">機能分離</A> |
+	<LI><A href="#compati">互換性</A> |
+	<LI><A href="#migration">移行</A>
+</UL>
+
+
+<H3><A name="new" id="new">新機能</A></H3>
+
+<DL class="sect">
+	<DT>ヒント機能<DD>
+	<UL>
+		<LI>リストボックスの下に各候補の説明を表示できます。説明文を書いたヒントファイルを hint= で指定します。〈→<A href="reference.html#dic:hint">CompleteX リファレンス：辞書の作り方：ヒントファイル</A>〉
+		<LI>名前補完モードでは候補となった単語が使われていた個所の前後2行が表示されます。
+		<DIV class="img"><IMG src="completex30.png" width="520" height="200" alt="スクリーンショット"></DIV>
+	</UL>
+	<DT>秀丸メール対応　<SMALL>（v3.01 から）</SMALL><DD>
+	<UL>
+		<LI>秀丸メールのメール作成ウィンドウでも使えるようになりました。
+		<LI>名前補完モードは候補を編集バッファから直接収集できるようになりました。秀丸メールや新規作成などの保存されていないウィンドウでも名前補完が使えます。
+	</UL>
+	<DT>キーカスタマイズ強化<DD>
+	<UL>
+		<LI>Shift や Ctrl との組み合わせキーを定義できます。カスタマイズは listbox.mac を直接書き換えて行います。〈→<A href="reference.html#operation:customize">CompleteX リファレンス：リストボックスの操作：キーカスタマイズ</A>〉
+	</UL>
+	<DT>ページアップ／ページダウン<DD>
+	<UL>
+		<LI>リストボックスで1ページずつ移動できます。デフォルトのキー割り当ては [←] [→] です。<SUP class="footmark"><A href="#foottext:1.1" name="footmark:1.1" id="footmark:1.1" title="上下へ移動するのになぜ左右の矢印キーかというと、秀丸マクロの inputchar 関数が [PageDown]/[PageUp] キーを拾えないからです。覚えにくい人は携帯の電話帳を思い浮かべてください。">*1</A></SUP>〈→<A href="reference.html#operation">CompleteX リファレンス：リストボックスの操作</A>〉
+	</UL>
+	<DT>プラグインの簡易指定<DD>
+	<UL>
+		<LI>ベースフォルダに <VAR>拡張子</VAR>.mac という名前のファイルを置くとプラグインとして実行されます。〈→<A href="reference.html#usage:plugin">CompleteX リファレンス：使い方：プラグインを使う</A>〉
+	</UL>
+	<DT>軽量化<DD>
+	<UL>
+		<LI>新機能じゃないですが。内部構造を全面的に設計しなおし、個々のマクロをスリム化しました。これにより、特にプラグイン使用時の処理が速くなったはずです。<SUP class="footmark"><A href="#foottext:1.2" name="footmark:1.2" id="footmark:1.2" title="体感ベースでは変わらないかもしれないけど…。">*2</A></SUP>
+	</UL>
+</DL>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:1.1" name="foottext:1.1" id="foottext:1.1">*1</A></DT>
+	<DD>上下へ移動するのになぜ左右の矢印キーかというと、秀丸マクロの inputchar 関数が [PageDown]/[PageUp] キーを拾えないからです。覚えにくい人は携帯の電話帳を思い浮かべてね。</DD>
+	<DT><A href="#footmark:1.2" name="foottext:1.2" id="foottext:1.2">*2</A></DT>
+	<DD>体感ベースでは変わらないかもしれないけど、速くなったの！</DD>
+</DL></DIV>
+
+
+
+<H3><A name="change" id="change">仕様変更</A></H3>
+
+<DL class="sect">
+	<DT>スマートアンドゥ<DD>
+	<UL>
+		<LI>アンドゥ2回で実行前の状態に戻ります。必ず2回です。2回で戻らなかったらバグです。<SUP class="footmark"><A href="#foottext:2.1" name="footmark:2.1" id="footmark:2.1" title="これはプラグインが listbox.mac を実行したときの話です。ユーザーが CompleteX-Main.mac を実行した場合、不一致による自動確定で最後に入力された文字を CompleteX-Main.mac が insert するので、これを含めると3回になります。">*1</A></SUP>
+	</UL>
+	<DT>プラグイン<DD>
+	<UL>
+		<LI>プラグインがリストボックスを表示するとき、 CompleteX-Main.mac に代わって listbox.mac を呼び出すようにしました。 listbox.mac の引数と返り値は listbox.param を介してやりとりします。
+		<LI>listbox.mac は不一致による自動確定で最後に入力された文字を insert しません。呼び出し元プラグインは最後に入力された文字によって処理を分岐したりできます。最後に入力された文字を insert するのは最初に実行されたプラグインの責任です。
+		<LI>プラグインの連鎖（プラグインが他のプラグインを呼び出すこと）のインターフェイスを規定しました。
+		<LI>プラグインのバージョン番号は、メジャーバージョンを CompleteX に合わせるようにしました。 CompleteX とプラグインのメジャーバージョンが同じなら組み合わせて使えることを意味します。
+		<LI>詳細は <A href="reference.html#plugin">CompleteX リファレンス：プラグインの作り方</A> を参照してください。
+	</UL>
+	<DT>フォルダ構成<DD>
+	<UL>
+		<LI>ホームフォルダの下に system フォルダを新設。ここは基本的にユーザーが触らない場所とします。
+		<LI>macrodll.dll が system フォルダに移りました。
+		<LI>プラグインがテンポラリ辞書ファイルを作る場所も system フォルダにしてください。
+	</UL>
+	<DT>macrodll.dll<DD>
+	<UL>
+		<LI>v0.80 を採用。正規表現まわりの仕様が変わりました。
+		<LI>最初に SETHMJREDLL() で HmJre.dll の場所を指定します。
+		<LI>\f 区切りは使えなくなりました。後方参照する場合は ( ) でパターンを囲みます。
+	</UL>
+	<DT>CompleteWord<DD>
+	<UL>
+		<LI>数字で始まる文字列は単語として収集されなくなりました。
+	</UL>
+	<DT>CompletePath<DD>
+	<UL>
+		<LI>パス区切りは path.separator で任意の文字列を指定できるようになりました。<SUP class="footmark"><A href="#foottext:2.2" name="footmark:2.2" id="footmark:2.2" title="ただし : を指定するとフルパス補完不可。 / と \ は常にセパレータとして認識される。">*2</A></SUP>
+		<LI>ひとつ上のフォルダ <SAMP>..\</SAMP> を常に表示します。<SUP class="footmark"><A href="#foottext:2.3" name="footmark:2.3" id="footmark:2.3" title="ルートフォルダでも表示しちゃうのは仕様です。">*3</A></SUP>
+	</UL>
+</DL>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:2.1" name="foottext:2.1" id="foottext:2.1">*1</A></DT>
+	<DD>これはプラグインが listbox.mac を実行したときの話です。ユーザーが CompleteX-Main.mac を実行した場合、不一致による自動確定で最後に入力された文字を CompleteX-Main.mac が insert するので、これを含めると3回になります。</DD>
+	<DT><A href="#footmark:2.2" name="foottext:2.2" id="foottext:2.2">*2</A></DT>
+	<DD>ただし <CODE>:</CODE> を指定するとフルパス補完不可。 <CODE>/</CODE> と <CODE>\</CODE> は常にセパレータとして認識される。</DD>
+	<DT><A href="#footmark:2.3" name="foottext:2.3" id="foottext:2.3">*3</A></DT>
+	<DD>ルートフォルダでも表示しちゃうのは仕様です。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="purge" id="purge">機能分離</A></H3>
+
+<DL class="sect">
+	<DT>辞書ファイルの正規化<DD>
+	<UL>
+		<LI>v2 では設定ファイルに Unsorted=Writeback と書くことで行っていた辞書ファイルの正規化は、専用のマクロになりました。正規化したい辞書ファイルを開き、 <VAR>ベースフォルダ</VAR>\system\sortdic.mac を実行してください。
+	</UL>
+	<DT>複数辞書ファイルの併合<DD>
+	<UL>
+		<LI>複数辞書ファイルの併合機能は本体から切り離されて独立したプラグインになりました。別途 <A href="mergedic.shtml">MergeDic.mac</A> をインストールして使ってください。
+	</UL>
+</DL>
+
+
+
+
+<H3><A name="compati" id="compati">互換性</A></H3>
+
+<DL class="sect">
+	<DT>プラグイン<DD>
+	<UL>
+		<LI>CompleteX v3 を CompleteX v2 のフォルダに上書きインストールした場合、 v2 用のプラグインはそのまま使えるはずです。
+		<LI>CompleteX v2 のフォルダを削除して CompleteX v3 を新規インストールした場合、 v2 用のプラグインは使えません。<SUP class="footmark"><A href="#foottext:4.1" name="footmark:4.1" id="footmark:4.1" title="どうしても使いたいときは CompleteX v2 のアーカイブから macrodll.dll を取り出して CompleteX のホームフォルダに置いてください。">*1</A></SUP>
+	</UL>
+	<DT>設定ファイル<DD>
+	<UL>
+		<LI>一部の設定項目の書き方が変わりました。設定ファイルの書き換えは移行マクロによって自動的に行われます。〈→<A href="#migration">移行</A>〉
+	</UL>
+</DL>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:4.1" name="foottext:4.1" id="foottext:4.1">*1</A></DT>
+	<DD>どうしても使いたいときは CompleteX v2 のアーカイブから macrodll.dll を取り出して CompleteX の<EM>ホームフォルダに</EM>置いてください。 system フォルダに置かれてる CompleteX v3 の macrodll.dll とはバージョンが違います。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="migration" id="migration">移行</A></H3>
+
+<UL class="sect">
+	<LI>v2 を使っていた環境に v3 を上書きインストールした場合、初回起動時に v2 から v3 への移行を促すダイアログが表示されます。 [はい(Y)] を押すと設定ファイルの書き換えが自動的に行われます。
+	<LI>手動で移行する場合は設定ファイルの内容を次のとおり書き換えてください。
+	<DIV class="table"><TABLE><TBODY>
+		<TR><TH>移行前</TH><TH>移行後</TH></TR>
+		<TR><TD>WithinWord=</TD><TD>wordhas=</TD></TR>
+		<TR><TD>path.FileSystem=Unix</TD><TD>path.separator=/</TD></TR>
+		<TR><TD>AutoFix=always</TD><TD>autofix=111</TD></TR>
+		<TR><TD>AutoFix=first,last</TD><TD>autofix=101</TD></TR>
+		<TR><TD>AutoFix=first</TD><TD>autofix=100</TD></TR>
+		<TR><TD>AutoFix=last</TD><TD>autofix=001</TD></TR>
+	</TBODY></TABLE></DIV>
+</UL>
+
+
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_hidemaru_macro_v2tov3.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" alt="">
+	<ADDRESS>(C) IKKI 2003-2006</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

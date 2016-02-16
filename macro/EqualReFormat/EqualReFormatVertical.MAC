@@ -1,0 +1,82 @@
+//【機能】":=","=>","="の位置を縦に揃える
+
+if (selecting == 0){
+    message "整形する範囲を選択して下さい。";
+    endmacro;
+}
+
+// 整形位置取得 //
+#seltopy = seltopy;
+#selendy = selendy;
+#posmax = -1;
+#index = 0;
+#line = #seltopy;
+
+disabledraw;
+
+while( #line <= #selendy ) {
+    call getequalposition #line;
+    #pos[#index] = ##return;
+    
+    if (#posmax < #pos[#index]){
+        #posmax = #pos[#index];
+    }
+    
+    #line = #line + 1;
+    #index = #index + 1;
+}
+
+if (#posmax < 0){
+//    message "「:=」「=>」「=」が見つかりませんでした。";
+    endmacro;
+}
+
+// 整形 //
+begingroupundo;
+#index = 0;
+#line = #seltopy;
+
+while( #line <= #selendy ) {
+    #j = 0;
+    #spacenum = 0;
+    $addspace = "";
+    
+    if (#pos[#index] >= 0){
+        #spacenum = #posmax - #pos[#index];
+        while( #j < #spacenum ){
+            $addspace = $addspace + " ";
+            #j = #j + 1;
+        }
+        moveto #pos[#index], #line;
+        insert $addspace;
+    }
+    
+    #line = #line + 1;
+    #index = #index + 1;
+}
+
+moveto 0, #selendy;
+endgroupundo;
+enabledraw;
+endmacro;
+
+//関数：EQUAL位置取得
+getequalposition:
+    $equalplsql = ":=";
+    $equalparam = "=>";
+    $equalsql = "=";
+
+    moveto 0, ##1;
+    $checkstr = gettext(0, ##1, linelen2, ##1);
+
+    #pos = strstr($checkstr, $equalplsql);
+
+    if (#pos < 0){
+        #pos = strstr($checkstr, $equalparam);
+    }
+
+    if (#pos < 0){
+        #pos = strstr($checkstr, $equalsql);
+    }
+    
+    return #pos;

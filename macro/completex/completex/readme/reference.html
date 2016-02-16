@@ -1,0 +1,982 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>CompleteX リファレンス</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt;
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt;
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> &gt;
+</UL>
+
+<H1 class="pagetop"><A name="pagetop" id="pagetop">CompleteX リファレンス</A></H1>
+
+<DIV class="date" align="right">Version 3.11　(2009/09/10)</DIV>
+
+<DIV class="subindex">
+	<H4 class="top">目次</H4>
+	<UL>
+		<LI><A href="#usage"><B>使い方</B></A>
+		<UL>
+			<LI><A href="#usage:try">使ってみよう</A>
+			<LI><A href="#usage:dic">辞書ファイルを指定する</A>
+			<LI><A href="#usage:plugin">プラグインを使う</A>
+		</UL>
+		<LI><A href="#operation"><B>リストボックスの操作</B></A>
+		<UL>
+			<LI><A href="#operation:key">キー操作</A>
+			<LI><A href="#operation:autofix">自動確定</A>
+			<LI><A href="#operation:customize">キーカスタマイズ</A>
+		</UL>
+		<LI><A href="#inifile"><B>設定ファイルの書き方</B></A>
+		<UL>
+			<LI><A href="#inifile:suffix">拡張子別の設定</A>
+			<LI><A href="#inifile:filetype">ファイルタイプ別の設定</A>
+			<LI><A href="#inifile:default">デフォルトの設定</A>
+			<LI><A href="#inifile:filename">ファイル名の指定方法</A>
+			<LI><A href="#inifile:reserved">予約セクション名</A>
+		</UL>
+		<LI><A href="#option"><B>設定項目</B></A>
+		<UL>
+			<LI><A href="#option:base">基本設定</A>
+			<LI><A href="#option:behavior">動作設定</A>
+			<LI><A href="#option:dic">辞書設定</A>
+			<LI><A href="#option:appearance">表示設定</A>
+			<LI><A href="#option:syntax">参照記法</A>
+		</UL>
+		<LI><A href="#dic"><B>辞書の作り方</B></A>
+		<UL>
+			<LI><A href="#dic:dicfile">辞書ファイル</A>
+			<LI><A href="#dic:hint">ヒントファイル</A>
+		</UL>
+		<LI><A href="#plugin"><B>プラグインの作り方</B></A>
+		<UL>
+			<LI><A href="#plugin:flow">処理の流れ</A>
+			<LI><A href="#plugin:listbox">リストボックスの使い方</A>
+			<LI><A href="#plugin:nest">プラグインの連鎖</A>
+			<LI><A href="#plugin:note">マクロ作者の方へ</A>
+		</UL>
+		<LI><A href="#qa"><B>Q&amp;A</B></A>
+	</UL>
+</DIV>
+
+
+<H2><A name="usage" id="usage">使い方</A></H2>
+
+<UL class="subindex">
+	<LI><A href="#usage:try">使ってみよう</A> |
+	<LI><A href="#usage:dic">辞書ファイルを指定する</A> |
+	<LI><A href="#usage:plugin">プラグインを使う</A>
+</UL>
+
+
+<H3><A name="usage:try" id="usage:try">使ってみよう</A></H3>
+
+<H4>名前補完モード</H4>
+
+<P>ベースフォルダにある CompleteWord.mac を実行するか、何も設定してない状態で CompleteX.mac を実行すると名前補完モードになります。名前補完モードでは現在編集中のファイル内にある単語が候補に挙がります<SUP class="footmark"><A href="#foottext:1.1" name="footmark:1.1" id="footmark:1.1" title="デフォルトでは、候補はディスク上のファイルから収集されるため、未保存の部分にある単語は候補に挙がりません。設定により編集バッファから直接収集するようにもできます。〈→ CompleteWord.mac：設定〉">*1</A></SUP>。やってみましょう。</P>
+<OL>
+	<LI>秀丸で適当なファイルを開きます。
+	<LI>CompleteX.mac に割り当てたキーを押します。
+	<LI>リストボックスが現れ、補完候補が表示されます。
+	<UL class="p">
+		<LI>文字列を打ち込むと候補が絞り込まれます。
+		<LI>[Tab] を押すと一意に定まる部分が補完されます。
+		<LI>[↑] [↓] で候補を選ぶこともできます。
+	</UL>
+	<LI>目的の候補を選んだら [Enter] で確定します。
+</OL>
+<P>補完対象となるのはカーソルの直前にある一続きのアルファベット等<SUP class="footmark"><A href="#foottext:1.2" name="footmark:1.2" id="footmark:1.2" title="アルファベット等 … abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ および設定項目の wordhas= に指定された記号。">*2</A></SUP>です。あらかじめ範囲選択しておくとその部分だけが補完対象となります。</P>
+<P>リストボックスの使い方は直感的にわかるでしょう。詳しくは <A href="#operation">リストボックスの操作</A> を参照してください。</P>
+
+<H4>辞書補完モード</H4>
+
+<P>辞書ファイルがある状態で CompleteX.mac を実行すると辞書補完モードになります。辞書ファイルは拡張子ごとに用意し、 <VAR>拡張子</VAR>.dic という名前でベースフォルダに置きます。ベースフォルダにある sample.dic を使って試してみましょう。このサンプル辞書は PHP5 の関数名を集めたものです。</P>
+<OL>
+	<LI>sample.dic をコピーし、ファイル名を txt.dic に変更します。
+	<LI>拡張子 txt の適当なファイルを開きます。
+	<LI>CompleteX.mac に割り当てたキーを押します。あとはさっきと同じです。
+</OL>
+<P>ほかの拡張子に対しても同様に辞書ファイルを用意すれば使えます。たとえば拡張子 php のファイルで同じ辞書を使うには、辞書ファイルを php.dic という名前にします。</P>
+<P>辞書ファイルは候補を書き並べるだけで簡単に作れます。〈→<A href="#dic">辞書の作り方</A>〉</P>
+
+<H4>混合補完モード</H4>
+
+<P>名前補完モードの候補と辞書補完モードの候補を混ぜることができます。設定ファイル config.txt に次の2行を書き加えます。</P>
+
+<DIV class="samptitle">config.txt</DIV>
+<PRE class="samp">
+[default]
+source=mix
+</PRE>
+<P>この設定は拡張子別に行うこともできます。詳しくは<A href="#inifile">設定ファイルの書き方</A>を参照してください。</P>
+
+<H4>ファイル名補完</H4>
+
+<P>ベースフォルダにある CompletePath.mac を実行します。詳しくは <A href="completepath.html">CompletePath.mac</A> を参照してください。</P>
+
+<H4>フォント名補完</H4>
+
+<P>ベースフォルダにある CompleteFont.mac を実行します。詳しくは <A href="completefont.html">CompleteFont.mac</A> を参照してください。</P>
+
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:1.1" name="foottext:1.1" id="foottext:1.1">*1</A></DT>
+	<DD>デフォルトでは、候補はディスク上のファイルから収集されるため、未保存の部分にある単語は候補に挙がりません。設定により編集バッファから直接収集するようにもできます。〈→ <A href="completeword.html#option">CompleteWord.mac：設定</A>〉</DD>
+	<DT><A href="#footmark:1.2" name="foottext:1.2" id="foottext:1.2">*2</A></DT>
+	<DD>アルファベット等 … abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ および<A href="#option">設定項目</A>の wordhas= に指定された記号。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="usage:dic" id="usage:dic">辞書ファイルを指定する</A></H3>
+
+<P>任意の名前の辞書ファイルを使うには、設定ファイルに記述を加えます。方法は<A href="#inifile">設定ファイルの書き方</A>を参照してください。辞書ファイルを指定するキーは dic= です。</P>
+<P>例：　拡張子 mac に対して辞書ファイル hidemac.dic を指定する場合</P>
+<DIV class="samptitle">config.txt</DIV>
+<PRE class="samp">
+[.mac]
+dic=hidemac.dic
+</PRE>
+<P>辞書ファイルは次の順序で検索され、最初に見つかったものが使用されます。</P>
+<OL>
+	<LI>拡張子別の設定
+	<LI>ファイルタイプ別の設定
+	<LI>デフォルトの設定
+	<LI><VAR>ベースフォルダ</VAR>\<VAR>拡張子</VAR>.dic
+</OL>
+
+
+
+
+<H3><A name="usage:plugin" id="usage:plugin">プラグインを使う</A></H3>
+
+<P>プラグインを使うには、入手したプラグイン（.mac ファイル）をベースフォルダに置き、設定ファイルに記述を加えます。方法は<A href="#inifile">設定ファイルの書き方</A>を参照してください。プラグインを指定するキーは plugin= です。</P>
+<P>例：　拡張子 htm に対してプラグイン htmltag.mac を指定する場合</P>
+<DIV class="samptitle">config.txt</DIV>
+<PRE>
+[.htm]
+plugin=htmltag.mac
+</PRE>
+<P>プラグインは次の順序で検索され、最初に見つかったものが使用されます。プラグインの指定は辞書ファイルの指定より優先されます。</P>
+<OL>
+	<LI>拡張子別の設定
+	<LI>ファイルタイプ別の設定
+	<LI>デフォルトの設定
+	<LI><VAR>ベースフォルダ</VAR>\<VAR>拡張子</VAR>.mac
+</OL>
+<P>プラグインは秀丸マクロの知識があれば作れます。〈→<A href="#plugin">プラグインの作り方</A>〉　また、有志の方が作ったプラグインが<A href="http://www18.big.or.jp/~fujiwara/ikki/forum/completex/">アップローダ</A>にあるかもしれません。</P>
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><B>リストボックスの操作</B> |
+		<LI><A href="#inifile">設定ファイルの書き方</A> |
+		<LI><A href="#option">設定項目</A> |
+		<LI><A href="#dic">辞書の作り方</A> |
+		<LI><A href="#plugin">プラグインの作り方</A> |
+		<LI><A href="#qa">Q&amp;A</A>
+	</UL>
+</DIV>
+
+<H2><A name="operation" id="operation">リストボックスの操作</A></H2>
+
+<UL class="subindex">
+	<LI><A href="#operation:key">キー操作</A> |
+	<LI><A href="#operation:autofix">自動確定</A> |
+	<LI><A href="#operation:customize">キーカスタマイズ</A>
+</UL>
+
+
+<H3><A name="operation:key" id="operation:key">キー操作</A></H3>
+
+<P>デフォルトのキー割り当ては次のとおりです。</P>
+
+<DIV class="table"><TABLE><TBODY>
+	<TR><TH>キー</TH><TH>動作</TH></TR>
+	<TR><TD>文字キー</TD><TD>文字として入力</TD></TR>
+	<TR><TD>Ctrl+文字キー</TD><TD>何もしない</TD></TR>
+	<TR><TD>Space</TD><TD>文字として入力</TD></TR>
+	<TR><TD>Enter</TD><TD>確定1</TD></TR>
+	<TR><TD>Shift+Enter</TD><TD>確定2</TD></TR>
+	<TR><TD>Ctrl+Enter</TD><TD>確定3</TD></TR>
+	<TR><TD>Backspace</TD><TD>1文字消去</TD></TR>
+	<TR><TD>Esc</TD><TD>キャンセル</TD></TR>
+	<TR><TD>Tab</TD><TD>補完</TD></TR>
+	<TR><TD>↑</TD><TD>前候補</TD></TR>
+	<TR><TD>↓</TD><TD>次候補</TD></TR>
+	<TR><TD>←</TD><TD>前ページ</TD></TR>
+	<TR><TD>→</TD><TD>次ページ</TD></TR>
+</TBODY></TABLE></DIV>
+
+<P><DFN>確定1</DFN>, <DFN>確定2</DFN>, <DFN>確定3</DFN> はどれも同じですが、プラグインによっては確定後の動作が変わる場合があります。</P>
+<P><DFN>キャンセル</DFN> は補完開始前の状態に戻ります。ただし <A href="#option">設定</A> で Appear=listbox としているときはリストボックスが消えるだけです。</P>
+
+
+
+
+<H3><A name="operation:autofix" id="operation:autofix">自動確定</A></H3>
+
+<P>以下の場合は現在選択中の候補が自動的に確定されます。</P>
+
+<DL>
+	<DT>一致による自動確定<DD>
+	<UL>
+		<LI><DFN>文字として入力</DFN> または <DFN>補完</DFN> で入力した文字列と候補が完全に一致した
+		<LI>かつ、前方一致する候補が他にない
+	</UL>
+	<DT>不一致による自動確定<DD>
+	<UL>
+		<LI><DFN>文字として入力</DFN> で<A href="#option">設定項目</A>の wordhas= に指定されていない記号を入力した
+		<LI>かつ、前方一致する候補がない
+	</UL>
+</DL>
+
+
+
+
+<H3><A name="operation:customize" id="operation:customize">キーカスタマイズ</A></H3>
+
+<P>CompleteX-Main.mac の冒頭部分を書き換えることで任意のキー割り当てに変更できます。詳しくは試行錯誤してください。</P>
+<PRE>
+//------ キー割り当て ----------------------------------------------------------
+// #F[キー] = 機能コード;
+#F[0x020] =   0;	// [Space]          	┌── 機能コード ──┐
+#F[0x00D] =   1;	// [Enter]          	│  0: 文字として入力 │
+#F[0x008] =  37;	// [Backspace]      	│ -1: キャンセル1    │
+#F[0x01B] =  -1;	// [Esc]            	│ -2: キャンセル2    │
+#F[0x009] =  32;	// [Tab]            	│ -3: キャンセル3    │
+#F[0x01D] =  33;	// [↑]             	│ -4: キャンセル4    │
+#F[0x01F] =  34;	// [↓]             	│  1: 確定1          │
+#F[0x01C] =  35;	// [←]             	│  2: 確定2          │
+#F[0x01E] =  36;	// [→]             	│  3: 確定3          │
+// #F[0x120] = ;	// Shift+[Space]    	│  4: 確定4          │
+#F[0x10D] =   2;	// Shift+[Enter]    	│ 32: 補完           │
+// #F[0x108] = ;	// Shift+[Backspace]	│ 33: 前候補         │
+// #F[0x11B] = ;	// Shift+[Esc]      	│ 34: 次候補         │
+// #F[0x109] = ;	// Shift+[Tab]      	│ 35: 前ページ       │
+// #F[0x11D] = ;	// Shift+[↑]       	│ 36: 次ページ       │
+// #F[0x11F] = ;	// Shift+[↓]       	│ 37: 1文字消去      │
+#F[0x11C] =  37;	// Shift+[←]       	│ 38: 1文字確定      │
+#F[0x11E] =  38;	// Shift+[→]       	│ 99: 何もしない     │
+// #F[0x220] = ;	// Ctrl+[Space]     	└──────────┘
+#F[0x20A] =   3;	// Ctrl+[Enter]     	
+// #F[0x27F] = ;	// Ctrl+[Backspace] 	
+#F[0x21D] =  35;	// Ctrl+[↑]        	
+#F[0x21F] =  36;	// Ctrl+[↓]        	
+// #F[0x21C] = ;	// Ctrl+[←]        	
+// #F[0x21E] = ;	// Ctrl+[→]        	
+// #F[0x31D] = ;	// Shift+Ctrl+[↑]  	
+// #F[0x31F] = ;	// Shift+Ctrl+[↓]  	
+// #F[0x31C] = ;	// Shift+Ctrl+[←]  	
+// #F[0x31E] = ;	// Shift+Ctrl+[→]  	
+// #F[0x1C0 + 'A'] = ;	// Ctrl+[ A ]
+//             :      	//        :  
+// #F[0x1C0 + 'Z'] = ;	// Ctrl+[ Z ]
+// #F[0x2C0 + 'A'] = ;	// Shift+Ctrl+[ A ]
+//             :      	//              :  
+// #F[0x2C0 + 'Z'] = ;	// Shift+Ctrl+[ Z ]
+</PRE>
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><A href="#operation">リストボックスの操作</A> |
+		<LI><B>設定ファイルの書き方</B> |
+		<LI><A href="#option">設定項目</A> |
+		<LI><A href="#dic">辞書の作り方</A> |
+		<LI><A href="#plugin">プラグインの作り方</A> |
+		<LI><A href="#qa">Q&amp;A</A>
+	</UL>
+</DIV>
+
+<H2><A name="inifile" id="inifile">設定ファイルの書き方</A></H2>
+
+<UL class="subindex">
+	<LI><A href="#inifile:suffix">拡張子別の設定</A> |
+	<LI><A href="#inifile:filetype">ファイルタイプ別の設定</A> |
+	<LI><A href="#inifile:default">デフォルトの設定</A> |
+	<LI><A href="#inifile:filename">ファイル名の指定方法</A> |
+	<LI><A href="#inifile:reserved">予約セクション名</A>
+</UL>
+
+<P>設定ファイルはベースフォルダにある config.txt という名前のテキストファイルです。サンプルとして sample-config.txt が同梱されています。</P>
+<P>設定ファイルはいくつかのセクションからなり、それぞれのセクションに <CODE>キー=値</CODE> の形で設定内容を書きます。</P>
+<PRE>
+[セクション]
+キー=値
+…
+</PRE>
+<P>設定は</P>
+<OL class="p">
+	<LI>拡張子別の設定
+	<LI>ファイルタイプ別の設定
+	<LI>デフォルトの設定
+</OL>
+<P>の順に検索され、最初に見つかったものが適用されます。見つからない場合は何も設定されていないものと見なされます。</P>
+
+
+
+
+<H3><A name="inifile:suffix" id="inifile:suffix">拡張子別の設定</A></H3>
+
+<P>特定の拡張子に対する設定はピリオドで始まる拡張子のセクションに書きます。</P>
+<P>例：　拡張子 mac に対して辞書ファイル hidemac.dic を指定する場合</P>
+<PRE>
+[.mac]
+dic=hidemac.dic
+</PRE>
+<P>値にファイル名を指定するときは、フルパスまたはベースフォルダからの相対パスで書きます。〈→<A href="#inifile:filename">ファイル名の指定方法</A>〉</P>
+
+
+
+
+<H3><A name="inifile:filetype" id="inifile:filetype">ファイルタイプ別の設定</A></H3>
+
+<P>複数の拡張子に対する設定を1か所にまとめて書くことができます。</P>
+<OL>
+	<LI>それらの拡張子を総称するファイルタイプ名を決めます。<A href="#inifile:reserved">予約セクション名</A>以外なら好きな名前を付けられます。
+	<LI>ファイルタイプのセクションに設定内容を書きます。
+	<LI>それぞれの拡張子のセクションに <CODE>@=<VAR>ファイルタイプ</VAR></CODE> と書きます。
+</OL>
+<P>例：　拡張子 htm, html のファイルタイプを htmlfile とし、辞書ファイル html401.dic を指定する場合</P>
+<PRE>
+[htmlfile]
+dic=html401.dic
+
+[.htm]
+@=htmlfile
+
+[.html]
+@=htmlfile
+</PRE>
+<P>@= は「値が設定されてなかったら他のセクションを参照せよ」という意味です。 @= があるからといって、そのセクションの他のキーが無効になるわけではありません。〈→<A href="#option:syntax">参照記法</A>〉</P>
+
+
+
+
+<H3><A name="inifile:default" id="inifile:default">デフォルトの設定</A></H3>
+
+<P>以上で定義されていない拡張子に対するデフォルトの設定は default セクションに書きます。</P>
+<P>例：　未定義の拡張子に対して辞書ファイル common.dic を指定する場合</P>
+<PRE>
+[default]
+dic=common.dic
+</PRE>
+<P>デフォルトの設定で辞書ファイルを指定すると、ベースフォルダに <VAR>拡張子</VAR>.dic を置いても使用されなくなります。</P>
+
+
+
+
+<H3><A name="inifile:filename" id="inifile:filename">ファイル名の指定方法</A></H3>
+
+<P>辞書ファイルやプラグインなどのファイル名を指定する場合、値にファイル名だけを書くとそのファイルはベースフォルダにあるものと見なされます。ベースフォルダ以外にあるファイルは、ベースフォルダからの相対パス、フルパス、 UNC パスのいずれかで指定します。</P>
+<P>例：　<VAR>ベースフォルダ</VAR>\hoge\fuga.dic を指定する方法</P>
+<PRE>
+dic=hoge\fuga.dic                                                     … 相対パス
+dic=C:\Program Files\Hidemaru\Macro\CompleteX\hoge\fuga.dic           … フルパス
+dic=\\Computer\C\Program Files\Hidemaru\Macro\CompleteX\hoge\fuga.dic … UNC パス
+</PRE>
+
+
+
+
+<H3><A name="inifile:reserved" id="inifile:reserved">予約セクション名</A></H3>
+
+<P>以下のセクション名は予約されています。他の目的には使えません。</P>
+<PRE>
+[default]   … デフォルトの設定
+[turukame]  … 秀丸メールに対する設定
+[new]       … 新規文書に対する設定
+[grep]      … grep 結果ウィンドウに対する設定
+[exeresult] … 実行結果ウィンドウに対する設定
+[webbrowse] … Web ブラウズモードに対する設定
+[plugin]    … プラグインから起動されたときの設定
+</PRE>
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><A href="#operation">リストボックスの操作</A> |
+		<LI><A href="#inifile">設定ファイルの書き方</A> |
+		<LI><B>設定項目</B> |
+		<LI><A href="#dic">辞書の作り方</A> |
+		<LI><A href="#plugin">プラグインの作り方</A> |
+		<LI><A href="#qa">Q&amp;A</A>
+	</UL>
+</DIV>
+
+<H2><A name="option" id="option">設定項目</A></H2>
+
+<UL class="subindex">
+	<LI><A href="#option:base">基本設定</A> |
+	<LI><A href="#option:behavior">動作設定</A> |
+	<LI><A href="#option:dic">辞書設定</A> |
+	<LI><A href="#option:appearance">表示設定</A> |
+	<LI><A href="#option:syntax">参照記法</A>
+</UL>
+
+<P>設定ファイルに記述できる項目は以下のとおりです。設定ファイルの記述方法は<A href="#inifile">設定ファイルの書き方</A>を参照してください。</P>
+<UL>
+	<LI>名前補完モードの設定 〈→<A href="completeword.html#option">CompleteWord.mac：設定</A>〉
+	<LI>ファイル名補完プラグインの設定 〈→<A href="completepath.html#option">CompletePath.mac：設定</A>〉
+</UL>
+
+<H3><A name="option:base" id="option:base">基本設定</A></H3>
+
+<DL class="sect">
+	<DT>source<DD>
+	補完モードを指定します。（デフォルト = auto）
+<PRE>
+source=dic  … 辞書補完モードになります。
+source=mix  … 混合補完モードになります。
+source=self … 名前補完モードになります。
+source=auto … 辞書ファイルの有無によって辞書補完モードと名前補完モードが自動的に切り替わります。
+</PRE>
+	mix 以外は通常、明示的に指定する必要はないと思います。
+	
+	<DT>dic<DD>
+	辞書ファイルを指定します。
+<PRE>
+dic=<VAR>filename</VAR>
+</PRE>
+	
+	<DT>hint<DD>
+	ヒントファイルを指定します。
+<PRE>
+hint=<VAR>filename</VAR>
+</PRE>
+	
+	<DT>plugin<DD>
+	プラグインを指定します。
+<PRE>
+plugin=<VAR>filename</VAR>
+</PRE>
+</DL>
+
+
+
+
+<H3><A name="option:behavior" id="option:behavior">動作設定</A></H3>
+
+<DL class="sect">
+	<DT>autofix<DD>
+	自動補完を行うタイミングを指定します。2進数3桁で、それぞれ最初、途中、最後に自動補完を行うかどうかを指定します。（デフォルト = 000）
+<DIV class="samptitle">例</DIV>
+<PRE>
+autofix=111 … 最初、途中、最後に自動補完を行います。
+autofix=101 … 最初と最後に自動補完を行います。
+autofix=100 … 最初に自動補完を行います。
+autofix=001 … 最後に自動補完を行います。
+autofix=000 … 自動補完を行いません。
+</PRE>
+	<UL class="sect">
+		<LI>最初 … 一意に定まる部分を補完した上で起動します。起動直後に [Tab] を押すのと同じです。
+		<LI>途中 … 一意に定まる部分を逐次補完します。1文字入力するたびに [Tab] を押すのと同じです。
+		<LI>最後 … 候補が唯一のとき自動補完します。残り1個になったら [Tab] を押すのと同じです。
+	</UL>
+	
+	<DT>autosave<DD>
+	名前補完モードなどでディスク上のファイルから候補を収集する前に、現在編集中のファイルを自動的に上書き保存します。（デフォルト = no）
+<PRE>
+autosave=yes
+</PRE>
+	
+	<DT>overwrite<DD>
+	単語の途中にカーソルを置いて実行したとき、カーソルより右の部分を上書きします。（デフォルト = no）
+<PRE>
+overwrite=yes
+</PRE>
+</DL>
+
+
+
+
+<H3><A name="option:dic" id="option:dic">辞書設定</A></H3>
+
+<DL class="sect">
+	<DT>casesense<DD>
+	大文字小文字を区別します。（デフォルト = no）
+<PRE>
+casesense=yes
+</PRE>
+	候補の絞り込み表示を行わない場合は効果がありません（大文字小文字は区別されないように見えます）。ファイル名補完モードでは大文字小文字は区別されません。
+	
+	<DT>unsorted<DD>
+	ソートされていない辞書ファイルを利用します。（デフォルト = no）
+<PRE>
+unsorted=yes       … 内部でソートします。
+unsorted=overlap   … 内部でソートし、重複候補を取り除きます（正規化）。
+</PRE>
+	unsorted はプラグインが作るテンポラリ辞書のための機能です。ユーザーが作る辞書ファイルは後述の方法で正規化してください。〈→<A href="#dic">辞書の作り方</A>〉
+	
+	<DT>wordhas<DD>
+	補完候補に記号（アルファベット・数字・アンダーバー以外の ASCII 文字）が含まれる場合、その記号を列記します。
+<PRE>
+wordhas=<VAR>@#$%&amp;...</VAR>
+</PRE>
+	この設定は補完対象文字列の取得と不一致による自動確定の動作に影響します。
+</DL>
+
+
+
+
+<H3><A name="option:appearance" id="option:appearance">表示設定</A></H3>
+
+<DL class="sect">
+	<DT>appear<DD>
+	表示形式を指定します。（デフォルト = both）
+<PRE>
+appear=listbox … 候補がリストボックスにのみ表示されます。（Visual Studio 風）
+appear=both    … 候補がカーソル位置とリストボックスの両方に表示されます。
+appear=inline  … 候補がカーソル位置にのみ表示されます。（インライン補完風）
+</PRE>
+	<DIV class="table"><TABLE><TBODY>
+		<TR>
+			<TH>appear=listbox</TH>
+			<TH>appear=both</TH>
+			<TH>appear=inline</TH>
+		</TR><TR>
+			<TD><IMG src="appear_listbox.png" width="220" height="90" alt="リストボックスのみ表示"></TD>
+			<TD><IMG src="appear_both.png" width="220" height="90" alt="両方に表示"></TD>
+			<TD><IMG src="appear_inline.png"  width="220" height="90" alt="カーソル位置のみ表示"></TD>
+		</TR>
+	</TBODY></TABLE></DIV>
+	
+	<DT>filter<DD>
+	候補の絞り込み表示を行います。（デフォルト = yes）
+<PRE>
+filter=no
+</PRE>
+	
+	<DT>rows<DD>
+	リストボックスの行数を指定します。（デフォルト = 8）
+<PRE>
+rows=<VAR>10</VAR>
+</PRE>
+	
+	<DT>width<DD>
+	リストボックスの幅をピクセル単位で指定します。（デフォルト = 200）
+<PRE>
+width=<VAR>300</VAR>
+</PRE>
+</DL>
+
+
+
+
+<H3><A name="option:syntax" id="option:syntax">参照記法</A></H3>
+<DL class="sect">
+	<DT>@<DD>
+	デフォルト値として他のセクションを参照します。他のセクションの設定をオーバーライドし、差分だけを書くことができます。
+	<DIV class="samptitle">例</DIV>
+<PRE>
+[htmlfile]
+source=mix
+dic=html401.dic
+
+[.shtml]
+@=htmlfile
+dic=html401_with_ssi.dic
+</PRE>
+	<P>この例だと拡張子 .shtml に対し　<CODE>source=mix</CODE>　<CODE>dic=html401_with_ssi.dic</CODE>　が設定されます。参照できるのは同じ設定ファイル内にあるセクションだけです。設定を誤ると無限ループします。</P>
+</DL>
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><A href="#operation">リストボックスの操作</A> |
+		<LI><A href="#inifile">設定ファイルの書き方</A> |
+		<LI><A href="#option">設定項目</A> |
+		<LI><B>辞書の作り方</B> |
+		<LI><A href="#plugin">プラグインの作り方</A> |
+		<LI><A href="#qa">Q&amp;A</A>
+	</UL>
+</DIV>
+
+<H2><A name="dic" id="dic">辞書の作り方</A></H2>
+
+<UL class="subindex">
+	<LI><A href="#dic:dicfile">辞書ファイル</A> |
+	<LI><A href="#dic:hint">ヒントファイル</A>
+</UL>
+
+<P>CompleteX の辞書ファイルとヒントファイルは行指向のテキストファイルです。アーカイブに入っている sample.dic と sample.hint を参考にしてください。</P>
+
+
+<H3><A name="dic:dicfile" id="dic:dicfile">辞書ファイル</A></H3>
+
+<UL class="sect">
+	<LI>1行に1つの補完候補を書きます。
+	<LI>候補は ASCII 文字（文字コード 0x20 ～ 0x7E）のみで構成されるのが基本です。非 ASCII 文字が含まれていても問題ありませんが、その候補は <DFN>上候補／下候補</DFN> で選ぶことになります。
+	<LI>候補に abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ 以外の文字が含まれる場合は<A href="#option:dic">設定項目</A>の wordhas= に指定する必要があります。
+	<LI>コメントは書けません。
+	<LI>ファイルの終端には改行コードが必要です。混合補完モードで収集した候補を後ろに結合するためです。
+	<LI>ファイル名は任意です。拡張子が .dic でなくてもかまいません。
+</UL>
+
+<H4>正規化</H4>
+<P>辞書ファイルは正規化されていなければなりません。正規化とはファイル内容を行ごとにソートし重複行を除去することです。辞書ファイルの正規化は次の方法で行います。</P>
+<OL>
+	<LI>正規化したい辞書ファイルを秀丸エディタで開きます。
+	<LI><VAR>ベースフォルダ</VAR>\system\sortdic.mac を実行します。
+</OL>
+<P><EM>Windows の sort コマンドとは結果が異なります。</EM>必ず上記の方法を使ってください。</P>
+
+
+
+
+<H3><A name="dic:hint" id="dic:hint">ヒントファイル</A></H3>
+
+<UL class="sect">
+	<LI>1行に1つのヒント文字列を書きます。
+	<LI>補完候補との関連は書いた順番によって決まります。つまり、辞書ファイルのn行目の候補とヒントファイルのn行目の文字列が関連づけられます。
+	<LI><CODE>\n</CODE> と書くと表示時に改行されます。
+	<LI>ファイル名は任意です。拡張子が .hint でなくてもかまいません。
+</UL>
+
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><A href="#operation">リストボックスの操作</A> |
+		<LI><A href="#inifile">設定ファイルの書き方</A> |
+		<LI><A href="#option">設定項目</A> |
+		<LI><A href="#dic">辞書の作り方</A> |
+		<LI><B>プラグインの作り方</B> |
+		<LI><A href="#qa">Q&amp;A</A>
+	</UL>
+</DIV>
+
+<H2><A name="plugin" id="plugin">プラグインの作り方</A></H2>
+
+<P>他の秀丸マクロから CompleteX の補完機能を利用することができます。また、そのマクロを CompleteX から起動することもできます。このようなマクロをプラグインと呼びます。アーカイブに入っている sample-plugin.mac を参考にしてください。</P>
+
+<UL class="subindex">
+	<LI><A href="#plugin:flow">処理の流れ</A> |
+	<LI><A href="#plugin:listbox">リストボックスの使い方</A> |
+	<LI><A href="#plugin:nest">プラグインの連鎖</A> |
+	<LI><A href="#plugin:note">マクロ作者の方へ</A>
+</UL>
+
+
+<H3><A name="plugin:flow" id="plugin:flow">処理の流れ</A></H3>
+
+<P>CompleteX は複数のマクロが連係して動作するように設計されています。ファイル構成を思い出してください。</P>
+<PRE>
+■<VAR>マクロフォルダ</VAR>\
+│□CompleteX.mac         … 起動マクロ
+│
+└■CompleteX\            … ベースフォルダ
+　│□CompleteX-Main.mac  … 本体マクロ
+　│□config.txt          … 設定ファイル
+　│□プラグイン
+　│
+　└■system
+　　　□listbox.mac       … リストボックス
+　　　□listbox.param     … パラメータファイル
+</PRE>
+<P>これらのマクロ群は次の順序で実行されていきます。</P>
+
+<DIV class="fig"><IMG src="plugin_flow.png" alt="処理の流れ" width="447" height="346"></DIV>
+<OL>
+	<LI>ユーザーは CompleteX.mac を起動します。（フローチャートには描いてない）
+	<LI>CompleteX.mac は CompleteX-Main.mac を起動します。
+	<LI>CompleteX-Main.mac は設定ファイルを見て、指定されたプラグインを起動します。
+	<LI>プラグインは必要な前処理を行い、 listbox.mac を起動します。
+	<LI>listbox.mac はパラメータファイルで指定された候補をユーザーに選択させ、確定文字列を書き込んで終了します。
+	<LI>プラグインは必要な後処理を行い、終了します。
+	<LI>CompleteX-Main.mac はそのまま終了します。
+</OL>
+
+
+
+
+<H3><A name="plugin:listbox" id="plugin:listbox">リストボックスの使い方</A></H3>
+
+<P>プラグインは内部でリストボックス listbox.mac を呼び出します。機能分担を階層的に描くと下図のようになります。 listbox.mac はパラメータファイル listbox.param を介して上位層との間で情報をやりとりします。ここでは listbox.mac のインターフェイスを規定します。</P>
+
+<DIV class="fig"><IMG src="plugin_layer1.png" alt="階層構造" width="447" height="304"></DIV>
+
+<P>下は単純なプラグインの例です。</P>
+
+<DIV class="samptitle">プラグイン.mac</DIV>
+<PRE>
+$CfgFile = currentmacrodirectory + "\\config.txt";
+
+// 引数の設定
+$$prmfile = currentmacrodirectory + "\\system\\listbox.param";
+writeinistr $$prmfile, "Parameter", "cfgfile",  $CfgFile;           // (1)
+writeinistr $$prmfile, "Parameter", "source",   "list";             // (2)
+writeinistr $$prmfile, "Parameter", "list",     "hoge,fuga,piyo";
+writeinistr $$prmfile, "Parameter", "hints",    "ほげ,ふが,ぴよ";
+writeinistr $$prmfile, "Parameter", "unsorted", "overlap";          // (3)
+
+// リストボックス起動
+execmacro currentmacrodirectory + "\\system\\listbox.mac";          // (4)
+
+// 結果の取得
+#result  = getininum($$prmfile, "Return", "result");                // (5)
+$instr   = getinistr($$prmfile, "Return", "instr");                 // (6)
+$basestr = getinistr($$prmfile, "Return", "basestr");               // (7)
+
+// 後始末
+if (#result == 9 || #result == 13 || #result &gt;= 32) {
+    insert char(#result);                                           // (8)
+}
+</PRE>
+
+<H4>引数の設定</H4>
+<P>リストボックスに渡す引数はパラメータファイル listbox.param の Parameter セクションに書き込みます。</P>
+<DL class="sect">
+	<DT>cfgfile
+	<DD>設定ファイルのパスを指定します(1)。 listbox.mac はここで指定された設定ファイルを読みに行きます。
+	<DT>source, dic, hint, list, hints
+	<DD>ソースを指定します(2)。辞書ファイルを使うか候補リストを使うかで、次のどちらかのパターンになります。<SUP class="footmark"><A href="#foottext:21.1" name="footmark:21.1" id="footmark:21.1" title="名前補完モードを使いたいときはプラグインの連鎖（後述）により子プラグインとして CompleteWord.mac を起動します。">*1</A></SUP>
+	<DL class="sect">
+		<DT>辞書ファイルを使う場合<DD>
+<PRE>
+writeinistr $$prmfile, "Parameter", "source",   "dic";
+writeinistr $$prmfile, "Parameter", "dic",      $dicfile;           // 辞書ファイル名
+writeinistr $$prmfile, "Parameter", "hint",     $hintfile;          // ヒントファイル名
+</PRE>
+		プラグイン側で辞書ファイルを作る場合、 ~tmp.dic というファイル名は避けてください。本体が利用するテンポラリ辞書ファイル名と衝突するためです。
+		<DT>候補リストを使う場合<DD>
+<PRE>
+writeinistr $$prmfile, "Parameter", "source",   "list";
+writeinistr $$prmfile, "Parameter", "list",     "hoge,fuga,piyo";   // 候補リスト
+writeinistr $$prmfile, "Parameter", "hints",    "ほげ,ふが,ぴよ";   // ヒントリスト
+</PRE>
+		リストはカンマ区切り文字列です。ヒントリストはヒントファイルと同様、リストボックスの下に表示される内容をカンマ区切り文字列で指定します。
+	</DL>
+</DL>
+<P>必要に応じてその他の設定を追加します(3)。書ける内容は設定ファイルと同じです。〈→<A href="#option">設定項目</A>〉　設定ファイルに書かれた設定よりもパラメータファイルに書かれた設定の方が優先されます。</P>
+<P>特に指定しない限り、補完対象となるのはカーソルの直前にある一続きのアルファベット等です。補完対象を特に指定したい場合は次のようにします。</P>
+<DL class="sect">
+	<DT>instr
+	<DD>初期文字列を指定します。
+<PRE>
+moveto #x1, #y1;  beginsel;  moveto #x2, #y2;  endsel;      // 削除する範囲を選択
+writeinistr $$prmfile, "Parameter", "instr", "xyz";         // 初期文字列
+</PRE>
+	この例だとリストボックス起動時に (#x1, #y1) - (#x2, #y2) の範囲が削除され、 (#x1, #y1) にカーソルが置かれ、 <SAMP>xyz</SAMP> が入力された状態になります。
+</DL>
+
+<H4>リストボックス起動</H4>
+<P>listbox.mac を起動します(4)。確定文字列が insert された状態で返ってきます。不一致による自動確定で最後に入力された文字は insert されていません。</P>
+
+<H4>結果の取得</H4>
+<P>結果はパラメータファイル listbox.param の Return セクションに書き込まれています。</P>
+<DL class="sect">
+	<DT>result
+	<DD>返り値を取得します(5)。返り値の意味は次のとおりです。
+<PRE>
+result=-1 … キャンセル (Esc)
+result=0  … 一致による自動確定
+result=1  … 確定1 (Enter)
+result=2  … 確定2 (Shift+Enter)
+result=3  … 確定3 (Ctrl+Enter)
+result=<VAR>35</VAR> … 不一致による自動確定　値は最後に入力された文字コード（9, 13, 32～126）
+</PRE>
+	<DT>instr
+	<DD>確定文字列を取得します(6)。この例では使いませんが、複雑なプラグインを作るときはきっと使いたくなります。
+	<DT>basestr
+	<DD>初期文字列を取得します(7)。この例では使いませんが、キャンセル時にアンドゥしてよいかどうかの判定で必要になります。
+</DL>
+
+<H4>後始末</H4>
+<P>不一致による自動確定で最後に入力された文字を書き込みます(8)。</P>
+<P>プラグイン内で DLL をロードした場合、そのプラグインが責任をもって解放してください。逆に、プラグインが起動された時点ですでに DLL がロードされていた場合、その DLL を勝手に解放してはいけません。</P>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:21.1" name="foottext:21.1" id="foottext:21.1">*1</A></DT>
+	<DD>名前補完モードを使いたいときはプラグインの連鎖（後述）により子プラグインとして CompleteWord.mac を起動します。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="plugin:nest" id="plugin:nest">プラグインの連鎖</A></H3>
+
+<P>プラグインから他のプラグインを呼び出すこともできます。これを「プラグインの連鎖」と呼ぶことにします。たとえば2つのプラグインを連鎖させると全体の構造は下図のようになります。親プラグインと子プラグインの間では設定ファイル config.txt を介して情報をやりとりします（listbox.param ではありません）。ここではプラグイン同士のインターフェイスを規定します。</P>
+
+<DIV class="fig"><IMG src="plugin_layer2.png" alt="階層構造" width="447" height="374"></DIV>
+
+<P><A href="#plugin:listbox">前節</A>で説明した単純なプラグインとの違いは次の2点です。</P>
+<UL class="p">
+	<LI>親プラグインは listbox.mac に代わって他のプラグインを呼び出します。そのため、下位層との間のインターフェイスが変わります。
+	<LI>子プラグインは呼び出し元が CompleteX-Main.mac から他のプラグインに代わったことを知る必要があります。そのため、上位層との間のインターフェイスが加わります。
+</UL>
+<P>下は親プラグインの例です。親として他のプラグインを呼び出すと同時に、自分が子となって他のプラグインから呼び出されることも考慮しています。 (1), (2), (7), (8) が子プラグインとして必要な対上位インターフェイス、 (3) ～ (6) が親プラグインとして必要な対下位インターフェイスです。</P>
+
+<PRE>
+$CfgFile = currentmacrodirectory + "\\config.txt";
+
+// ファイルタイプ決定
+if (getinistr($CfgFile, "plugin", "type") == "plugin") {
+    $Type = "plugin";                                               // (1)　対上位
+} else {
+    $Type = filetype;                                               // (2)
+}
+
+// 引数の設定
+writeinistr $CfgFile, "plugin", "type", "plugin";                   // (3)　対下位
+writeinistr $CfgFile, "plugin", "@", filetype;                      // (4)　対下位
+
+// 子プラグイン起動
+if ($Type != "plugin") begingroupundo;
+execmacro currentmacrodirectory + "\\子プラグイン.mac";             // (5)　対下位
+if ($Type != "plugin") endgroupundo;
+
+// 結果の取得
+#result  = getininum($CfgFile, "plugin", "result");                 // (6)　対下位
+$instr   = getinistr($CfgFile, "plugin", "instr");
+$basestr = getinistr($CfgFile, "plugin", "basestr");
+
+// 後始末
+if ($Type == "plugin") {
+    writeinistr $CfgFile, "plugin", 0, 0;                           // (7)　対上位
+    writeinistr $CfgFile, "plugin", "basestr", "\"" + $basestr + "\"";
+    writeinistr $CfgFile, "plugin", "instr",   "\"" + $instr + "\"";
+    writeininum $CfgFile, "plugin", "result",  #result;
+} else if (#result == 9 || #result == 13 || #result &gt;= 32) {
+    insert char(#result);                                           // (8)
+} else if (#result &lt;= -1 &amp;&amp; $instr == $basestr) {
+    undo;                                                           // (9)
+}
+</PRE>
+
+<P>最下位の（自分で listbox.mac を呼び出す）子プラグインを作るときは、対下位インターフェイスを listbox.mac のもの〈→<A href="#plugin:listbox">前節</A>〉に差し替えればいいです。具体例はアーカイブに入っている sample-plugin.mac を見てください。</P>
+<P>実際にプラグインを作るときは、最上位のプラグインを作っているつもりでも対上位インターフェイスを持たせておいたほうがいいです。他のプラグインからその機能を使いたいと思ったとき子プラグインとして呼び出すことができ、車輪の再発明を避けられます。</P>
+
+<H4>ファイルタイプ決定</H4>
+<P>最初に設定ファイル config.txt の plugin セクションの type キーの値を見てください。この値が <CODE>plugin</CODE> だった場合、自分は他のプラグインから呼び出されたので、ファイルタイプは <CODE>"plugin"</CODE> とします(1)。それ以外の場合、自分は最上位のプラグインなので、ファイルタイプは <CODE>filetype</CODE> キーワードの値とします(2)。<SUP class="footmark"><A href="#foottext:22.1" name="footmark:22.1" id="footmark:22.1" title="秀丸メールにも対応するなら、秀丸メール上で実行されたらファイルタイプを &quot;turukame&quot; とします。判定方法は CompleteX-Main.mac の GetType サブルーチンを参考にしてください。">*1</A></SUP></P>
+<DL class="sect">
+	<DT>type
+	<DD>プラグインの連鎖の有無を示します。
+<PRE>
+[plugin]
+type=plugin … 連鎖している → ファイルタイプは "plugin"
+type=       … 連鎖してない → ファイルタイプは filetype
+</PRE>
+</DL>
+
+<H4>引数の設定～子プラグイン起動～結果の取得</H4>
+<P>親プラグインは config.txt の plugin セクションの type キーに <CODE>plugin</CODE> という値を書き込みます(3)。</P>
+<P>必要に応じてその他の設定を plugin セクションに追加します(4)。内容はユーザーが設定ファイルに書くものと同じです。〈→<A href="#option">設定項目</A>〉</P>
+<P>設定が済んだら子プラグインを起動します(5)。確定文字列が insert された状態で返ってきます。不一致による自動確定で最後に入力された文字は insert されていません。</P>
+<P>親プラグインは config.txt の plugin セクションから子プラグインの実行結果を取得します(6)。内容は listbox.mac の返り値と同じです。</P>
+
+<H4>後始末</H4>
+<P>自分が他のプラグインから呼び出されていた場合、呼び出し元に結果を返します(7)。最後に入力された文字を書き込むのは最上位のプラグインの役目なので、自分が書き込んではいけません。</P>
+<P>自分が最上位のプラグインだった場合、不一致による自動確定で最後に入力された文字を書き込みます(8)。キャンセルされた場合はアンドゥすることもできます(9)。</P>
+<P>プラグイン内で DLL をロードした場合、そのプラグインが責任をもって解放してください。逆に、プラグインが起動された時点ですでに DLL がロードされていた場合、その DLL を勝手に解放してはいけません。</P>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:22.1" name="foottext:22.1" id="foottext:22.1">*1</A></DT>
+	<DD>秀丸メールにも対応するなら、秀丸メール上で実行されたらファイルタイプを <CODE>"turukame"</CODE> とします。判定方法は CompleteX-Main.mac の GetType サブルーチンを参考にしてください。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="plugin:note" id="plugin:note">マクロ作者の方へ</A></H3>
+
+<UL class="sect">
+	<LI>CompleteX v2 用のプラグインを v3 用に直すときは <A href="v2tov3.html">v2 → v3</A> を参考にしてください。
+	<LI>プラグインを作るとき、私の書いたコードの一部を流用するのは OK です。許可は要りません。
+	<LI>自作マクロに補完エンジンとして CompleteX 本体を組み込むことができます。同梱配布も OK です。
+	<LI>ドキュメントを読んでもわからない点は <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> でお気軽にお尋ねください。
+</UL>
+
+
+
+
+<DIV class="footer">
+	<A href="#pagetop">CompleteX リファレンス</A>
+	<HR>
+	<UL class="subindex">
+		<LI><A href="#usage">使い方</A> |
+		<LI><A href="#operation">リストボックスの操作</A> |
+		<LI><A href="#inifile">設定ファイルの書き方</A> |
+		<LI><A href="#option">設定項目</A> |
+		<LI><A href="#dic">辞書の作り方</A> |
+		<LI><A href="#plugin">プラグインの作り方</A> |
+		<LI><B>Q&amp;A</B>
+	</UL>
+</DIV>
+
+<H2><A name="qa" id="qa">Q&amp;A</A></H2>
+
+<H4>秀丸メール／新規文書／grep 結果／実行結果／Web ブラウズモードのウィンドウで使うには？</H4>
+
+<P>設定ファイルに書ける特殊なセクションとして次のものがあります。これらのセクションに設定を記述してください。</P>
+<PRE>
+[turukame]      … 秀丸メールに対する設定
+[new]           … 新規文書に対する設定
+[grep]          … grep 結果ウィンドウに対する設定
+[exeresult]     … 実行結果ウィンドウに対する設定
+[webbrowse]     … Web ブラウズモードに対する設定
+</PRE>
+<P>ベースフォルダに turukame.dic, new.dic, grep.dic, exeresult.dic, webbrowse.dic を置いて使うこともできます。</P>
+
+<H4>「メモリが足りないので処理を中止します。」というエラーが出る／設定内容が有効にならない／なぜか名前補完モードになる</H4>
+
+<P>config.txt を排他的に開いたまま実行していませんか。 config.txt を閉じるか、ファイルの排他制御を無効にしてください。</P>
+
+<H4>設定ファイル名はなぜ config.ini じゃなくて config.txt なの？</H4>
+
+<P>一部のアンチウィルスソフトを使っている環境で、拡張子が .ini のファイルへの書き込みが極端に遅くなるという噂を聞いたからです。ほんまかいな。</P>
+
+<H4>まだわかんないことがあるんだけど。</H4>
+
+<P><A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A>へお越しください。</P>
+
+
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI><A href="#pagetop">CompleteX リファレンス</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<ADDRESS>(C) IKKI 2003-2009</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

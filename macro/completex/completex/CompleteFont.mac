@@ -1,0 +1,124 @@
+// 
+//  	CompleteFont
+//  	Version 3.11  (2009/09/10)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$CfgFile = currentmacrodirectory + "\\config.txt";
+$FontDic = currentmacrodirectory + "\\fonts.dic";
+
+// #debug = 1;
+call Main;
+endmacro;
+
+Main:
+	call LoadDLL;
+	call GetType;
+	call Prepare;
+	call Listbox;
+	call FreeDLL;
+	return;
+
+Prepare:		// 辞書作成
+	if (existfile($FontDic)) {
+		return;
+	}
+	if (dllfunc("STRISTR", getenv("ComSpec"), "command.com") >= 0) {
+		$$regkey = "\"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Fonts\"";		// 9x 系
+		runsync2 "regedit.exe /e /a \"" + $FontDic + "\" " + $$regkey;
+	} else {
+		$$regkey = "\"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts\"";		// NT 系
+		runsync2 "reg.exe export " + $$regkey + " \"" + $FontDic + "\""; 	// Vista UAC 回避。2000 では使えない 
+		if (!result) runsync2 "regedit.exe /e /a \"" + $FontDic + "\" " + $$regkey;
+	}
+	##_ = dllfunc("COLLECTSTR_SET", "output", "");
+	##_ = dllfunc("COLLECTSTR_CLEARSTR");
+	##_ = dllfunc("COLLECTSTR_COLLECT", $FontDic, "\"(.+?)( Bold| Italic)*( [0-9]+(,[0-9]+)+)?( \\(.+\\))?\"=", "\\1\n");
+	// フォント辞書ファイル作成
+	##fp = dllfunc("FILE_OPENFILE", $FontDic, "w");
+	if (##fp == 0) {
+		call Error "フォント辞書ファイルが作れません\n"
+		 + "同名のファイルやフォルダがあったら削除するか、名前を変更してください\n\n"
+		 + "フォント辞書ファイル: " + $FontDic;
+	}
+	##z = dllfunc("COLLECTSTR_GETDATASIZE");
+	while (##v < ##z) {
+		$$a = dllfuncstr("COLLECTSTR_GETSTR", ##v);
+		$$a = dllfuncstr("GSUB", $$a, " & ", "\n", false, false);
+		$$a = dllfuncstr("GSUB", $$a, "^[@%&].*\\n", "", false, false);
+		##_ = dllfunc("FILE_WRITEFILE", $$a, ##fp);
+		##v = ##v + 1;
+	}
+	##_ = dllfunc("FILE_CLOSEFILE", ##fp);
+	message "フォント辞書ファイルを作成しました\n\n"
+	 + "フォント辞書ファイルは自動的に更新されません。フォントを追加／削除したときはフォント辞書ファイルを削除してください\n\n"
+	 + "フォント辞書ファイル: " + $FontDic;
+	return;
+
+Listbox:		// リストボックス起動
+	if ($Type != "plugin") begingroupundo;
+	$$prmfile = currentmacrodirectory + "\\system\\listbox.param";
+	writeinistr $$prmfile, "Parameter", "cfgfile",  $CfgFile;
+	writeinistr $$prmfile, "Parameter", "source",   "dic";
+	writeinistr $$prmfile, "Parameter", "dic",      $FontDic;
+	writeinistr $$prmfile, "Parameter", "hint",     "nul";
+	writeinistr $$prmfile, "Parameter", "wordhas",  "-";
+	writeinistr $$prmfile, "Parameter", "unsorted", "overlap";
+	writeinistr $$prmfile, "Parameter", "zenkaku",  "yes";
+	execmacro currentmacrodirectory + "\\system\\listbox.mac";
+	#result  = getininum($$prmfile, "Return", "result");
+	$instr   = getinistr($$prmfile, "Return", "instr");
+	$basestr = getinistr($$prmfile, "Return", "basestr");
+	writeinistr $$prmfile, "Parameter", 0, 0;
+	if ($Type != "plugin") endgroupundo;
+	if ($Type == "plugin") {		// プラグインへ結果を返す
+		writeinistr $CfgFile, "plugin", 0, 0;
+		writeininum $CfgFile, "plugin", "result", #result;
+		writeinistr $CfgFile, "plugin", "instr",  "\"" + $instr + "\"";
+		writeinistr $CfgFile, "plugin", "basestr",  "\"" + $basestr + "\"";
+	} else if (#result == 9 || #result == 13 || #result >= 32) {		// 最後に入力された文字を書き込む
+		insert char(#result);
+	} else if (#result <= -1 && $instr == $basestr) {
+		undo;
+	}
+	return;
+
+//------ 共通サブルーチン ------------------------------------------------------
+
+GetType:		// ファイルタイプを取得
+	if (getinistr($CfgFile, "plugin", "type") == "plugin") {
+		$Type = "plugin";
+	} else if (leftstr(dllfuncstr("WINDOW_GETCLASSNAME", hidemaruhandle(0)), 8) == "TuruKame") {
+		$Type = "turukame";
+	} else {
+		$Type = filetype;
+	}
+	return;
+
+LoadDLL:		// DLL ロード
+	if (rightstr(loaddllfile, 13) != "\\macrodll.dll") {
+		loaddll currentmacrodirectory + "\\system\\macrodll.dll";
+		if (!result) {
+			call Error "macrodll.dll がロードできません\n"
+			 + "CompleteX を再インストールしてみてください\n\n"
+			 + currentmacrodirectory + "\\system\\macrodll.dll";
+		}
+		if (!dllfunc("SETHMJREDLL", hidemarudir + "\\HmJre." + "dll")) {
+			call Error "HmJre." + "dll が見つかりません\n"
+			 + "秀丸エディタを再インストールしてみてください\n"
+			 + hidemarudir + "\\HmJre." + "dll";
+		}
+		#basestat = #basestat | 0x01;
+	}
+	return;
+
+FreeDLL:		// DLL 解放
+	if (#basestat & 0x01) freedll;
+	return;
+
+Error:		// エラー処理
+	if ($$1 != "") message currentmacrobasename + ":  " + $$1;
+	freedll;
+	endmacro;
+
+//  		(C) IKKI <fujiwara@big.jp> 2006-2009

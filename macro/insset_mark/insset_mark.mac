@@ -1,0 +1,59 @@
+//見出しバーから階層情報を取得し、zn_helper.set_markを出力する
+
+//定数
+$delstr[0] = "PROCEDURE ";
+#dellen[0] = strlen($delstr[0]);
+$delstr[1] = "FUNCTION ";
+#dellen[1] = strlen($delstr[1]);
+$delstr[2] = "(";
+#dellen[2] = strlen($delstr[2]);
+$delstr[3] = " - ";
+#dellen[3] = strlen($delstr[3]);
+$Separator = "->";
+
+//見出しバー取得
+$title = gettitle(2);
+if ($title == "") {
+     message "見出し情報が取得できませんでした。";
+     endmacro;
+}
+
+//"PROCEDURE " 削除
+#pos = strstr($title, $delstr[0]);
+while(#pos >= 0){
+    $left  = leftstr($title, #pos);
+    $right = rightstr($title, strlen($title) - (#pos + #dellen[0]));
+    $title = $left + $right;
+    #pos   = strstr($title, $delstr[0]);
+}
+
+//"FUNCTION " 削除
+#pos = strstr($title, $delstr[1]);
+while(#pos >= 0){
+    $left  = leftstr($title, #pos);
+    $right = rightstr($title, strlen($title) - (#pos + #dellen[1]));
+    $title = $left + $right;
+    #pos   = strstr($title, $delstr[1]);
+}
+
+//"(" 削除
+#pos = strstr($title, $delstr[2]);
+while(#pos >= 0){
+    $left  = leftstr($title, #pos);
+    $right = rightstr($title, strlen($title) - (#pos + #dellen[2]));
+    $title = $left + $right;
+    #pos   = strstr($title, $delstr[2]);
+}
+
+//" - " ⇒ "->" 変換
+#pos = strstr($title, $delstr[3]);
+while(#pos >= 0){
+    $left  = leftstr($title, #pos);
+    $right = rightstr($title, strlen($title) - (#pos + #dellen[3]));
+    $title = $left + $Separator + $right;
+    #pos   = strstr($title, $delstr[3]);
+}
+
+//zn_helper.set_mark出力
+insert "zn_helper.set_mark('" + $title + "');";
+

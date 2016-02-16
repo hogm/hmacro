@@ -1,0 +1,39 @@
+beginclipboardread;
+
+if (!getclipboardinfo(0)) {
+    endmacro;
+}
+
+if (getclipboardinfo(1)) {
+    pasterect;
+    endmacro;
+}
+
+$str = getclipboard;
+if (rectselecting == 1){
+    #seltopx = seltopx;
+    #selendx = selendx;
+    #seltopy = seltopy;
+    #selendy = selendy;
+    disabledraw;
+    begingroupundo;
+    #line = #seltopy;
+    while( #line <= #selendy ) {
+        moveto #seltopx, #line;
+        insert $str;
+        #line = #line + 1;
+    }
+
+    #strsize = strlen($str) ;
+    #seltopx = #seltopx + #strsize;
+    #selendx = #selendx + #strsize;
+
+    moveto #seltopx,#seltopy;
+    beginrect;
+    moveto #selendx,#selendy;
+    endgroupundo;
+    enabledraw;
+}
+else{
+    paste;
+}

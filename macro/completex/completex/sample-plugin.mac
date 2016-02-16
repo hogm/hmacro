@@ -1,0 +1,48 @@
+// 
+//  	プラグインのサンプル
+//  	Version 3.1  (2009/09/04)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$CfgFile = currentmacrodirectory + "\\config.txt";
+
+// ファイルタイプ決定
+if (getinistr($CfgFile, "plugin", "type") == "plugin") {
+	$Type = "plugin";
+} else {
+	$Type = filetype;
+}
+
+// 一括アンドゥ開始
+if ($Type != "plugin") begingroupundo;
+
+// 引数の設定
+$$prmfile = currentmacrodirectory + "\\system\\listbox.param";
+writeinistr $$prmfile, "Parameter", "cfgfile",  $CfgFile;
+writeinistr $$prmfile, "Parameter", "source",   "list";
+writeinistr $$prmfile, "Parameter", "list",     "hoge,fuga,piyo";
+writeinistr $$prmfile, "Parameter", "hints",    "ほげ,ふが,ぴよ";
+writeinistr $$prmfile, "Parameter", "unsorted", "overlap";
+
+// リストボックス起動
+execmacro currentmacrodirectory + "\\system\\listbox.mac";
+
+// 結果の取得
+#result  = getininum($$prmfile, "Return", "result");
+$instr   = getinistr($$prmfile, "Return", "instr");
+$basestr = getinistr($$prmfile, "Return", "basestr");
+
+// 一括アンドゥ終了
+if ($Type != "plugin") endgroupundo;
+
+// 後始末
+if ($Type == "plugin") {
+	writeinistr $CfgFile, "plugin", 0, 0;
+	writeininum $CfgFile, "plugin", "result",  #result;
+	writeinistr $CfgFile, "plugin", "instr",   "\"" + $instr + "\"";
+	writeinistr $CfgFile, "plugin", "basestr", "\"" + $basestr + "\"";
+} else if (#result == 9 || #result == 13 || #result >= 32) {
+	insert char(#result);
+} else if (#result <= -1 && $instr == $basestr) {
+	undo;
+}

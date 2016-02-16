@@ -1,0 +1,54 @@
+//【機能】FUNCTION/PROCEDUREのBEGINにカーソルを移動
+
+loaddll "hmjre.dll";
+if(!result){
+  message "DLLのロードに失敗しました。";
+  endmacro;
+}
+
+disabledraw;
+
+//定数宣言
+$funcstring = "(FUNCTION|PROCEDURE)[\\s\\t]+";
+$spacestring = "                                                            ";
+
+#col = x;
+#line = y;
+#linecount = linecount2;
+call getlinetext #line, linelen2;
+
+//FUNCTION or PROCEDURE ある？
+#funcpos = dllfunc("FindRegularNoCaseSense", $funcstring, $$return, 0);
+if(#funcpos < 0){
+    enabledraw;
+    endmacro;
+}
+
+//BEGIN文字列設定
+$beginstring = "^" + leftstr($spacestring, #funcpos) + "BEGIN";
+
+//BEGINが見つかるまでループ
+while (#line < #linecount){
+    call getlinetext #line, linelen2;
+    #result = dllfunc("FindRegularNoCaseSense", $beginstring, $$return, 0);
+
+    if(#result >= 0){
+        //xがBEGINのNより後ろの場合、BEGINの先頭にカーソル移動
+        if(#col > strlen($beginstring)-1){
+            #col = #funcpos;
+        }
+        moveto #col, #line;
+        break;
+    }
+    
+    #line = #line + 1;
+}
+
+enabledraw;
+endmacro;
+
+// 1行取得関数 //
+getlinetext:
+    //タブはスペースに変換
+    $result = filter("HmFilter.hmf", "ToSpace", "1", gettext(0, ##1, ##2, ##1));
+    return $result;

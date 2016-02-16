@@ -1,0 +1,6 @@
+
+PROCEDURE ${1:procedure_name}
+IS
+BEGIN
+    $0
+END;

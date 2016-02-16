@@ -1,0 +1,81 @@
+// 
+//  	CompleteX の辞書を正規化する
+//  	Version 3.03  (2007/02/04)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$PrmFile = currentmacrodirectory + "\\sortdic.ini";
+$CfgFile = getinistr($PrmFile, "Parameter", "cfgfile");
+// #debug = 1;
+
+call LoadDLL;
+call Main;
+call FreeDLL;
+endmacro;
+
+Main:		// 手動モード（単独で実行される）
+	$dic = filename2;
+	$hint = dllfuncstr("GSUB", $dic, "\\.dic$", ".hint");
+	$$m = $dic + "\nを CompleteX の辞書ファイルとして正規化します。";
+	if (updated) {
+		$$m = $$m + "\n上書き保存していいですね？";
+	}
+	question $$m;
+	if (!result) return;
+	if (updated) {
+		save;
+	}
+	$$m = "一緒に正規化するヒントファイルはありますか？";
+	question $$m;
+	if (result) {
+		call GetFilename "ヒントファイルを指定してください", $hint;
+		if ($$return == "") return;
+		$hint = $$return;
+	} else {
+		$hint = "";
+	}
+	#result = dllfunc("FILE_SORTFILE", $dic, $hint);
+	if (#result) {
+		loadfile filename2;
+		$$m = "正規化しました\n";
+		$$m = $$m + "\n辞書ファイル = " + $dic;
+		if ($hint != "") {
+			$$m = $$m + "\nヒントファイル = " + $hint;
+		}
+	} else {
+		$$m = "正規化できませんでした";
+	}
+	message $$m;
+	return;
+
+GetFilename:
+	$$fn = input($$1, $$2);
+	if ($$fn == "") return;
+	while (!existfile($$fn)) {
+		$$fn = input("指定されたファイルが見つかりません\n" + $$1, $$fn);
+		if ($$fn == "") return;
+	}
+	return $$fn;
+
+//------ 共通サブルーチン ------------------------------------------------------
+
+LoadDLL:		// DLL ロード
+	loaddll currentmacrodirectory + "\\macrodll.dll";
+	if (!result) {
+		call Error "macrodll.dll がロードできません\n"
+		 + "CompleteX を再インストールしてみてください\n\n"
+		 + currentmacrodirectory + "\\macrodll.dll";
+	}
+	##_ = dllfunc("SETHMJREDLL", hidemarudir + "\\HmJre." + "dll");
+	return;
+
+FreeDLL:		// DLL 解放
+	freedll;
+	return;
+
+Error:		// エラー処理
+	if ($$1 != "") message currentmacrobasename + ":  " + $$1;
+	if (#basestat & 0x01) freedll;
+	endmacro;
+
+//  		(C) IKKI <fujiwara@big.jp> 2006-2007

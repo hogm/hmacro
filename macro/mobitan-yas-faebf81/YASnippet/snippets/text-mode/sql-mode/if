@@ -1,0 +1,6 @@
+#name : IF ... END IF;
+#group : control structure
+# --
+IF ${1:condition} THEN
+    $0
+END IF;

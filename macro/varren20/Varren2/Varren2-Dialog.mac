@@ -1,0 +1,1 @@
+execmacro currentmacrodirectory + "\\Varren2-Main.mac", "ui=dialog";

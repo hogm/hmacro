@@ -1,0 +1,190 @@
+//==============================================================================
+//
+//      sqlplus.mac - sqlplusを呼出
+//
+//==============================================================================
+
+loaddll "hmjre.dll";
+if(!result){
+  message "DLLのロードに失敗しました。";
+  endmacro;
+}
+
+// 検索バッファの保持
+$searchBuffer = searchbuffer;
+$replacebuffer = $searchbuffer;
+#searchOption = searchoption;
+$originalfilename = dllfuncstr( "ReplaceRegular", "\\", filename, 0, "\/" ,1);
+$connection_regular = "[ \\t]*[0-9a-zA-Z]{1,30}/[0-9a-zA-Z]{1,30}@[0-9a-zA-Z._]{1,30}[ \\t]*";
+$tempdir = getenv("TEMP");
+$sqlfile = $tempdir + "\\sqlplus.sql";
+$tmpfile = $tempdir + "\\sqlplus.txt";
+$inifile = macrodir + "\\sqlplus\\sqlplus.ini";
+$option = "set echo off\nset tab off\nset termout on\nset trimout on\nset trimspool on\nset define off\nset verify off\nset numwidth 10\nset long 100000\nset longchunksize 100000\nset linesize 32767\nset pagesize 50000\nset serveroutput on size 1000000\n";
+
+if (selecting == 1)
+{
+    $sql = gettext(seltopx, seltopy, selendx, selendy);
+}
+else
+{
+    $sql = gettext(0, 0, 4000, linecount2);
+}
+$allsql = gettext(0, 0, 4000, linecount2);
+
+#traceonly_pos = strstr(toupper($sql), "REM TRACE" );
+#str_pos = strstr(toupper($sql), "SELECT" );
+#end_pos = strstr(toupper($sql), ";" );
+if (#str_pos > -1 && #end_pos > -1 && #traceonly_pos > -1 && #str_pos > #traceonly_pos )
+{
+    $option = $option +  "set autotrace off\ncolumn plan_table_output format a300 heading VALUE\n";
+    $explain = "EXPLAIN PLAN FOR\n";
+    $exp_sql = "SELECT plan_table_output FROM TABLE(DBMS_XPLAN.display('plan_table',null,'serial'));";
+    $sql = $explain + midstr( $sql, #str_pos, #end_pos - #str_pos + 1) + "\n" + $exp_sql;
+    $format = "log";
+}
+else
+{
+    #html_pos = strstr(toupper($sql), "REM HTML" );
+    if (#html_pos > -1) $format = "html";
+    #csv_pos = strstr(toupper($sql), "REM CSV" );
+    if (#csv_pos > -1) $format = "csv";
+
+}
+
+$connection = "";
+if ($connection == "") call GetConnectionStrnig midstr($sql, 4, strstr($sql, "\n") - 4); 
+if ($connection == "") call GetConnectionStrnig midstr($allsql, 4, strstr($allsql, "\n") - 4);
+if ($connection == "") {
+    #save = true;
+    $default = getinistr($inifile, "Default", "ConnectionString");
+} else {
+    #save = false;
+    $default = $connection;
+    $connection = "";
+}
+
+$string = input("Oracle接続識別子(user/password@sid)", $default);
+call GetConnectionStrnig $string;
+if ($connection == "") {
+    call EndMacro;
+}
+else {
+    if (#save) writeinistr $inifile, "Default", "ConnectionString", $connection;
+}
+
+$show_message = getinistr($inifile, "Confirmation", "ConnectionString");
+if ($show_message == "True")
+{
+    question $connection + "で実行しますか？";
+    if( result == no ) {
+        call EndMacro;
+    }
+}
+
+if ($format == "") $format = tolower(getinistr($inifile, "Log", "Format"));
+if ($format == "html")
+{
+    $logfile = $tempdir + "\\sqlplus.html";
+    $option = $option + "set autotrace off\nset feedback off\nset echo off\nset markup html on spool on preformat off entmap on\n";
+}
+else if ($format == "csv")
+{
+    $logfile = $tempdir + "\\sqlplus.csv";
+    $option = $option + "set autotrace off\nset feedback off\nset echo off\nset head off\nset colsep \',\'\n";
+}
+else
+{
+    $logfile = $tempdir + "\\sqlplus.log";
+    $option = $option + "set autotrace on\n";
+}
+
+openfile "/h";
+insert $option;
+insert $sql;
+if ($format == "log") insert "\nshow errors";
+insert "\nEXIT\n";
+saveas $sqlfile;
+prevhidemaru;
+closehidemaruforced findhidemaru($sqlfile);
+
+//runsync2 "cmd /c (sqlplus -S -L " + $connection + " @\"" + $sqlfile + "\")";
+//runsync2 "cmd /c (sqlplus -S -R 3 " + $connection + " @" + $sqlfile + " > \"" + $logfile + "\" ) ";
+runsync2 "cmd /c (sqlplus -S -R 2 " + $connection + " @" + $sqlfile + " > \"" + $logfile + "\" ) ";
+
+
+$show_sql = getinistr($inifile, "SQL", "Show");
+if ($show_sql == "True") call ShowSQL;
+
+$show_log = getinistr($inifile, "Log", "Show");
+if ($show_log == "True") call ShowLog;
+
+EndMacro:
+    // 検索バッファ、置換バッファの復元
+    setsearch $searchBuffer, #search_option;
+    setreplace $replacebuffer;
+
+    freedll;
+    endmacro;
+
+GetConnectionStrnig:
+    if ($$1 == "") return;
+    #ret = dllfunc("FindRegular", $connection_regular, $$1, 0);
+    //正規表現にマッチすると-1より大きい値を返す。
+    if(#ret > -1){
+        $connection = $$1;
+    }
+    return;
+
+ShowLog:
+    if ($format == "html" || $format == "csv")
+    {
+        call ShellExecute $logfile, $format;
+    }
+    else
+    {
+        call CloseAndOpenHidemaru $logfile;
+        // エラー発生場所にファイル名の記述を追加
+        replaceallfast "^(\\d+)\\/\\d+\\s", $originalfilename + "\(\\1\)",regular;
+        save;
+    }
+    return;
+
+ShowSQL:
+    call CloseAndOpenHidemaru $sqlfile;
+    return;
+
+CloseAndOpenHidemaru:
+    if( findhidemaru( $$1 ) > 0 ) {
+        closehidemaruforced findhidemaru($$1);
+    }
+    openfile $$1;
+    return;
+
+ShellExecute:
+    //----------------------------------------------------------------------
+    //  拡張子のレジストリー内参照先をレジストリーから検索
+    openreg "CLASSESROOT", "." + $$2; //レジストリーを開く
+    $RegPath = getregstr(""); //標準を所得
+    closereg; //レジストリーを閉じる
+
+    //----------------------------------------------------------------------
+    //  拡張子の参照先をレジストリーから検索
+    openreg "CLASSESROOT",$RegPath+"\\shell\\open\\command"; //レジストリーを開く
+    $ExePath = getregstr(""); //標準を所得
+    closereg; //レジストリーを閉じる
+
+    //----------------------------------------------------------------------
+    //  「"%1"」を削除
+    #var = strlen($ExePath); //一時変数の設定
+    while( #var >= 0 ){
+        if( midstr($ExePath,#var,1)==" " )break; //スペース探し
+        #var = #var-1; //一時変数減算
+    }
+    $ExePath = midstr($ExePath,0,#var); //ソフトのパスを設定
+
+    //----------------------------------------------------------------------
+    //  指定のソフトでそのファイルを開く
+    run $ExePath+" \""+$$1+"\""; //ファイルを開く
+    return;
+

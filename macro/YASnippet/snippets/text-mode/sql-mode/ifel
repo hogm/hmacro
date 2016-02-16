@@ -1,0 +1,6 @@
+
+IF ${1:condition} THEN
+    $0
+ELSE
+    $0
+END IF;

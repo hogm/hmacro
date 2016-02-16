@@ -1,0 +1,10 @@
+//検索バッファの保持
+$replacebuffer  = replacebuffer;
+#searchOption   = searchoption;
+
+begingroupundo;
+replaceallfast "^[ 　\\t]+|[ 　\\t]+$" , "" , regular, nocasesense, inselect, nohilight;
+endgroupundo;
+
+//検索バッファの復元
+setsearch $replacebuffer, #searchOption;

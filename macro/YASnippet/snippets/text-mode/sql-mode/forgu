@@ -1,0 +1,24 @@
+
+
+l_hr_all_organization_units hr_all_organization_units%ROWTYPE;
+
+FUNCTION find_organization_unit(
+    p_organization_id IN hr_all_organization_units.organization_id%TYPE
+)
+RETURN hr_all_organization_units%ROWTYPE
+IS
+    l_result hr_all_organization_units%ROWTYPE;
+BEGIN
+    SELECT  *
+    INTO    l_result
+    FROM    hr_all_organization_units
+    WHERE   organization_id = p_organization_id
+            AND (SYSDATE >= date_from AND (SYSDATE < date_to OR date_to IS NULL))
+            AND location_id IS NOT NULL
+    ;
+
+    RETURN l_result;
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

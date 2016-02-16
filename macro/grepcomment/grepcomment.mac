@@ -1,0 +1,11 @@
+//検索バッファの保持
+$searchBuffer   = searchbuffer;
+#searchOption   = searchoption;
+$grepfilebuffer = grepfilebuffer;
+
+//実行
+localgrep "-- (FIXME|TODO|XXX) .*", regular
+
+//検索バッファの復元
+setsearch $searchBuffer, #searchOption;
+setgrepfile $grepfilebuffer;

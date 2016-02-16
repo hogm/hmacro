@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>Wisteria - 秀丸マクロ - CompleteX</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+</UL>
+
+<H2 class="pagetop">CompleteX</H2>
+
+<DIV class="abst"><P>リストボックスによる入力補完マクロ</P></DIV>
+
+<DIV class="date" align="right">Version 3.11　(2009/09/10)</DIV>
+
+<DIV class="layout"><TABLE width="98%"><TR><TD class="subindex" valign="top">
+	<H4 class="top">目次</H4>
+	<UL>
+		<LI><A href="#outline">概要</A>
+		<LI><A href="#download">ダウンロード</A>
+		<LI><A href="#setup">セットアップ</A>
+		<LI><A href="#statements">お約束</A>
+		<LI><A href="#history">バージョン履歴</A>
+		<LI><A href="#v2tov3">v2 からの変更点</A>
+		<LI><A href="#olds">旧バージョン</A>
+		<LI><A href="#feedback">フィードバック</A>
+	</UL>
+	<H4><A href="reference.html">リファレンス</A></H4>
+	<UL>
+		<LI><A href="reference.html#usage">使い方</A>
+		<LI><A href="reference.html#operation">リストボックスの操作</A>
+		<LI><A href="reference.html#inifile">設定ファイルの書き方</A>
+		<LI><A href="reference.html#option">オプション設定</A>
+		<LI><A href="reference.html#dic">辞書の作り方</A>
+		<LI><A href="reference.html#plugin">プラグインの作り方</A>
+		<LI><A href="reference.html#qa">Q&amp;A</A>
+	</UL>
+	<H4>同梱プラグイン</H4>
+	<UL>
+		<LI><A href="completeword.html">CompleteWord.mac</A>
+		<LI><A href="completepath.html">CompletePath.mac</A>
+		<LI><A href="completefont.html">CompleteFont.mac</A>
+	</UL>
+	<H4><A href="http://www18.big.or.jp/~fujiwara/ikki/forum/completex/">アップローダ</A></H4>
+	<H4><A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A></H4>
+</TD><TD class="body" valign="top">
+	<DIV class="fig" style="margin-top: 0;"><IMG src="completex31.png" alt="スクリーンショット" width="624" height="273"></DIV>
+	
+	<H3><A name="outline" id="outline">概要</A></H3>
+	<UL>
+		<LI>秀丸エディタ用の入力補完マクロです。 Visual Studio にある インテリセンス (IntelliSense) のようなコード補完機能が秀丸で実現できます。
+		<LI>2種類の補完モードがあります。
+		<DL>
+			<DT><DFN>辞書補完モード</DFN><DD>あらかじめ用意した辞書から補完します。 Emacs でいう シンボル展開 (complete-symbol) にあたります。拡張子ごとに辞書を指定できます。
+			<DT><DFN>名前補完モード</DFN><DD>編集中のファイル内で使われている単語を補完します。 Emacs でいう 動的略称展開 (dabbrev-completion) にあたります。
+		</DL>
+		<LI>プラグインにより機能を拡張できます。2つのプラグインが同梱されています。
+		<DL>
+			<DT><DFN>ファイル名補完プラグイン</DFN><DD>ファイル名やフォルダ名を補完します。相対パス、絶対パス、 UNC パスが書けます。
+			<DT><DFN>フォント名補完プラグイン</DFN><DD>システムにインストールされているフォント名を補完します。
+		</DL>
+		<LI>旧バージョン v2 からの変更点は <A href="v2tov3.html">v2 → v3</A> を参照してください。
+	</UL>
+</TD></TR></TABLE></DIV>
+
+
+<H3><A name="download" id="download">ダウンロード</A></H3>
+
+<UL class="files">
+	<LI class="lzh"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/completex311.lzh">completex311.lzh</A>　Version 3.11　(2009/09/10)
+</UL>
+
+
+<H3><A name="setup" id="setup">セットアップ</A></H3>
+
+<H4><A name="setup:install" id="setup:install">インストール</A></H4>
+<OL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> ver 7.00 以降をお使いですね？<SUP class="footmark"><A href="#foottext:1.1" name="footmark:1.1" id="footmark:1.1" title="秀丸エディタ v5.x ～ v6.x では CompleteX v3.08 を使ってください。〈→旧バージョン〉　秀丸エディタ v4.x 以前では CompleteX は使えません。">*1</A></SUP>
+	<LI>マクロフォルダの位置を確認します。マクロフォルダは秀丸エディタの [その他]-[動作環境...]-[パス]-[環境]-[マクロファイル用のフォルダ] で指定されているフォルダです。無指定なら Hidemaru.exe と同じフォルダです。
+	<LI>CompleteX のアーカイブをマクロフォルダに解凍します。必ずディレクトリ構造を保ったまま解凍してください。〈→<A href="#files">ファイル構成</A>〉
+	<LI>[マクロ]-[マクロ登録...] で CompleteX.mac を適当な番号に登録します。
+	<LI>[その他]-[キー割り当て...] で適当なキーに割り当てます。
+	<LI>割り当てたキーを押します。
+	<LI>リストボックスが表示されたらインストール完了です。実際に使ってみましょう。〈→<A href="reference.html#usage">使い方</A>〉
+</OL>
+
+<H4><A name="setup:update" id="setup:update">アップデート</A></H4>
+<OL class="sect">
+	<LI>新しいアーカイブをマクロフォルダに上書き解凍します。
+</OL>
+<UL>
+	<LI>v2 からのアップグレードも同様にフォルダごと上書きで OK です。初回起動時に移行マクロが走ります。〈→<A href="v2tov3.html">v2 → v3</A>〉
+	<LI>設定ファイルはそのまま引き継がれます。
+	<LI>キー割り当てをカスタマイズしている場合は初期化されます。必要なら事前にバックアップを取るなどしてください。
+</UL>
+
+<H4><A name="setup:uninstall" id="setup:uninstall">アンインストール</A></H4>
+<OL class="sect">
+	<LI>インストール時と同じ方法でキー割り当てを解除します。
+	<LI>同様にマクロ登録も解除します。
+	<LI>CompleteX.mac およびベースフォルダ以下の全ファイルを削除します。
+</OL>
+<UL>
+	<LI>レジストリは使っていません。
+</UL>
+
+
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:1.1" name="foottext:1.1" id="foottext:1.1">*1</A></DT>
+	<DD>秀丸エディタ v5.x ～ v6.x では CompleteX v3.08 を使ってください。〈→<a href="#olds">旧バージョン</a>〉　秀丸エディタ v4.x 以前では CompleteX は使えません。</DD>
+</DL></DIV>
+
+
+
+<H3><A name="files" id="files">ファイル構成</H3>
+
+<P>インストール後のファイル構成は次のようになります。（■=フォルダ、□=ファイル）</P>
+<PRE>
+■<VAR>マクロフォルダ</VAR>\
+│□CompleteX.mac         … 起動マクロ
+│
+└■CompleteX\            … ベースフォルダ
+　│□config.txt          … 設定ファイル
+　│□sample-config.txt   … 設定ファイルのサンプル
+　│□sample.dic          … 辞書ファイルのサンプル
+　│□sample.hint         … ヒントファイルのサンプル
+　│□CompleteX-Main.mac  … 本体
+　│□CompleteWord.mac    … 名前補完プラグイン
+　│□CompletePath.mac    … ファイル名補完プラグイン
+　│□CompleteFont.mac    … フォント名補完プラグイン
+　│
+　└■system
+　　　□sortdic.mac       … 辞書ファイル正規化マクロ
+　　　□makedic-php.js    … 辞書作成スクリプト (PHP 用)
+　　　□listbox.mac
+　　　□listbox.param
+　　　□macrodll.dll
+</PRE>
+<P>マクロフォルダ直下の CompleteX フォルダを<DFN>ベースフォルダ</DFN>と呼びます。サンプル以外のファイル名・フォルダ名は変更しないのが無難です。</P>
+<P>CompleteWord.mac, CompletePath.mac, CompleteFont.mac も必要に応じてキー割り当てしてください。</P>
+
+
+
+
+<H3><A name="usage" id="usage">使い方</H3>
+
+<P><A href="reference.html">リファレンス</A> を参照してください。</P>
+
+
+
+
+<H3><A name="statements" id="statements">お約束</A></H3>
+
+<H4>動作環境</H4>
+<UL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> v7.00 以降で動作するはずです。
+	<LI>秀丸エディタ v8.00β13 + HMJRE.DLL v2.05 で動作確認しました。
+</UL>
+
+<H4>ライセンス</H4>
+<UL class="sect">
+	<LI>このマクロはフリーウェアです。自由に利用、改変、再配布することができます。
+	<LI>改変したものを公に再配布するときは次のことを明記してください。
+	<UL class="p">
+		<LI>改変したものである旨（できれば改変内容も）
+		<LI>改変元の名称、バージョン、一次配布場所
+	</UL>
+</UL>
+
+<H4>配布場所</H4>
+<P>一次配布場所は <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">Wisteria - 秀丸マクロ - CompleteX</A> です。二次配布は次のところで行われています。</P>
+<UL>
+	<LI><A href="http://hide.maruo.co.jp/lib/macro/">秀丸エディタのマクロライブラリ</A>
+	<LI><A href="http://www.vector.co.jp/vpack/filearea/win95/writing/edit/hm/">Vector - Windows95/98/Me &gt; 文書作成 &gt; テキストエディタ &gt; 秀丸エディタ</A>
+</UL>
+
+<H4>謝辞</H4>
+<P>CompleteX は偉大なマクロ作者たちの英知を結集して作られたものです。（私の英知は入ってない）</P>
+<UL>
+	<LI><A href="http://www.ms.u-tokyo.ac.jp/~abenori/mycreate/fortex.html">祝鳥（のりてふ）</A> の作者 <A href="http://www.ms.u-tokyo.ac.jp/~abenori/">阿部 紀行</A> さん
+	<P>リストボックスを表示する DLL はもともと祝鳥（のりてふ）のために作られたもので、それを勝手に再利用したのが CompleteX のはじまりです。以来、のりさんとは共同開発体制？を敷いています。いつもありがとうございます。</P>
+	<LI><A href="http://hpcgi2.nifty.com/masema/bbs2/wforum.cgi">みんなで秀丸マクロを作る掲示板</A> の主 <A href="http://homepage2.nifty.com/masema/">ませま</A> さん
+	<P>主に仕様策定段階での議論や技術的な情報交換にこちらの掲示板を活用させていただいてました。</P>
+</UL>
+<P>CompleteX は次のところで紹介されてます。（発見順）</P>
+<UL>
+	<LI><A href="http://hail2u.net/blog/software/completex.html">hail2u.net - Weblog - CompleteX</A>
+	<LI><A href="http://d.hatena.ne.jp/jun-yoshida/20070311/1173623729">jun-ichi.blog.hatena &gt; 2007-03-11 秀丸で入力補完</A>
+	
+	
+	
+	<LI><A href="http://lets-go.hp.infoseek.co.jp/prog05.html">「すっきり!!デフラグ」非公式ヘルプのページ &gt; 無料で揃えるプログラミング環境 &gt; 第5章. Java</A>
+	<LI><A href="http://diary.hatena.ne.jp/mitty/20030609">はてなダイアリー - Random Walk... &gt; 2003-06-09</A>
+	
+	<LI><A href="http://irusuka.sakura.ne.jp/pc/soft.html">いるすか &gt; PC/Web &gt; 愛用ソフト</A>
+	<LI>書籍　<A href="http://www.gihyo.co.jp/books/syoseki.php/4-7741-2069-3">『秀丸』を100倍生かす 強力マクロの使い方</A>
+	<LI><A href="http://igaiga.s39.xrea.com/fswiki/wiki.cgi?page=%BD%A8%B4%DD">秀丸 - igaiga fswiki</A>
+	
+	
+	<LI><A href="http://d.hatena.ne.jp/Kousei777/20060806">Kousei日記、備忘録 &gt; 2006-08-06 (日)</A>
+	<LI><A href="http://hossy.info/diary/diary06c.php#t045">ほっしー's ほどほど日記 ('06 12月)</A>
+	<LI>他にもあったら教えてください。
+</UL>
+<P>上記の皆さん、ご意見をくださった皆さん、ほか関係する皆さんに深く感謝します。ありがとうございます。</P>
+
+
+
+
+<H3><A name="history" id="history">バージョン履歴</A></H3>
+
+<DL class="history">
+	<DT>Version 3.11 <SMALL>(2009/09/10)</SMALL><DD>
+	<UL>
+		<LI>添付の辞書を PHP 5.3 のものに更新
+		<LI>PHP 辞書作成スクリプトを同梱 (system\makedic-php.js)
+		<LI><A href="completefont.html#history">CompleteFont.mac の更新</A>
+	</UL>
+	<DT>Version 3.1 <SMALL>(2009/09/04)</SMALL><DD>
+	<UL>
+		<LI>秀丸エディタ v7.00 対応 (秀丸エディタ v6.x 以前では使えなくなりました)
+		<LI>アンドゥ関係の動作仕様変更
+		<UL>
+			<LI>確定した場合、アンドゥ 1 回で補完前の状態に戻る
+			<LI>キャンセルした場合、アンドゥ 0 回で補完前の状態に戻る
+			<LI>プラグインとして呼び出された場合の動作は従来通り
+		</UL>
+		<LI>タイトルバーに候補の共通部分を表示してたのを廃止
+		<LI><A href="completeword.html#history">CompleteWord.mac の更新</A>
+		<LI><A href="completepath.html#history">CompletePath.mac の更新</A>
+		<LI><A href="completefont.html#history">CompleteFont.mac の更新</A>
+	</UL>
+	<DT>Version 3.08 <SMALL>(2009/08/26)</SMALL><DD>
+	<UL>
+		<LI><A href="completeword.html#history">CompleteWord.mac の更新</A>
+		<LI>macrodll の更新
+	</UL>
+	<DT>Version 3.07 <SMALL>(2008/07/20)</SMALL><DD>
+	<UL>
+		<LI>macrodll のメモリリーク修正
+		<LI><A href="completefont.html#history">CompleteFont.mac の更新</A>
+	</UL>
+	<DT>Version 3.06 <SMALL>(2007/10/19)</SMALL><DD>
+	<UL>
+		<LI>何もしなくても最初の候補が選択されるバグ修正（v3.05 でエンバグした）
+	</UL>
+	<DT>Version 3.05 <SMALL>(2007/09/30)</SMALL><DD>
+	<UL>
+		<LI>添付の辞書を PHP 5.2.3 のものに更新
+		<LI>リストボックスのスクロールバーの [▼] をクリックすると変なことになるバグ修正
+	</UL>
+	<DT>Version 3.04 <SMALL>(2007/02/07)</SMALL><DD>
+	<UL>
+		<LI>秀丸エディタ v6.50 でしか使えなくなってたバグ修正（v3.03 でエンバグした）
+		<LI>ヒントをカンマ区切りリストで与える場合の設定名 <CODE>comment</CODE> を <CODE>hints</CODE> に変更
+		<LI>固定ヒント機能を追加（仕様はまだ流動的です）
+	</UL>
+	<DT>Version 3.03 <SMALL>(2007/02/04)</SMALL><DD>
+	<UL>
+		<LI>sortdic.mac でヒントファイルも一緒に正規化
+		<LI>macrodll.dll v0.82 (20070204) 同梱（DLL の仕様変更に対応）
+		<LI><A href="completefont.html#history">CompleteFont.mac の更新</A>
+	</UL>
+	<DT>Version 3.02 <SMALL>(2006/11/08)</SMALL><DD>
+	<UL>
+		<LI>ドキュメント修正
+	</UL>
+	<DT>Version 3.02 <SMALL>(2006/11/02)</SMALL><DD>
+	<UL>
+		<LI><A href="completepath.html#history">CompletePath.mac の更新</A>
+	</UL>
+	<DT>Version 3.01 <SMALL>(2006/10/23)</SMALL><DD>
+	<UL>
+		<LI>秀丸メール対応
+		<LI>Windows 9x 系でリストボックスを消したとき OS ごと落ちるバグ修正
+		<LI>macrodll.dll v0.80 (20061013) 同梱
+		<LI><A href="completeword.html#history">CompleteWord.mac の更新</A>
+		<LI><A href="completepath.html#history">CompletePath.mac の更新</A>
+		<LI><A href="completefont.html#history">CompleteFont.mac の更新</A>
+	</UL>
+	<DT>Version 3.0 <SMALL>(2006/10/01)</SMALL><DD>
+	<UL>
+		<LI>正式版
+		<LI>macrodll.dll v0.80 (20060922) 同梱
+		<LI><CODE>Overwrite=yes</CODE> でキャンセルしたとき起動前の状態に戻らないバグ修正
+	</UL>
+	<DT>Version 3.0 beta 6 <SMALL>(2006/08/06)</SMALL><DD>
+	<UL>
+		<LI>補完中 Ctrl+[ V ] でクリップボードから貼り付け
+	</UL>
+	<DT>Version 3.0 beta 5 <SMALL>(2006/08/06)</SMALL><DD>
+	<UL>
+		<LI>プラグインからプラグインを呼び出したあと「DLL がロードされてないのに dllfunc 関数が使われました」というエラーが出ることがあるバグ修正
+	</UL>
+	<DT>Version 3.0 beta 4 <SMALL>(2006/05/30)</SMALL><DD>
+	<UL>
+		<LI>プラグイン使用時 IME の状態が元に戻らないバグ修正
+		<LI>添付の PHP 用ヒントファイルの冗長さを減らす
+	</UL>
+	<DT>Version 3.0 beta 3 <SMALL>(2006/05/18)</SMALL><DD>
+	<UL>
+		<LI>ファイル名補完でキャンセルしたとき、その前に確定した文字列が書き込まれることがあるバグ修正
+	</UL>
+	<DT>Version 3.0 beta 2 <SMALL>(2006/05/11)</SMALL><DD>
+	<UL>
+		<LI>sortdic.mac のエラーを修正
+	</UL>
+	<DT>Version 3.0 beta 1 <SMALL>(2006/05/06)</SMALL><DD>
+	<UL>
+		<LI>初版
+	</UL>
+</DL>
+
+
+
+
+<H3><A name="v2tov3" id="v2tov3">v2 からの変更点</A></H3>
+
+<P><A href="v2tov3.html">v2 → v3</A> を参照してください。</P>
+
+
+
+
+<H3><A name="olds" id="olds">旧バージョン</A></H3>
+
+<UL class="files">
+	<LI class="lzh"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/completex308.lzh">completex308.lzh</A>　Version 3.08　(2009/08/26)
+	<LI class="html"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex_v2/">CompleteX v2</A>
+	<LI class="html"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/old/completex1.shtml">CompleteX v1</A>
+</UL>
+
+
+
+
+<H3><A name="feedback" id="feedback">フィードバック</A></H3>
+
+<P>バグ報告・提案・質問・ツッコミなどは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> へどうぞ。</P>
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_hidemaru_macro_completex.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" alt="">
+	<ADDRESS>(C) IKKI 2003-2009</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

@@ -1,0 +1,26 @@
+//前提条件：開発基準に準拠したフォルダ名、ファイル名であること
+
+$filename = filename;
+#pos = strstr($filename, "s.pls");
+
+if(#pos>0){
+    //ボディをオープン
+    $checkdir = "\\package\\";
+    $adddir = "\\package_body\\";
+    $extension = "b.pls";
+}
+else{
+    //仕様部をオープン
+    $checkdir = "\\package_body\\";
+    $adddir = "\\package\\";
+    $extension = "s.pls";
+}
+
+#pos = strstr($filename, $checkdir);
+$left = leftstr($filename, #pos);
+$right = midstr($filename, #pos + strlen($checkdir), strlen($filename) - (#pos + strlen($checkdir) + strlen($extension)));
+$filename = $left + $adddir + $right + $extension;
+
+if(existfile($filename) == 1){
+    openfile "/m3 " + $filename;
+}

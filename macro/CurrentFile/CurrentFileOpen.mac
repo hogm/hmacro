@@ -1,0 +1,15 @@
+$inifilename = macrodir + "\\CurrentFile\\CurrentFile.ini";
+$currentfilename = getinistr($inifilename, "currentfile", "file01");
+
+if($currentfilename == ""){
+    message "カレントファイルが登録されていません。";
+    endmacro;
+}
+
+if(!existfile($currentfilename)){
+    message "カレントファイルが存在しません。\n\nカレントファイル ： " + $currentfilename;
+    endmacro;
+}
+
+// 起動パラメータ"/m3"：同じファイルを２つ開くことを禁止する（既に開いているファイルにジャンプする）
+openfile "/m3 " + $currentfilename;

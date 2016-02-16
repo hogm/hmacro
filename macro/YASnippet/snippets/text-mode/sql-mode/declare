@@ -1,0 +1,10 @@
+PROCEDURE ä÷êîñº
+IS
+BEGIN
+    èàóù
+END;
+PROCEDURE \vprocedure_name\f
+IS
+BEGIN
+    \vstatemant\f
+END;

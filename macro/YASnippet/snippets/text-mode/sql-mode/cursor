@@ -1,0 +1,12 @@
+
+DECLARE
+    ;
+BEGIN
+    FOR r_${1:table_name} IN (
+        SELECT  *
+        FROM    ${1:table_name}
+        WHERE   
+    ) LOOP
+        $0
+    END LOOP;
+END;

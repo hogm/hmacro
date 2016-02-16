@@ -1,0 +1,4 @@
+
+WHILE ${1:condition} LOOP
+    $0
+END LOOP;

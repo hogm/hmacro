@@ -1,0 +1,4 @@
+SELECT  ${1:*}
+FROM    ${2:table_name}
+WHERE   $0
+;

@@ -1,0 +1,5 @@
+if (version < 700) {
+	message "秀丸エディタのバージョンが古いです\n秀丸エディタを v7.00 以上にバージョンアップするか、\nAltComment を v1.06 以下にバージョンダウンしてください";
+	endmacro;
+}
+execmacro currentmacrodirectory + "\\AltComment\\AltComment-Main.mac";

@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>Wisteria - 秀丸マクロ - CompleteFont.mac</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex">CompleteX</A> &gt; 
+</UL>
+
+<H2 class="pagetop">CompleteFont.mac</H2>
+
+<DIV class="abst"><P>フォント名補完マクロ　（<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> 用プラグイン）</P></DIV>
+
+<DIV class="date" align="right">Version 3.11　(2009/09/10)</DIV>
+
+<DIV class="layout">
+	<TABLE width="98%">
+	<TR><TD class="subindex" valign="top">
+	<H4 class="top">目次</H4>
+	<UL>
+		<LI><A href="#download">ダウンロード</A>
+		<LI><A href="#outline">概要</A>
+		<LI><A href="#usage">使い方</A>
+		<LI><A href="#option">設定</A>
+		<LI><A href="#statements">お約束</A>
+		<LI><A href="#history">バージョン履歴</A>
+		<LI><A href="#feedback">フィードバック</A>
+	</UL>
+</TD><TD class="body">
+	<DIV class="img"><IMG src="completefont.png" width="400" height="200" alt="スクリーンショット"></DIV>
+</TD></TR></TABLE></DIV>
+
+
+<H3><A name="download" id="download">ダウンロード</A></H3>
+
+<P><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> に同梱されています。</P>
+
+
+<H3><A name="outline" id="outline">概要</A></H3>
+
+<UL class="sect">
+	<LI>フォント名の補完機能を提供します。
+	<LI>システムにインストールされているフォント名が入力できます。
+</UL>
+
+
+<H3><A name="usage" id="usage">使い方</A></H3>
+
+<UL class="sect">
+	<LI><VAR>マクロフォルダ</VAR>\CompleteX\CompleteFont.mac を実行します。
+	<LI>半角英数字以外を含むフォント名を途中から補完するには、あらかじめフォント名の部分を範囲選択してから実行します。
+	<LI>初回起動時にフォント辞書ファイルが自動的に作成されます。
+	
+	<LI>フォント辞書ファイルは自動的に更新されません。フォントを追加／削除したときはフォント辞書ファイルを手動で削除してください。
+</UL>
+
+
+<H3><A name="option" id="option">設定</A></H3>
+
+<P>設定項目はありません。</P>
+
+
+<H3><A name="statements" id="statements">お約束</A></H3>
+
+<P>動作環境、ライセンス、配布場所は <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> と同じです。
+
+
+<H3><A name="history" id="history">バージョン履歴</A></H3>
+<DL class="history">
+	<DT>Version 3.11 <SMALL>(2009/09/10)</SMALL><DD>
+	<UL>
+		<LI>Windows XP/Vista でフォント辞書ファイル作成時に reg.exe を使う (Vista でユーザーアカウント制御ダイアログが表示されなくなりました)
+	</UL>
+	<DT>Version 3.1 <SMALL>(2009/09/04)</SMALL><DD>
+	<UL>
+		<LI>秀丸エディタ v7.00 対応 (秀丸エディタ v6.x 以前では使えなくなりました)
+		<LI>アンドゥ関係の動作仕様変更
+		<UL>
+			<LI>確定した場合、アンドゥ 1 回で補完前の状態に戻る
+			<LI>キャンセルした場合、アンドゥ 0 回で補完前の状態に戻る
+			<LI>プラグインとして呼び出された場合の動作は従来通り
+		</UL>
+	</UL>
+	<DT>Version 3.07 <SMALL>(2008/07/20)</SMALL><DD>
+	<UL>
+		<LI>Windows Vista 対応（フォント辞書ファイルを毎回作成しない）
+	</UL>
+	<DT>Version 3.03 <SMALL>(2007/02/04)</SMALL><DD>
+	<UL>
+		<LI>CompleteX v3.03 対応（CompleteX v3.02 以前では使えません）
+	</UL>
+	<DT>Version 3.01 <SMALL>(2006/10/23)</SMALL><DD>
+	<UL>
+		<LI>関係ないパラメータヒントが表示されることがあるバグ修正
+	</UL>
+	<DT>Version 3.0 <SMALL>(2006/10/01)</SMALL><DD>
+	<UL>
+		<LI>CompleteX v3 対応正式版
+	</UL>
+</DL>
+
+
+<H3><A name="feedback" id="feedback">フィードバック</A></H3>
+
+<P>ご意見、ご感想、バグ報告、ツッコミなどは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> へどうぞ。</P>
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_completefont.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" border="0" alt="">
+	<ADDRESS>(C) IKKI 2006-2009</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

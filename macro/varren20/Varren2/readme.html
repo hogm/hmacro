@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="ja">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=shift_jis">
+	<meta http-equiv="content-style-type" content="text/css">
+	<link rel="stylesheet" type="text/css" href="http://mobitan.org/wisteria-std.css">
+	<title>Wisteria - 秀丸マクロ - Varren2</title>
+</head>
+<body>
+
+<ul class="headnavi">
+	<li><a href="http://mobitan.org/">Wisteria</a> &gt;</li>
+	<li><a href="http://mobitan.org/hm/">秀丸マクロ</a> &gt;</li>
+</ul>
+
+<h2 class="pagetop">Varren2</h2>
+
+<div class="abst"><p>変数名変更 (Eclipse 風)</p></div>
+
+<div class="date" align="right"><!--{varren2|Version {verstr}　{date}-->Version 2.0　2011/10/01<!--}--></div>
+
+<div class="layout"><table width="98%"><tr><td class="subindex" valign="top">
+	<h4 class="top">目次</h4>
+	<ul>
+		<li><a href="#download">ダウンロード</a></li>
+		<li><a href="#outline">概要</a></li>
+		<li><a href="#setup">セットアップ</a></li>
+		<li><a href="#usage">使い方</a></li>
+		<li><a href="#detector">変数名とスコープの検出</a></li>
+		<li><a href="#setting">設定</a></li>
+		<li><a href="#statements">お約束</a></li>
+		<li><a href="#history">バージョン履歴</a></li>
+		<li><a href="#old">旧バージョン</a></li>
+		<li><a href="#feedback">フィードバック</a></li>
+	</ul>
+</td><td class="body" valign="top">
+	<div class="img"><img src="http://mobitan.org/hm/varren2/varren20.png" width="464" height="222" /></div>
+</td></tr></table></div>
+
+
+<h3><a name="download" id="download">ダウンロード</a></h3>
+
+<ul class="files">
+	<li class="zip"><!--{varren2|<a href="http://mobitan.org/hm/varren2/{arcname}">{arcname}</a>　Version {verstr}　({date})--><a href="http://mobitan.org/hm/varren2/varren20.zip">varren20.zip</a>　Version 2.0　(2011/10/01)<!--}-->
+</ul>
+
+
+<h3><a name="outline" id="outline">概要</a></h3>
+
+<ul class="sect">
+	<li>ソースコード上の変数名や関数名などを一括置換します。一般の単語も置換できます。</li>
+	<li>たぶん秀丸マクロ初・本格的なプレースホルダ編集機能を搭載。すべての出現個所がリアルタイムに書き換わり、カーソルから視線を外すことなく直観的に編集できます。</li>
+	<li>プログラミング言語に応じて変数のスコープを自動検出できます。検出ロジックはプラグイン方式になっていて、簡単なマクロを書くことで任意の言語に対応できます。</li>
+	<li>変数名が衝突すると警告が出ます。</li>
+</ul>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="setup" id="setup">セットアップ</a></h3>
+
+<h4><a name="setup:install" id="setup:install">インストール</a></h4>
+<ol class="sect">
+	<li><a href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</a> ver 8.00 以降をお使いですね？</li>
+	<li>マクロフォルダの位置を確認します。マクロフォルダは秀丸の [その他]-[動作環境]-[パス]-[環境]-[マクロファイル用のフォルダ] で指定されているフォルダです。無指定なら Hidemaru.exe と同じフォルダです。</li>
+	<li>ダウンロードしたアーカイブをマクロフォルダに解凍します。</li>
+	<li>[マクロ]-[マクロ登録] で Varren2.mac を適当な番号に登録します。</li>
+	<li>[その他]-[キー割り当て] で適当なキーに割り当てます。</li>
+</ol>
+<p>インストール後のファイル構成は次のようになります。</p>
+<pre>
+■マクロフォルダ\
+│・Varren2.mac           … 起動マクロ
+└■Varren2\
+　│・Varren2-Main.mac    … 本体マクロ
+　│・Varren2-Dialog.mac  … 本体マクロ (ダイアログ版)
+　│・detect.mac.mac      … 検出マクロ (サンプル: 秀丸マクロ用)
+　│・readme.html         … このドキュメント
+　└■system\
+　　　・placeholder2.mac  … プレースホルダ編集マクロ
+</pre>
+
+<h4><a name="setup:uninstall" id="setup:uninstall">アンインストール</a></h4>
+<ol class="sect">
+	<li>インストール時と同じ方法でキー割り当てを解除します。</li>
+	<li>同様にマクロ登録も解除します。</li>
+	<li>Varren2.mac と Varren2 フォルダを削除します。レジストリは使っていません。</li>
+</ol>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="usage" id="usage">使い方</a></h3>
+
+<ol class="sect">
+	<li>置換したい変数名の上にカーソルを置いて Varren2.mac を実行します。<ul class="p">
+		<li>大文字小文字は区別されます。</li>
+		<li>範囲選択時は選択範囲が単語として置換されます。</li>
+		<li>BOX 選択には対応していません (論理行単位で処理されます)。</li>
+	</ul></li>
+	<li>着色されたプレースホルダ上で編集を行います。<ul class="p">
+		<li>プレースホルダ編集中は次の操作のみが有効です:<ul class="p">
+			<li>文字入力 (直接入力のみ)</li>
+			<li>[BS]: バックスペース</li>
+			<li>[Enter]: 確定</li>
+			<li>[Esc]: キャンセル</li>
+			<li>[←][→][↑][↓]: カーソル移動</li>
+			<li>Shift+[←][→][↑][↓]: 範囲選択</li>
+			<li>Ctrl+[ X ]: カット</li>
+			<li>Ctrl+[ C ]: コピー</li>
+			<li>Ctrl+[ V ]: ペースト</li>
+		</ul></li>
+		<li>これら以外の操作は一切できません。例: [Delete]、[PageUp]、日本語入力、マウス操作など。<!--{footnote|Delete が利かないのはイヤだ! IME が使えなくちゃイヤだ! という人は、Varren2\Varren2-Dialog.mac を起動してみましょう。見飽きた文字入力ウィンドウが現れます。しかし、そいつを使うぐらいなら普通に置換すりゃいいんじゃないすかね?--><SUP class="footmark"><A href="#foottext:3.1" name="footmark:3.1" id="footmark:3.1" title="Delete が利かないのはイヤだ! IME が使えなくちゃイヤだ! という人は、Varren2\Varren2-Dialog.mac を起動してみましょう。見飽きた文字入力ウィンドウが現れます。しかし、そいつを使うぐらいなら普通に置換すりゃいいんじゃないすかね?">*1</A></SUP><!--}--></li>
+	</ul></li>
+	<li>[Enter] を押すか、プレースホルダ外の場所で文字入力すると確定します。[Esc] を押すと実行前の状態に戻ります。</li>
+</ol>
+
+<!--{foottext-->
+<DIV class="footnote"><HR><DL>
+	<DT><A href="#footmark:3.1" name="foottext:3.1" id="foottext:3.1">*1</A></DT>
+	<DD>Delete が利かないのはイヤだ! IME が使えなくちゃイヤだ! という人は、Varren2\Varren2-Dialog.mac を起動してみましょう。見飽きた文字入力ウィンドウが現れます。しかし、そいつを使うぐらいなら普通に置換すりゃいいんじゃないすかね?</DD>
+</DL></DIV>
+<!--}-->
+
+
+<h3><a name="detector" id="detector">変数名とスコープの検出</a></h3>
+
+<p>置換される変数名とスコープ (置換対象範囲) は、デフォルトでは次のルールで決定されます。</p>
+<ul>
+	<li>変数名:<ol class="p">
+		<li>無選択時: カーソル位置を含み、正規表現 <code>[@#$]*[_a-zA-Z0-9]+</code> にマッチする文字列。</li>
+		<li>範囲選択時: その選択範囲の文字列。</li>
+	</ol></li>
+	<li>スコープ:<ol class="p">
+		<li>折りたたみ可能行の範囲選択 (アウトライン解析との対応) で選択される範囲。</li>
+		<li>それで何も選択されなかった場合は、ファイル全体。</li>
+	</ol></li>
+</ul>
+<p>ファイルタイプ別の検出マクロを書くことで、この動作をカスタマイズすることができます。サンプルとして秀丸マクロのソースコード用の検出マクロが同梱されています:</p>
+
+<div class="samptitle">detect.mac.mac</div>
+<pre>
+// 変数名を取得
+if (!selecting) {
+	call SearchHere &quot;(|##?|\\$\\$?)[_a-zA-Z0-9]+&quot;;
+}
+$name = gettext(seltopx, seltopy, selendx, selendy, true);
+if ($name != &quot;&quot;) {
+	// スコープを範囲選択
+	if (leftstr($name, 2) == &quot;##&quot; || leftstr($name, 2) == &quot;$$&quot;) {
+		selectcfunc; // 強調行の範囲選択
+	} else {
+		selectall; // すべて選択
+	}
+}
+// 変数名を返す
+endmacro $name;
+
+// (以下サブルーチン略)
+</pre>
+
+<ul>
+	<li>この例では、まず、正規表現 <code>(|##?|\\$\\$?)[_a-zA-Z0-9]+</code> にマッチする文字列を変数名として取得します。次に、変数名の左側 2 文字が <code>##</code> または <code>$$</code> であればローカル変数と見なし、スコープとして強調行の範囲を選択します。そうでなければグローバル変数と見なし、スコープとしてファイル全体を選択します。最後に、<code>endmacro</code> の引数として変数名を返します。</li>
+</ul>
+<p>任意のプログラミング言語に対応させるには、この例にならって検出マクロを作ってください。</p>
+<ul>
+	<li>ファイル名は detect.<var>(拡張子)</var>.mac とし、Varren2-Main.mac と同じフォルダに置いてください。</li>
+	<li>ユーザーが Varren2.mac を起動したときのカーソル位置／選択範囲が維持された状態で検出マクロが起動されます。</li>
+	<li>検出マクロは次の 2 つの仕事をしてください。<ul class="p">
+		<li>置換対象の変数名を取得し、endmacro の引数として本体に返すこと。</li>
+		<li>スコープを範囲選択すること。</li>
+	</ul></li>
+	<li>変数名を取得できなかった場合は空文字列を返してください。この場合はスコープを範囲選択しないでください。</li>
+	<li>スコープは論理行単位となります。</li>
+	<li>検出マクロ内でメッセージ等を出す場合は、その前後で enabledraw; disabledraw; してください。</li>
+</ul>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="setting" id="setting">設定</a></h3>
+
+<dl class="sect">
+	<dt>プレースホルダの表示色</dt>
+	<dd>Varren2\system\placeholder2.mac の冒頭をいじるとカスタマイズできます。
+<pre>
+// 文字色
+#FontColor = 0x000000;
+
+// 背景色 (Varren2 で使うのは先頭の 1 色だけ)
+// ↑明               橙     赤     青     緑    青紫    茶     桜     水     草    赤紫    黄     灰
+// $ColorPalette = "<span style="background:#FDE5CC; color:#000000;">FDE5CC</span> <span style="background:#F2CDD1; color:#000000;">F2CDD1</span> <span style="background:#C4E1F2; color:#000000;">C4E1F2</span> <span style="background:#D9EAD5; color:#000000;">D9EAD5</span> <span style="background:#DFD7E7; color:#000000;">DFD7E7</span> <span style="background:#F2EADD; color:#000000;">F2EADD</span> <span style="background:#F5DEDD; color:#000000;">F5DEDD</span> <span style="background:#DBE8ED; color:#000000;">DBE8ED</span> <span style="background:#DDECD0; color:#000000;">DDECD0</span> <span style="background:#EEDDEF; color:#000000;">EEDDEF</span> <span style="background:#F0ECD8; color:#000000;">F0ECD8</span> <span style="background:#EAEAEA; color:#000000;">EAEAEA</span> ";
+// $ColorPalette = "<span style="background:#FBCB9A; color:#000000;">FBCB9A</span> <span style="background:#E59CA4; color:#000000;">E59CA4</span> <span style="background:#89C3E5; color:#000000;">89C3E5</span> <span style="background:#B3D5AB; color:#000000;">B3D5AB</span> <span style="background:#BFAFCF; color:#000000;">BFAFCF</span> <span style="background:#E6D5BC; color:#000000;">E6D5BC</span> <span style="background:#EBBDBB; color:#000000;">EBBDBB</span> <span style="background:#B8D1DB; color:#000000;">B8D1DB</span> <span style="background:#BCDAA2; color:#000000;">BCDAA2</span> <span style="background:#DDBBDF; color:#000000;">DDBBDF</span> <span style="background:#E2D9B1; color:#000000;">E2D9B1</span> <span style="background:#CBCBCB; color:#000000;">CBCBCB</span> ";
+   $ColorPalette = "<span style="background:#F9B268; color:#000000;">F9B268</span> <span style="background:#D86B77; color:#000000;">D86B77</span> <span style="background:#4EA5D8; color:#000000;">4EA5D8</span> <span style="background:#8DC182; color:#000000;">8DC182</span> <span style="background:#9F87B7; color:#000000;">9F87B7</span> <span style="background:#D9C19B; color:#000000;">D9C19B</span> <span style="background:#E19D99; color:#000000;">E19D99</span> <span style="background:#95BAC9; color:#000000;">95BAC9</span> <span style="background:#9BC874; color:#000000;">9BC874</span> <span style="background:#CC9ACF; color:#000000;">CC9ACF</span> <span style="background:#D4C68B; color:#000000;">D4C68B</span> <span style="background:#989898; color:#000000;">989898</span> ";
+// $ColorPalette = "<span style="background:#B45F06; color:#FFFFFF;">B45F06</span> <span style="background:#9F2936; color:#FFFFFF;">9F2936</span> <span style="background:#1B587C; color:#FFFFFF;">1B587C</span> <span style="background:#4E8542; color:#FFFFFF;">4E8542</span> <span style="background:#604878; color:#FFFFFF;">604878</span> <span style="background:#997339; color:#FFFFFF;">997339</span> <span style="background:#CD5C56; color:#FFFFFF;">CD5C56</span> <span style="background:#538BA2; color:#FFFFFF;">538BA2</span> <span style="background:#5B8835; color:#FFFFFF;">5B8835</span> <span style="background:#AB57AF; color:#FFFFFF;">AB57AF</span> <span style="background:#B49F42; color:#FFFFFF;">B49F42</span> <span style="background:#464646; color:#FFFFFF;">464646</span> ";
+// ↓暗
+</pre>
+	</dd>
+</dl>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="statements" id="statements">お約束</a></h3>
+
+<h4>動作環境</h4>
+<ul class="sect">
+	<li><a href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</a> v8.00 以降で動作するはずです。</li>
+	<li>秀丸エディタ v8.11 で動作確認しました。</li>
+</ul>
+
+<h4>ライセンス</h4>
+<ul class="sect">
+	<li>このマクロはフリーウェアです。自由に利用、改変、再配布することができます。</li>
+	<li>改変したものを公に再配布するときは次のことを明記してください。<ul class="p">
+		<li>改変したものである旨 (できれば改変内容も)</li>
+		<li>改変元の名称、バージョン、一次配布場所</li>
+	</ul></li>
+</ul>
+
+<h4>配布場所</h4>
+<p>一次配布場所は <a href="http://mobitan.org/hm/varren2/">Wisteria - 秀丸マクロ - Varren2</a> です。二次配布は次のところで行われています。</p>
+<ul>
+	<li><a href="http://hide.maruo.co.jp/lib/macro/">秀丸エディタのマクロライブラリ</a></li>
+	<li><a href="http://www.vector.co.jp/vpack/filearea/winnt/writing/edit/hm/">Vector - WindowsVista/XP/2000/NT &gt; 文書作成 &gt; テキストエディタ &gt; 秀丸エディタ</a></li>
+</ul>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="history" id="history">バージョン履歴</a></h3>
+
+<dl class="history">
+	<dt>Version 2.0 <small>(2011/09/30)</small></dt>
+	<dd><ul>
+		<li>初版</li>
+	</ul></dd>
+</dl>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="old" id="old">旧バージョン</a></h3>
+
+<p>もはや全然別物だがね!</p>
+<ul class="files">
+	<li><a href="http://mobitan.org/hm/varren/"><b>Varren</b></a>　変数名変更　<small>Version 1.04　(2008/12/27)</small>
+	<li><a href="http://mobitan.org/hm/varlook/"><b>Varlook</b></a>　変数名強調　<small>Version 1.04　(2008/12/27)</small>
+</ul>
+
+<!--{foottext--><!--}-->
+
+
+<h3><a name="feedback" id="feedback">フィードバック</a></h3>
+
+<p>検出マクロの提供、バグ報告、提案、ツッコミなどは <a href="http://forum.mobitan.org/hm/">談話室</a> へどうぞ。</p>
+
+<!--{foottext--><!--}-->
+
+
+<div class="footer" align="right">
+	<ul class="footnavi">
+		<li>&lt; <a href="http://mobitan.org/hm/">秀丸マクロ</a></li>
+		<li>&lt; <a href="http://mobitan.org/">Wisteria</a></li>
+	</ul>
+	<hr />
+	<address>(C) mobitan 2011</address>
+</div>
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-12380484-1");
+pageTracker._setDomainName(".mobitan.org");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+// ReformTag.mac :	Written by Motonori Tamaki ver.03/01/08
+//	Tabsize = 8
+
+if( !selecting )
+	selectall;
+cut;
+#oldhidemaru = hidemaruhandle( 0 );
+newfile;
+paste;
+
+{//JavaScriptタグの内容とpreタグの内容を退避。
+	title "退避中";
+
+	#ReformingHidemaru = hidemaruhandle( 0 );
+	gofiletop;
+
+	while( 1 )
+	{
+		//Scriptタグの内容を選択。
+		searchdown "<script";
+		if( !result )
+			break;
+		searchdown ">";
+		if( !result )
+			break;
+		right;
+		beginsel;
+		searchdown "</script>";
+		if( !result )
+			break;
+		left;
+
+		//カット、タグの挿入、退避。
+		cut;
+		#isCount = #isCount + 1;
+		insert "#s" + str( #isCount ) + "#";
+		newfile;
+		#BackupScriptHidemaru[#isCount] = hidemaruhandle( 0 );
+		paste;
+		setactivehidemaru #ReformingHidemaru;
+	}
+	gofiletop;
+	while( 1 )
+	{
+		//preタグの内容を選択。
+		searchdown "<pre";
+		if( !result )
+			break;
+		searchdown ">";
+		if( !result )
+			break;
+		right;
+		beginsel;
+		searchdown "</pre>";
+		if( !result )
+			break;
+
+		//カット、タグの挿入、退避。
+		cut;
+		#ipCount = #ipCount + 1;
+		insert "#p" + str( #ipCount ) + "#";
+		newfile;
+		#BackupPreHidemaru[#ipCount] = hidemaruhandle( 0 );
+		paste;
+		setactivehidemaru #ReformingHidemaru;
+	}
+	setactivehidemaru #ReformingHidemaru;
+}
+
+//大雑把に整形
+{
+	//まず一行にタグ一個にする。
+	replaceallfast ">", ">\n", regular;
+	replaceallfast "<", "\n<", regular;
+	replaceallfast "<!--", "<!--##>\n", regular;
+	replaceallfast "<!--\n", "<!--#>\n", regular;
+
+	//タグをフォーマットする。
+	replaceallfast "^<[ |\t]", "<", regular;
+
+	//空白とタブを削除する
+	title "空白整形中";
+	replaceallfast "( *|\t*)\n( *|\t*)", "\n", regular;
+
+	//余計な改行を削除する。
+	title "改行整形中";
+//	replaceallfast "\\n+", "\n", regular;	//が通らない。なぜ？
+	replaceallfast "\n\n", "\n", regular;
+	while( result )
+		replaceallfast "\n\n", "\n", regular;
+
+}
+disabledraw;
+//タグでインデントする。
+{
+	gofiletop;
+	while(1)
+	{
+		//新規タグ検索
+		searchdown "<";
+		if( !result )
+			break;
+		//位置の保存
+		#iStartX = x;
+		#iStartY = y;
+
+		//タグ中の改行削除
+		while( 1 )
+		{
+			golineend2;
+			$endword = gettext( x-1, y, x, y );
+			if( $endword != ">" )
+			{
+				golineend2;
+				beginsel;
+				wordrightsalnen;
+				wordleft;
+				delete;
+				insert " ";
+			}else
+				break;
+		}
+		moveto #iStartX, #iStartY;
+
+		//タグの取得
+		right;
+		beginsel;
+		wordrightsalnen;
+		tolower;
+		escape;
+		$tag = gettext( seltopx, seltopy, selendx, selendy );
+		title "タグインデント整形中：" + str(y) + "行目：<" + $tag + ">";
+
+		//ブロックタグじゃないタグの除外
+		if( leftstr($tag,1) == "/" || $tag == "meta" || $tag == "img" || $tag == "hr"  || $tag == "br" || leftstr($tag,1) == "!" )
+		{
+			//brタグは前の行の最後に移動
+			if( $tag == "br" )
+			{
+				//もし前の行末もタグならそのときは普通に戻る。
+				golinetop2;
+				left;
+				beginsel;
+				left;
+				escape;
+				if( gettext( seltopx, seltopy, selendx, selendy ) != ">" )
+				{
+					moveto #iStartX, #iStartY;
+					beginsel;
+					wordleft;
+					delete;
+				}else{
+					golineend2;
+					right;
+				}
+			}
+			//hrタグは前後に改行を挿入
+//			if( $tag == "hr" )
+//			{
+//				golinetop2;
+//				insert "\n";
+//				golineend2;
+//				insert "\n\n";
+//			}
+			golineend2;
+			continue;
+		}
+		moveto #iStartX, #iStartY;
+		#iEndY = #iStartY;
+		#iStart2Y = #iStartY;
+		//タグのネストを考慮して、終了タグを探す
+		NestCheck:
+		moveto 0, #iEndY;
+		golineend2;
+		searchdown "</" + $tag + ">";	//終了タグを探す
+		if( !result )
+		{//タグのネストがおかしい。このマクロでは無視して次のタグ検索。
+			moveto #iStartX, #iStartY;
+			golineend2;
+			continue;
+		}
+		#iEndY = y;
+
+		//現在の開始タグから現在の終了タグの間に開始タグは含まれているか
+		moveto 0, #iStart2Y;
+		golineend2;
+		beginsel;
+		moveto 0, #iEndY;
+		searchdown "<" + $tag, inselect;
+		if( result )
+		{//タグがネストしている。ここから次の終了タグ検索。
+			escape;
+			#iStart2Y = y;
+			goto NestCheck;
+		}else{//終了タグの位置が見つかった。インデントする。
+			escape;
+			if( #iStartY + 1 == #iEndY )	//タグの中身がないときは無視して次のタグ検索。
+			{
+				escape;
+				moveto #iStartX, #iStartY;
+				golineend2;
+				continue;
+			}
+			if( #iStartY + 2 == #iEndY && $tag != "script" )
+			{//終了タグ内が1行なら一行にまとめる。<td>...</td>って感じに。
+				moveto 0, #iStartY+1;	//開始タグの次の行頭に移動
+				{
+					while( colorcode & 0x20 )
+						delete;//インデント分のスペースを削る。
+					backspace;//行末の改行を削る。
+				}
+				moveto 0, #iStartY+1;	//開始タグの次の行頭に移動
+				{//もう一回やって終了タグを行末に持ってくる。
+					while( colorcode & 0x20 )
+						delete;//インデント分のスペースを削る。
+					backspace;//行末の改行を削る。
+				}
+			}
+			else if( $tag != "html" && $tag != "frame" && $tag != "table" )	//これらはインデントしない(範囲広いから)
+			{
+				//インデント
+				moveto 0, #iStartY+1;
+				beginsel;
+				moveto 0, #iEndY;
+				indent;
+				escape;
+			}
+			moveto #iStartX, #iStartY;
+			golineend2;
+		}
+	}
+	escape;
+	gofiletop;
+	delete;
+}
+
+replaceallfast "<!--#>\n", "<!--\n", regular;
+replaceallfast "<!--##>\n", "<!--", regular;
+
+replaceallfast "<!--\t*", "<!--", regular;
+
+{//Scriptタグの内容を書き戻す。
+	while( #isCount > 0 )
+	{
+		gofiletop;
+		searchdown "#s" + str( #isCount ) + "#";
+			//いくつインデントされているか調べる。
+			##indents = x / tabcount - 1;
+		beginsel;
+		searchdown "#";
+		right;
+		delete;
+
+		setactivehidemaru #BackupScriptHidemaru[#isCount];
+		selectall;
+		cut;
+
+		setactivehidemaru #ReformingHidemaru;
+		closehidemaruforced #BackupScriptHidemaru[#isCount];
+
+		beginsel;
+		golinetop2;
+		delete;
+
+		##TX = x;
+		##TY = y;
+
+		paste;
+		beginsel;
+		moveto ##TX, ##TY;
+		while( ##indents > 0)
+		{
+			indent;
+			##indents = ##indents - 1;
+		}
+		escape;
+		#isCount = #isCount - 1;
+	}
+}
+{//preタグの内容を書き戻す。
+	while( #ipCount > 0 )
+	{
+		gofiletop;
+		searchdown "#p" + str( #ipCount ) + "#";
+		beginsel;
+		searchdown "#";
+		right;
+
+		setactivehidemaru #BackupPreHidemaru[#ipCount];
+		selectall;
+		cut;
+
+		setactivehidemaru #ReformingHidemaru;
+		closehidemaruforced #BackupPreHidemaru[#ipCount];
+
+		insertreturn;
+		golinetop2;
+		insertreturn;
+		up;
+		paste;
+		#ipCount = #ipCount - 1;
+	}
+}
+
+gofiletop;
+title "整形完了。";
+enabledraw;
+
+selectall;
+cut;
+
+#bufferhidemaru = hidemaruhandle( 0 );
+setactivehidemaru #oldhidemaru;
+closehidemaruforced #bufferhidemaru;
+
+paste;

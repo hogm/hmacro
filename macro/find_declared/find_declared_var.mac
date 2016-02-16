@@ -1,0 +1,96 @@
+
+// 検索バッファの保持
+$search_buffer = searchbuffer;
+#search_option = searchoption;
+
+selectword;
+$word = gettext(seltopx,seltopy,selendx,selendy);
+
+if(strlen($word) == 0){
+    endmacro;
+}
+
+$regular_header = "^[\\t ]*" + $word + "[\\t ]+";
+$regular_const = "(CONSTANT[\\t ]+)?";
+$regular_default = "([\\t ]+DEFAULT[\\t ]+|[\\t ]+:=[\\t ]+).+";
+$regular_footer = "[\\t ]*(;|;[\\t ]*--.*)[\\t ]*$";
+
+if(gettext(seltopx-1,seltopy,seltopx,selendy) == "."){
+    moveto seltopx-2,seltopy;
+    selectword;
+
+    //仕様部を開く
+    $filename = "../package/" + gettext(seltopx,seltopy,selendx,selendy) + "S.pls";
+    
+    if(existfile($filename) == 1){
+        openfile $filename;
+    }
+    else{
+        endmacro;
+    }
+}
+
+// varchar型
+$regular_varchar = "(CONSTANT[\\t ]+)?(VARCHAR|VARCHAR2|NVARCHAR2|CHAR|NCHAR)(\\([0-9]+\\))?([\\t ]*|" + $regular_default + ")";
+$buffer = $regular_header + $regular_const + $regular_varchar + $regular_footer;
+call SearchSub;
+
+// number型
+$regular_number= "NUMBER(\\([0-9,]+\\))?([\\t ]*|" + $regular_default + ")";
+$buffer = $regular_header + $regular_const + $regular_number + $regular_footer;
+call SearchSub;
+
+// integer型
+$regular_integer = "(CONSTANT[\\t ]+)?(PLS_INTEGER|BINARY_INTEGER)([\\t ]*|" + $regular_default + ")";
+$buffer = $regular_header + $regular_const + $regular_integer + $regular_footer;
+call SearchSub;
+
+// type型
+$regular_type = "[a-zA-Z0-9_.@ ]*(%TYPE|%ROWTYPE)([\\t ]*|" + $regular_default + ")";
+$buffer = $regular_header + $regular_const + $regular_type + $regular_footer;
+call SearchSub;
+
+// exception型
+$regular_exception = "EXCEPTION[\\t ]*";
+$buffer = $regular_header + $regular_const + $regular_exception + $regular_footer;
+call SearchSub;
+
+// type型
+$buffer = "^[\\t ]*TYPE" + "[\\t ]+" + $word + "[\\t ]+";
+call SearchSub;
+
+// その他
+$regular_others = "(CONSTANT[\\t ]+)?(LONG|LONG RAW|RAW|ROWID|BOOLEAN|BFILE|BLOB|CLOB|NCLOB|DATE)([\\t ]*|" + $regular_default + ")[\\t ]*";
+$buffer = $regular_header + $regular_const + $regular_others + $regular_footer;
+call SearchSub;
+
+// パラメータ
+$buffer = "(^[\\t ]*|[\\t ]*\\([\\t ]+|[\\t ]*,[\\t ]+)" + $word + "[\\t ]+(IN|OUT|OUT[\\t ]+NO_COPY|IN[\\t ]+OUT|IN[\\t ]+[\\t ]+NO_COPY).*";
+call SearchSub;
+
+// コレクション型
+$regular_collection= ".+_TYPE([\\t ]*|" + $regular_default + ")";
+$buffer = $regular_header + $regular_collection + $regular_footer;
+call SearchSub;
+
+call TerminateSub;
+
+SearchSub:
+    searchup2 $buffer, nocasesense, regular, nohilight, loop, maskcomment;
+    if(result){
+        call TerminateSub;
+    }
+    searchup2 $buffer, nocasesense, regular, nohilight, loop;
+    if(result){
+        call TerminateSub;
+    }
+    return;
+
+TerminateSub:
+    // 検索バッファの復元
+    setsearch $search_buffer, #search_option;
+
+    // 編集エリアにフォーカスを設定
+    setfocus;
+
+    endmacro;

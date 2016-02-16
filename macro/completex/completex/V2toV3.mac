@@ -1,0 +1,85 @@
+// 
+//  	CompleteX v2 → v3 移行マクロ  (2006/10/01)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$CfgFile = currentmacrodirectory + "\\config.txt";
+$MyName2 = currentmacrodirectory + "\\V2toV3.mac";
+
+if      (!existfile($CfgFile)) goto New;
+else if (!existfile($MyName2)) goto Upgrade;
+else                           goto Update;
+endmacroall;
+
+New:		// 新規インストール
+// 	question "CompleteX v3 を初期化します。\n\n"
+// 	 + "v2 用のプラグインを使いますか？";
+// 	if (result) call CopyDLL;
+	call RenameMe;
+	endmacro;
+
+Upgrade:		// v2 からのバージョンアップ
+	question "CompleteX を v2 から v3 へ移行します。\n\n"
+	 + "CompleteX v3 では設定ファイルの書き方が変わりました。\n"
+	 + "[はい(Y)] を押すと設定ファイルを自動的に書き換えます。\n"
+	 + "[いいえ(N)] を押すと何もしません。\n\n"
+	 + "設定ファイル: \n"
+	 + $CfgFile;
+	if (result) {
+		call Migrate;
+		$$m = $$return;
+	} else {
+		$$m = "何もしませんでした。";
+	}
+	call RenameMe;
+	message $$m + "\n"
+	 + "移行作業をもう一度行うには、移行マクロを手動で実行してください。\n\n"
+	 + "移行マクロ: \n"
+	 + $MyName2 + "\n"
+	 + "設定ファイル: \n"
+	 + $CfgFile;
+	endmacroall;
+
+Update:		// v3 からのアップデート
+	call RenameMe;
+	endmacro;
+
+Migrate:
+	openfile $CfgFile;
+	if (!result) return "設定ファイルを開けませんでした。移行は完了していません。";
+	$$searchbuffer  = searchbuffer;
+	##searchoption  = searchoption;
+	$$replacebuffer = replacebuffer;
+	call IniRep "AutoFix", "always",       "autofix", "111";
+	call IniRep "AutoFix", "first.*last",  "autofix", "101";
+	call IniRep "AutoFix", "last.*first",  "autofix", "101";
+	call IniRep "AutoFix", "first",        "autofix", "100";
+	call IniRep "AutoFix", "last",         "autofix", "001";
+	call IniRep "WithinWord", "\\f.*?\\f", "wordhas", "\\1";
+	call IniRep "path.FileSystem", "Unix", "path.separator", "/";
+	setsearch  $$searchbuffer, ##searchoption;
+	setreplace $$replacebuffer;
+	save;
+	if (!result) return "設定ファイルを書き換えました。\n移行を完了するには、設定ファイルを保存してください。";
+	return "移行が完了しました。";
+
+IniRep:		// INI ファイルを書き換える
+	replaceallfast "^[ \\t]*" + $$1 + "[ \\t]*=[ \\t]*" + $$2 + "[ \\t]*$", $$3 + "=" + $$4, regular, nocasesense;
+	return result;
+
+RenameMe:		// 自分をリネーム
+	if (currentmacrobasename != "v2tov3_runonce.mac") return;
+	loaddll currentmacrodirectory + "\\system\\macrodll.dll";
+	if (result) {
+		##_ = dllfunc("FILE_COPYFILE",   currentmacrofilename, $MyName2);
+		##_ = dllfunc("FILE_DELETEFILE", currentmacrofilename);
+		freedll;
+	} else {
+		run getenv("ComSpec") + " /c move \"" + currentmacrofilename + "\" \"" + $MyName2 + "\"";
+	}
+	return;
+
+CopyDLL:		// DLL をベースフォルダにコピー
+	if (existfile(currentmacrodirectory + "\\macrodll.dll")) return;
+	run getenv("ComSpec") + " /c copy \"" + currentmacrodirectory + "\\system\\macrodll.dll" + "\" \"" + currentmacrodirectory + "\\\"";
+	return;

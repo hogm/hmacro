@@ -1,0 +1,9 @@
+loaddll "hmjre.dll";
+if(!result){
+  message "DLL‚Ìƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½B";
+  endmacro;
+}
+
+$s = dllfuncstr( "ReplaceRegular", "(.+)from(.+)", "select * from dual", 1, "\\1FROM\\2");
+message $s;
+

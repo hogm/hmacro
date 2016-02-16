@@ -1,0 +1,27 @@
+
+l_mtl_system_items_b mtl_system_items_b%ROWTYPE;
+
+FUNCTION find_item(
+    p_segment1 IN mtl_system_items_b.segment1%TYPE,
+    p_organization_code IN mtl_parameters.organization_code%TYPE
+)
+RETURN mtl_system_items_b%ROWTYPE
+IS
+    l_result mtl_system_items_b%ROWTYPE;
+BEGIN
+    SELECT  mtl_system_items_b.*
+    INTO    l_result
+    FROM    mtl_system_items_b
+        JOIN
+            mtl_parameters
+        ON  mtl_system_items_b.organization_id = mtl_parameters.organization_id
+    WHERE   mtl_system_items_b.segment1 = p_segment1
+        AND mtl_system_items_b.segment2 IS NULL
+        AND mtl_parameters.organization_code = p_organization_code
+    ;
+
+    RETURN l_result;
+EXCEPTION 
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

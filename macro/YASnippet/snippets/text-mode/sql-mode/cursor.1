@@ -1,0 +1,16 @@
+
+DECLARE
+    CURSOR c_${1:table_name}
+    IS
+    SELECT  *
+    FROM    ${1:table_name}
+    ;
+BEGIN
+    OPEN c_${1:table_name};
+    LOOP
+        FETCH c_${1:table_name} INTO r_${1:table_name};
+        EXIT WHEN c_${1:table_name}%NOTFOUND;
+        $0;
+    END LOOP;
+    CLOSE c_${1:table_name};
+END;

@@ -1,0 +1,23 @@
+// 選択行全てにマーク/マーク解除するマクロ
+if (selecting == 1){
+    #seltopx = seltopx;
+    #selendx = selendx;
+    #seltopy = seltopy;
+    #selendy = selendy;
+    disabledraw;
+    #line = #seltopy;
+    while( #line <= #selendy ) {
+        moveto #seltopx, #line;
+        setmark;
+        #line = #line + 1;
+    }
+
+    moveto #seltopx,#seltopy;
+    beginsel;
+    moveto #selendx,#selendy;
+    endsel;
+    enabledraw;
+}
+else{
+    setmark;
+}

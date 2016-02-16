@@ -1,0 +1,75 @@
+SqlFmt リリースノート                                                   2005-08-27
+
+Ver.1.07 から Ver.1.08 への移行時の注意
+(1).
+    CREATE/ALTER TABLE 文の PARTITION BY, SUBPARTITION BY, FREELISTS 句の
+    前方で改行するように修正しました。
+
+(2).
+    -h|--help オプションで表示される USAGE: の書き方が間違っていたので
+    修正しました。
+
+(3).
+    -o|--stdio オプションを追加しました。標準入出力を介して整形前／整形後
+    の文を他のプログラムとやり取りすることが出来ます。
+
+(4).
+    TKPROF ユーティリティーから出力されたレポートファイルを自動認識する
+    ようになりました。このファイルに含まれる SQL や PL/SQL ブロックの
+    部分だけを選択的に一括して整形することが出来ます。
+
+
+Ver.1.06 から Ver.1.07 への移行時の注意
+(1).
+    MERGE 文の when matched then, when not matched then 句の
+    前方で改行するように修正しました。
+
+(2).
+    動的リンクライブラリ形式ファイル(DLL)を追加リリースしました。
+    このファイルに含まれているDLL関数を使用することにより
+    SqlFmt.exe の機能を他のホスト言語やプログラムから使用する
+    事が可能になりました。このライブラリには下記4つの関数が
+    エクスポートされています。
+
+        iPerformInCompatibleForm() (秀丸エディタ用)
+        iCopyToPreparedStr() (VB, C, C++ 用)
+        iCopyToPreparedVc2() (PL/SQL 用)
+        iFmtStmt() (C, C++ 用)
+
+    それぞれの利用方法について製品ディレクトリの下に設けた
+    sample というディレクトリでサンプルを用意してあります。
+
+(3).
+    整形済みの文を再度整形しても同じ結果になるように修正しました。
+    （従来ではバイト列レベルで微妙な違いが生じることがあった）
+
+(4).
+    ファイル名を指定して整形する場合の終了直前のメッセージで
+    x 個のファイルを整形しました。(合計 y バイト)の表示で
+    整形後のファイルの合計バイト数でなく、整形前のファイルの
+    合計バイト数を表示していたのを修正しました。
+
+
+Ver.1.05 から Ver.1.06 への移行時の注意
+(1).
+    下記の構文を新しくサポートしました。
+
+        MERGE
+        CROSS JOIN
+        NATURAL JOIN
+        INNER JOIN
+        LEFT {OUTER} JOIN
+        RIGHT {OUTER} JOIN
+        FULL {OUTER} JOIN
+        JOIN ON USING
+
+(2).
+    UPDATE 文で SET 句が改行されない不具合を修正しました。
+
+(3).
+    CASE 句を含む文を処理できるように修正しました。
+
+以上
+
+Copyright (c) 2003 Plumsix Co.,Ltd. All rights reserved.
+

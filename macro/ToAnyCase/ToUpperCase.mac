@@ -1,0 +1,27 @@
+#seltopx = seltopx;
+#selendx = selendx;
+#seltopy = seltopy;
+#selendy = selendy;
+
+if (rectselecting == 1){
+    disabledraw;
+    begingroupundo;
+    #line = #seltopy;
+    while( #line <= #selendy ) {
+        moveto #seltopx, #line;
+        beginsel;
+        moveto #selendx, #line;
+        endsel;
+        toupper;
+        #line = #line + 1;
+    }
+
+    moveto #seltopx,#seltopy;
+    beginrect;
+    moveto #selendx,#selendy;
+    endgroupundo;
+    enabledraw;
+}
+else{
+    toupper;
+}

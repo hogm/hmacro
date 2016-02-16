@@ -1,0 +1,12 @@
+<pre>                  /tags/REL-1.0.1―┐
+                                    ／  │
+                                  ／――┼end   
+                                ／            
+                              ／        ↓merge 
+           /tags/REL-1.0.0―┐          
+                        ／  │          
+    /branches/RB-1.0.0／――┼end                         /branches/RB-1.1.x／――
+                    ／      │                                            ／  
+                  ／        ↓merge                                     ／    
+/trunk━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+</pre>

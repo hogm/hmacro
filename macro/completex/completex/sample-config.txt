@@ -1,0 +1,47 @@
+;
+;	config.txt  記述例
+;	for CompleteX v3.0b1 (2006/05/08)
+;
+
+; キー（「=」の左辺）は大文字小文字を区別しません。値（右辺）は区別します。
+
+
+; すべてのファイルタイプで最初と最後に自動補完する
+[default]
+autofix=101
+
+; 拡張子 .txt は辞書補完モード、辞書ファイル sample.dic を使用
+[.txt]
+dic=sample.dic
+
+; 拡張子 .mac は混合補完モード、辞書ファイル macro.dic を使用、「#」と「$」は単語の一部と見なす
+[.mac]
+source=mix
+dic=macro.dic
+wordhas=#$
+
+; 拡張子 .ini はファイル名補完モード、隠しファイルも候補に出す
+[.ini]
+source=path
+path.showhidden=yes
+
+; 拡張子 .c はプラグイン c_include.mac を使用、自動で上書き保存する
+[.c]
+plugin=c_include.mac
+autosave=yes
+
+; 拡張子 .htm, .html, .shtml はファイルタイプ htmlfile とし、辞書ファイル html401.dic を使用
+[htmlfile]
+dic=html401.dic
+path.separator=/
+
+[.htm]
+@=htmlfile
+
+[.html]
+@=htmlfile
+
+; 拡張子 .shtml は辞書ファイル html401-with-ssi.dic を使用、他の設定は htmlfile と一緒
+[.shtml]
+dic=html401-with-ssi.dic
+@=htmlfile

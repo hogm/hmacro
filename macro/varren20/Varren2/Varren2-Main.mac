@@ -1,0 +1,231 @@
+// 
+//  	Varren2
+//  	Version 2.0  (2011/10/01)
+//  	by mobitan  http://mobitan.org/
+// 
+
+// デフォルトの変数のパターン (正規表現、単語、大文字小文字を区別する)
+$Word = "[@#$]*[_a-zA-Z0-9]+";
+
+// 2011/09/30	v2.0	初版
+
+// #debug = 3;
+call Initialize;
+if (strstr(tolower(getarg(0)), "ui=dialog") >= 0) {
+	call MainD;
+} else {
+	call MainP;
+}
+call Finalize;
+endmacro;
+
+MainP: // プレースホルダ編集でやる
+	call GetCur;  $$origin = $$return;
+	call Detect;  $$srctxt = $$return;
+	if ($$srctxt == "") return false;
+	call GetCur;  $$scope  = $$return;
+	call Locate $$srctxt;  $$location = $$return;
+	if ($$location == "") {
+		call SetCur $$origin;
+		return false;
+	}
+	call SetCur $$origin;
+	call PhEdit $$location;  $$reptxt = $$return;
+	call GetCur;  $$destin = $$return;
+	undo; // $$destin を取得した後に!
+	if (#result <= 0) {
+		call SetCur $$origin;
+		return false;
+	}
+	call Execute $$srctxt, $$reptxt, $$scope;
+	call SetCur $$destin;
+	if (#result >= ' ') {
+		insert char(#result);
+	}
+	return true;
+
+MainD: // ダイアログ入力でやる
+	call GetCur;  $$origin = $$return;
+	call Detect;  $$srctxt = $$return;
+	if ($$srctxt == "") return false;
+	call GetCur;  $$scope  = $$return;
+	escape;
+	call SetCur $$origin;
+	call Dialog $$srctxt;  $$reptxt = $$return;
+	call Execute $$srctxt, $$reptxt, $$scope;
+	call SetCur $$origin;
+	return true;
+
+Detect: // カーソル位置の変数名を取得・スコープを範囲選択
+	// $$return = 変数名
+	$$detector = currentmacrodirectory + "\\detect" + filetype + ".mac";
+	if (existfile($$detector)) {
+		execmacro $$detector;
+		$$name = getresultex(-1);
+		if ($$name == "") call Warn $$detector + ":\n変数名を取得できません\n変数上にカーソルを置いて実行してください";
+	} else {
+		if (!selecting) {
+			call SearchHere $Word;
+			if (!##return) call Warn "\n変数上にカーソルを置いて実行してください";
+		}
+		$$name = gettext(seltopx, seltopy, selendx, selendy, true);
+		selectfoldable 0x0020;
+		if (!selecting) selectall;
+	}
+	return $$name;
+
+Locate: // 文字列の出現位置リストを作成 (画面内かつ選択範囲内に限る)
+	// $$1 = 文字列
+	// $$return = 出現位置リスト
+	##ox = x;  ##oy = y;
+	if (!selecting) {
+		selectall;
+	}
+	##topy = #screentopy; // 起動した時点の
+	if (##topy < seltopy) {
+		##topy = seltopy;
+	}
+	##btmy = #screentopy + windowheight - 1;
+	if (##btmy > selendy) {
+		##btmy = selendy - (selendcolumn == 0);
+	}
+	moveto 0, ##btmy + 1;  beginsel;  moveto 0, ##topy;  endsel;
+	$$location = "";
+	searchdown2 $$1, inselect, nohilight, word, casesense;
+	while (result) {
+		$$location = $$location + str(seltoplineno) + "," + str(seltopcolumn) + "," + str(selendlineno) + "," + str(selendcolumn) + ";";
+		finddown;
+	}
+	escape;
+	moveto ##ox, ##oy;
+	if (#debug >= 3) call Confirm "Locate:\ntopy=\t" + str(##topy) + "\nbtmy=\t" + str(##btmy) + "\nlocation=\n" + $$location + "";
+	return $$location;
+
+PhEdit: // プレースホルダ編集
+	// $$1 = プレースホルダ位置リスト
+	// $$return = 最初のプレースホルダに入力された文字列
+	// [OUT]
+	// #result = 結果コード
+	if (#debug >= 2) call Confirm "PhEdit:\n" + $$1 + "";
+	execmacro currentmacrodirectory + "\\system\\placeholder2.mac", $$1;
+	$$summary = getresultex(-1); // "PH1の内容\nPH2の内容\n...\n結果コード"
+	#result = val(midstr($$summary, strrstr($$summary, "\n") + 1));
+	if (#debug >= 3) call Confirm "PhEdit:\nresult=\t" + str(#result) + "\nsummary=\n" + $$summary + "";
+	return leftstr($$summary, strstr($$summary, "\n"));
+
+Dialog: // ダイアログ入力
+	// $$1 = 初期値
+	enabledraw;
+	$$instr = input("新しい変数名を入力してください", $$1);
+	disabledraw;
+	if ($$instr == "") $$instr = $$1; // キャンセル ⇒ 変更なし
+	#result = 1;
+	return $$instr;
+
+Execute: // 領域内を全置換 (衝突確認する)
+	// $$1 = 検索文字列
+	// $$2 = 置換文字列
+	// $$3 = 対象領域
+	if ($$1 == $$2) return false;
+	call SetCur $$3;
+	call SearchInSelect $$2;
+	if (##return) {
+		question $$2 + " はすでに存在します。\n" + $$1 + " を " + $$2 + " に置換しますか?";
+		if (!result) return false;
+	}
+	call SetCur $$3;
+	call ReplaceInSelect $$1, $$2;
+	return ##return;
+
+//==============================================================================
+//. 	座標操作サブルーチン
+//==============================================================================
+// 
+// 座標を表す文字列
+// "0000001100000022"
+//  \______/\______/
+//   lineno  column 
+// 
+// 領域を表す文字列
+// "00000011000000220000003300000044"
+//  \______/\______/\______/\______/
+//   seltop  seltop  selend  selend
+//   lineno  column  lineno  column
+
+GetCur: // 現在の座標／領域を取得
+	if (selecting) {
+		return rightstr("00000000" + str(seltoplineno), 8) + rightstr("00000000" + str(seltopcolumn), 8) + rightstr("00000000" + str(selendlineno), 8) + rightstr("00000000" + str(selendcolumn), 8);
+	} else {
+		return rightstr("00000000" + str(lineno), 8) + rightstr("00000000" + str(column), 8);
+	}
+	return;
+
+SetCur: // 座標へ移動／領域を選択
+	if (strlen($$1) >= 32) {
+		moveto2 val(midstr($$1, 24, 8)), val(midstr($$1, 16, 8));
+		beginsel;
+		moveto2 val(midstr($$1, 8, 8)), val(midstr($$1, 0, 8));
+		endsel;
+	} else if (strlen($$1) >= 16) {
+		moveto2 val(midstr($$1, 8, 8)), val(midstr($$1, 0, 8));
+	}
+	return;
+
+//==============================================================================
+//. 	共通サブルーチン
+//==============================================================================
+
+SearchHere: // カーソル位置を含む検索
+	// $$1 = 正規表現
+	escape;
+	##ox = x;  ##oy = y;
+	right;
+	searchup $$1, regular, nohilight, word, casesense;
+	while (result && (##oy < foundendy || (##oy == foundendy && ##ox <= foundendx))) {
+		##bx = foundtopx;  ##by = foundtopy;  ##dx = foundendx;  ##dy = foundendy;
+		findup;
+	}
+	if (##dx || ##dy) {
+		moveto ##dx, ##dy;  beginsel;  moveto ##bx, ##by;  endsel;
+		return true;
+	}
+	moveto ##ox, ##oy;
+	beginsel;  endsel;
+	escape;
+	return false;
+
+SearchInSelect: // 選択範囲内を検索
+	// $$1 = 検索文字列
+	searchdown $$1, inselect, nohilight, word, casesense;
+	return result;
+
+ReplaceInSelect: // 選択範囲内を全置換
+	// $$1 = 検索文字列
+	// $$2 = 置換文字列
+	begingroupundo;
+	replaceallfast $$1, $$2, inselect, nohilight, word, casesense;
+	endgroupundo;
+	return result;
+
+Initialize: // 初期化
+	setcompatiblemode 0x0200;
+	#screentopy = screentopy;
+	disabledraw;
+	return;
+
+Finalize: // 後始末
+	enabledraw;
+	return;
+
+Warn: // 警告メッセージ
+	enabledraw;
+	message $$1;
+	return;
+
+Confirm: // デバッグ用
+	enabledraw;
+	question currentmacrobasename + ": " + $$1;
+	if (result) return;
+	endmacro;
+
+//  		(C) mobitan 2011

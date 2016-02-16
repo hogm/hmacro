@@ -1,0 +1,3 @@
+$inifilename = macrodir + "\\CurrentFile\\CurrentFile.ini";
+$currentfilename = filename2;
+writeinistr $inifilename, "currentfile", "file01", $currentfilename;

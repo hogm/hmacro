@@ -1,0 +1,12 @@
+
+DECLARE
+    CURSOR c_${1:table_name}
+    IS
+    SELECT  *
+    FROM    ${1:table_name}
+    ;
+BEGIN
+    FOR r_${1:table_name} IN c_${1:table_name} LOOP
+        $0
+    END LOOP;
+END;

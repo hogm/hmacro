@@ -1,0 +1,102 @@
+//==============================================================================
+//
+//      sqlplus.mac - sqlplusを呼出
+//
+//==============================================================================
+
+loaddll "hmjre.dll";
+if(!result){
+  message "DLLのロードに失敗しました。";
+  endmacro;
+}
+
+$connection_regular = "[ \\t]*[0-9a-zA-Z]{1,30}/[0-9a-zA-Z]{1,30}(@[0-9a-zA-Z._]{1,30}){0,1}[ \\t]*";
+//$tempdir = getenv("TEMP");
+$tempdir = "C:";
+$sqlfile = $tempdir + "\\sqlplus.sql";
+$cmdfile = macrodir + "\\sqlplus\\desc.sql";
+$inifile = macrodir + "\\sqlplus\\sqlplus.ini";
+$logfile = $tempdir + "\\sqlplus.log";
+
+if (selecting == 1)
+{
+    $sql = gettext(seltopx, seltopy, selendx, selendy);
+}
+else
+{
+    $sql = gettext(0, 0, 4000, linecount2);
+}
+$allsql = gettext(0, 0, 4000, linecount2);
+
+$connection = "";
+if ($connection == "") call GetConnectionStrnig midstr($sql, 4, strstr($sql, "\n") - 4);
+if ($connection == "") call GetConnectionStrnig midstr($allsql, 4, strstr($allsql, "\n") - 4);
+if ($connection == "") call GetConnectionStrnig getinistr($inifile, "Default", "ConnectionString");
+if ($connection == "") call EndMacro;
+
+$show_message = getinistr($inifile, "Confirmation", "ConnectionString");
+if ($show_message == "True")
+{
+    question $connection + "で実行しますか？";
+    if( result == no ) {
+        call EndMacro;
+    }
+}
+
+$default = getinistr($inifile, "Desc", "Owner");
+if ($default == "") $default = midstr($connection, 0, strstr($connection, "/"));
+$owner = input("Owner", $default);
+if ($owner == "") $owner = midstr($connection, 0, strstr($connection, "/"));
+writeinistr $inifile, "Desc", "Owner", $owner;
+$owner = "\"" + $owner + "\"";
+
+$default = getinistr($inifile, "Desc", "Object");
+$table = input("Object", $default);
+if ($table == "") call EndMacro;
+writeinistr $inifile, "Desc", "Object", $table;
+$table = "\"" + $table + "\"";
+
+$default = getinistr($inifile, "Desc", "DatabaseLink");
+$dblk = input("Database Link", $default);
+writeinistr $inifile, "Desc", "DatabaseLink", $dblk;
+if ($dblk == "") $dblk = "''";
+$dblk = "\"" + $dblk + "\"";
+
+$default = getinistr($inifile, "Desc", "Mode");
+$mode = input("desc or sel or ins or upd or src", $default);
+if ($mode == "") call EndMacro;
+writeinistr $inifile, "Desc", "Mode", $mode;
+$mode = "\"" + $mode + "\"";
+
+runsync2 "cmd /c (copy /Y \"" + $cmdfile + "\" " + $sqlfile + ")";
+runsync2 "cmd /c (sqlplus -S -R 3 " + $connection + " @" + $sqlfile + " " + $owner + " " + $table + " " + $dblk + " " + $mode + " > " + $logfile + " ) ";
+
+call ShowLog;
+
+EndMacro:
+    freedll;
+    endmacro;
+
+GetConnectionStrnig:
+    if ($$1 == "") return;
+    #ret = dllfunc("FindRegular", $connection_regular, $$1, 0);
+    //正規表現にマッチすると-1より大きい値を返す。
+    if(#ret > -1){
+        $connection = $$1;
+    }
+    return;
+
+ShowLog:
+    call CloseAndOpenHidemaru $logfile;
+    return;
+
+ShowSQL:
+    call CloseAndOpenHidemaru $sqlfile;
+    return;
+
+CloseAndOpenHidemaru:
+    if( findhidemaru( $$1 ) > 0 ) {
+        closehidemaruforced findhidemaru($$1);
+    }
+    openfile $$1;
+    return;

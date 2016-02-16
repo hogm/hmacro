@@ -1,0 +1,56 @@
+//【機能】":=","=>","="を整形（余計なスペース削除）
+
+//検索バッファの保持
+$replacebuffer = replacebuffer;
+#searchOption = searchoption;
+
+$selectingflag = "";
+
+if (selecting == 1){
+    if (rectselecting == 1){
+        $selectingflag = "1";   //矩形選択
+    }
+    else{
+        $selectingflag = "2";   //範囲選択
+    }
+    
+    #seltopx = seltopx;
+    #selendx = selendx;
+    #seltopy = seltopy;
+    #selendy = selendy;
+}
+
+disabledraw;
+begingroupundo;
+
+replaceallfast "[ \\t]*:=[ \\t]*", " := ", regular, nocasesense, inselect, nohilight;
+
+if (result == 0){
+    call recoveryselect $selectingflag, #seltopx, #seltopy, #selendx, #selendy;
+    replaceallfast "[ \\t]*=>[ \\t]*", " => ", regular, nocasesense, inselect, nohilight;
+    if (result == 0){
+        call recoveryselect $selectingflag, #seltopx, #seltopy, #selendx, #selendy;
+        replaceallfast "[ \\t]*=[ \\t]*", " = ", regular, nocasesense, inselect, nohilight;
+    }
+}
+
+endgroupundo;
+enabledraw;
+
+//検索バッファの復元
+setsearch $replacebuffer, #searchOption;
+endmacro;
+
+// 関数：範囲選択復元
+recoveryselect:
+    moveto ##2, ##3;
+    if ($$1 == "1"){
+        beginrect;
+    }
+    else{
+        beginsel;
+    }
+    moveto ##4, ##5;
+    endsel;
+
+    return;

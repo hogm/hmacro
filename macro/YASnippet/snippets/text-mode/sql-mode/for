@@ -1,0 +1,4 @@
+
+FOR ${1:i} IN ${2:lower_bound} .. ${3:higher_bound} LOOP
+    $0
+END LOOP;

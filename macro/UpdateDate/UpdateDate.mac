@@ -1,0 +1,30 @@
+call Initialize;
+call Main;
+call Finalize;
+endmacro;
+
+Main:
+    disabledraw;
+    begingroupundo;
+    if (!selecting) {
+        ##oc = column;  ##ol = lineno;
+        right;
+        searchup "^|[0-9]{4}/[0-9]{2}/[0-9]{2}", regular;
+        if (!(result && selecting && seltopcolumn <= ##oc && selendcolumn > ##oc)) {
+            escape;
+            movetolineno ##oc + 1, ##ol;
+        }
+    }
+    insert year + "/" + month + "/" + day;
+    endgroupundo;
+    enabledraw;
+    return;
+
+Initialize:     // èâä˙âª
+    $searchbuffer  = searchbuffer;
+    #searchoption  = searchoption;
+    return;
+
+Finalize:       // å„énññ
+    setsearch  $searchbuffer, #searchoption;
+    return;

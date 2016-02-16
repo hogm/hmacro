@@ -1,0 +1,191 @@
+[snippet]
+DECLARE=DECLARE\n    \vdeclare\f\nBEGIN\n    \vstatements\f\nEND;\n
+EXCEPTION=EXCEPTION\nWHEN \vexception\f THEN\n    \vstatements\f
+BEGIN=BEGIN\n    \vstatements\f\nEND;\n
+FUNCTION=FUNCTION \vfunction_name\f\nRETURN \vdatatype\f\nIS\n    l_result \vdatatype\f;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION(TYPE)=FUNCTION \vfunction_name\f\nRETURN \vtable_name\f.\vcolumn_name\f%TYPE\nIS\n    l_result \vtable_name\f.\vcolumn_name\f%TYPE;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION(BOOLEAN)=FUNCTION \vfunction_name\f\nRETURN BOOLEAN\nIS\n    l_result BOOLEAN;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION(DATE)=FUNCTION \vfunction_name\f\nRETURN DATE\nIS\n    l_result DATE;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION(NUMBER)=FUNCTION \vfunction_name\f\nRETURN NUMBER\nIS\n    l_result NUMBER;\nBEGIN\n    RETURN l_result;\nEND;\n
+FUNCTION(VARCHAR2)=FUNCTION \vfunction_name\f\nRETURN VARCHAR2\nIS\n    l_result VARCHAR2(4000);\nBEGIN\n    RETURN l_result;\nEND;\n
+PROCEDURE=PROCEDURE \vprocedure_name\f\nIS\nBEGIN\n    \vstatemant\f\nEND;\n
+IF=IF \vcondition\f THEN\n    \vstatement\f\nEND IF;\n
+IFEL=IF \vcondition\f THEN\n    \vstatement\f\nELSE\n    \vstatement\f\nEND IF;\n
+ELIF=IF \vcondition\f THEN\n    \vstatements\f\nELSIF \vcondition\f THEN\n    \vstatements\f\nELSE\n    \vstatements\f\nEND IF;\n
+CASE(式)=CASE \v[expression]\f\nWHEN \vcomparison\f THEN \vreturn\f;\nWHEN \vcomparison\f THEN \vreturn\f;\nELSE \vreturn\f;\nEND;\n
+CASE(文)=CASE \v[expression]\f\nWHEN \vcomparison\f THEN \vstatement\f\nWHEN \vcomparison\f THEN \vstatement\f\nELSE \vstatement\f\nEND CASE;\n
+LOOP=LOOP\n    \vEXIT WHEN condition;\f\n    \vstatements;\f\nEND LOOP;\n
+WHILE=WHILE (\vcondition\f) LOOP\n    \vstatements\f\nEND LOOP;\n
+FOR=FOR \vi\f IN \v[REVERSE]\f \vlower_bound\f..\vhigher_bound\f LOOP\n    \vstatements\f\nEND LOOP;\n
+GOTO=LOOP\n\tIF condition THEN\n\t\tGOTO continue_loop;\n\tEND IF;\n\t<<continue_loop>>\n\tNULL;\nEND LOOP;\n
+CURSOR(暗黙カーソル)=DECLARE\n\tdeclarations;\nBEGIN\n\tFOR cursor_record IN (select_statement) LOOP\n\t\tsequence_of_statements;\n\tEND LOOP;\nEND;\n
+CURSOR(明示カーソル)=DECLARE\n\tCURSOR cursor_name\n\t(\tparameter1 NUMBER\n\t,\tparameter2 VARCHAR2\n\t)\n\tIS\n\tselect_statement;\nBEGIN\n\tOPEN cursor_name(parameter_value1,parameter_value2);\n\tLOOP\n\t\tFETCH cursor_name INTO cursor_record;\n\t\tEXIT WHEN cursor_name%NOTFOUND;\n\t\tsequence_of_statements;\n\tEND LOOP;\n\tCLOSE cursor_name;\nEND;\n
+CURSOR(明示カーソルFOR ループ)=DECLARE\n\tCURSOR cursor_name\n\t(\tparameter1 NUMBER\n\t,\tparameter2 VARCHAR2\n\t)\n\tIS\n\tselect_statement;\nBEGIN\n\tFOR cursor_record IN cursor_name(parameter_value1,parameter_value2) LOOP\n\t\tsequence_of_statements;\n\tEND LOOP;\nEND;\n
+UTL_FILE(書込サンプル)=PROCEDURE utl_file-file_write_sample\nIS\n\tCURSOR cursor_name\n\tIS\n\tselect_statement;\n\n\tc_dir CONSTANT VARCHAR2(1024) := utl_file_directory;\n\tc_file CONSTANT VARCHAR2(1024) := 'file_name.dat';\n\tl_file_handle UTL_FILE.file_type;\n\tl_put_line VARCHAR2(32767);\nBEGIN\n\tl_file_handle := UTL_FILE.fopen(c_dir,c_file,'w',32767);\n\tFOR cursor_record IN cursor_name LOOP\n\t\tsequence_of_statements;\n\t\tUTL_FILE.put_line(l_file_handle,l_put_line);\n\tEND LOOP;\n\tUTL_FILE.fclose(l_file_handle);\nEXCEPTION\nWHEN OTHERS THEN\n\tIF UTL_FILE.is_open(l_file_handle) THEN\n\t\tUTL_FILE.fclose(l_file_handle);\n\tEND IF;\nEND;\n
+UTL_FILE(読込サンプル)=PROCEDURE utl_file-file_read_sample\nIS\n\tl_buffer VARCHAR2(32767);\n\tl_file_handle UTL_FILE.FILE_TYPE;\n\tl_exists BOOLEAN;\n\tl_file_length NUMBER;\n\tl_blocksize NUMBER;\n\tl_buf VARCHAR2(4000);\n\tl_dir CONSTANT VARCHAR2(1024) := utl_file_directory;\n\tl_file CONSTANT VARCHAR2(1024) := 'file_name.dat';\n\n\tFUNCTION get_string(i_string IN VARCHAR2)\n\tRETURN VARCHAR2\n\tIS\n\tBEGIN\n\t\tRETURN RTRIM(i_string);\n\tEND;\n\n\tFUNCTION get_date(\ti_string IN VARCHAR2\n\t\t\t\t\t,\ti_format IN VARCHAR2 DEFAULT 'YYYYMMDD')\n\tRETURN DATE\n\tIS\n\tBEGIN\n\t\tRETURN TO_DATE(LTRIM(RTRIM(i_string, ' 　'), ' 　'),i_format);\n\tEND;\n\n\tFUNCTION get_number(i_string IN VARCHAR2)\n\tRETURN NUMBER\n\tIS\n\tBEGIN\n\t\tRETURN TO_NUMBER(LTRIM(RTRIM(i_string, ' 　'), ' 　'));\n\tEND;\nBEGIN\n\tUTL_FILE.fgetattr (l_dir,l_file,l_exists,l_file_length,l_blocksize);\n\tIF NOT l_exists THEN\n\t\tGOTO end_function;\n\tEND IF;\n\n\tl_file_handle := UTL_FILE.FOPEN(l_dir,l_file,'r',32767);\n\tBEGIN\n\t\tLOOP\n\t\t\tUTL_FILE.get_line(l_file_handle,l_buffer);\n\t\t\tIF l_buffer IS NULL THEN\n\t\t\t\tGOTO continue_loop;\n\t\t\tEND IF;\n\n\t\t\tsequence_of_statements;\n\t\t\t\n\t\t\t--sample\n\t\t\tBEGIN\n\t\t\t\tread_number_value1 := get_number(SUBSTRB(l_buffer, 001, 005));\n\t\t\t\tread_string_value2 := get_string(SUBSTRB(l_buffer, 006, 005));\n\t\t\t\tread_date_value3   := get_date\t(SUBSTRB(l_buffer, 011, 008)[,'YYYYMMDD']);\n\t\t\tEXCEPTION\n\t\t\tWHEN OTHERS THEN\n\t\t\t\texception_of_statements;\n\t\t\tEND;\n\n\t\t\t<<continue_loop>>\n\t\t\tNULL;\n\t\tEND LOOP;\n\tEXCEPTION\n\t\tWHEN NO_DATA_FOUND THEN\n\t\t\tNULL;\n\tEND;\n\tUTL_FILE.fclose(l_file_handle);\n\n\t<<end_function>>\n\tNULL;\nEND;\n
+BULK_EXCEPTIONS(FORALLの例外処理)=DECLARE\n\tTYPE NumList IS TABLE OF NUMBER;\n\tnum_tab NumList := NumList(10,0,11,12,30,0,20,199,2,0,9,1);\n\terrors NUMBER;\n\tdml_errors EXCEPTION;\n\tPRAGMA exception_init(dml_errors, -24381);\nBEGIN\n\tFORALL i IN num_tab.FIRST..num_tab.LAST SAVE EXCEPTIONS\n\t\tDELETE FROM emp WHERE sal > 500000/num_tab(i);\nEXCEPTION\nWHEN dml_errors THEN\n\terrors := SQL%BULK_EXCEPTIONS.COUNT;\n\tdbms_output.put_line('Number of errors is ' || errors);\n\tFOR i IN 1..errors LOOP\n\t\tdbms_output.put_line('Error ' || i || ' occurred during '|| 'iteration ' || SQL%BULK_EXCEPTIONS(i).ERROR_INDEX);\n\t\tdbms_output.put_line('Oracle error is ' || SQLERRM(-SQL%BULK_EXCEPTIONS(i).ERROR_CODE));\n\tEND LOOP;\nEND;\n
+FIND_TABLE=l_\vtable_name\f \vtable_name\f%ROWTYPE;\nFUNCTION find_\vtable_name\f(\n    p_\vcolumn_name\f IN \vtable_name\f.\vcolumn_name\f%TYPE\n)\nRETURN \vtable_name\f%ROWTYPE\nIS\n    l_result \vtable_name\f%ROWTYPE;\nBEGIN\n    SELECT  *\n    INTO    l_result\n    FROM    \vtable_name\f\n    WHERE   \vcolumn_name\f = p_\vcolumn_name\f\n    ;\n    RETURN l_result;\nEXCEPTION\nWHEN NO_DATA_FOUND OR TOO_MANY_ROWS THEN\n    zn_helper.raise_warn(\n        '\vtable_name\f.\vcolumn_name\f => [ ' || p_\vcolumn_name\f || ' ] :' ||\n        SQLERRM\n    );\nEND;\nl_\vtable_name\f :=\n    find_\vtable_name\f(\n        p_\vcolumn_name\f => l_\vcolumn_name\f\n    );\n
+ABS
+ACOS
+ADD_MONTHS
+ASCII
+ASCIISTR
+ASIN
+ATAN
+ATAN2
+AVG
+BFILENAME
+BIN_TO_NUM
+BITAND
+CAST
+CEIL
+CHARTOROWID
+CHR
+COALESCE
+COMPOSE
+CONCAT
+CONVERT
+CORR
+COS
+COSH
+COUNT
+COVAR_POP
+COVAR_SAMP
+CUBE_TABLE
+CURRENT_DATE
+CURRENT_TIMESTAMP
+DBTIMEZONE
+DECODE
+DECOMPOSE
+DEREF
+DUMP
+EMPTY_BLOB, EMPTY_CLOB
+EXISTSNODE
+EXP
+FLOOR
+FROM_TZ
+GREATEST
+GROUP_ID
+GROUPING
+GROUPING_ID
+HEXTORAW
+INITCAP
+INSTR
+INSTRB
+INSTRC
+INSTR2
+INSTR4
+LAST_DAY
+LEAST
+LENGTH
+LENGTHB
+LENGTHC
+LENGTH2
+LENGTH4
+LN
+LOCALTIMESTAMP
+LOG
+LOWER
+LPAD
+LTRIM
+MAKE_REF
+MAX
+MIN
+MOD
+MONTHS_BETWEEN
+NCHAR
+NEW_TIME
+NEXT_DAY
+NLS_CHARSET_DECL_LEN
+NLS_CHARSET_ID
+NLS_CHARSET_NAME
+NLS_INITCAP
+NLS_LOWER
+NLS_UPPER
+NLSSORT
+NULLIF
+NUMTODSINTERVAL
+NUMTOYMINTERVAL
+NVL
+NVL2
+POWER
+PREDICTION
+PREDICTION_BOUNDS
+PREDICTION_COST
+PREDICTION_SET
+RATIO_TO_REPORT
+RAWTOHEX
+RAWTONHEX
+REFTOHEX
+REGEXP_COUNT
+REGEXP_INSTR
+REGEXP_SUBSTR
+REPLACE
+ROUND
+ROWIDTOCHAR
+ROWIDTONCHAR
+RPAD
+RTRIM
+SESSIONTIMEZONE
+SIGN
+SIN
+SINH
+SOUNDEX
+SQRT
+STDDEV
+STDDEV_POP
+STDDEV_SAMP
+SUBSTR
+SUBSTRB
+SUBSTRC
+SUBSTR2
+SUBSTR4
+SUM
+SYS_CONNECT_BY_PATH
+SYS_CONNECT
+SYS_DBURIGEN
+SYS_EXTRACT_UTC
+SYS_GUID
+SYS_TYPEID
+SYS_XMLAGG
+SYS_XMLGEN
+SYSDATE
+SYSTIMESTAMP
+TAN
+TANH
+TO_CHAR
+TO_CLOB
+TO_DATE
+TO_DSINTERVAL
+TO_LOB
+TO_MULTI_BYTE
+TO_NCHAR
+TO_NLOB
+TO_NUMBER
+TO_SINGLE_BYTE
+TO_TIMESTAMP
+TO_TIMESTAMP_TZ
+TO_YMINTERVAL
+TRANSLATE
+TRANSLATE USING
+TRUNC
+UID
+UINSTR
+UPPER
+USER
+USERENV
+VALUE
+VAR_POP
+VAR_SAMP
+VARIANCE
+VSIZE
+XMLCAST
+XMLDIFF
+XMLEXISTS
+XMLPATCH
+
+\n… 改行
+\t… タブ
+\v… 確定後のカーソル位置／選択範囲の始まり
+\f… 選択範囲の終わり
+\\… \ という文字そのもの

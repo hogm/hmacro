@@ -1,0 +1,10 @@
+//      CompleteX  ãNìÆÉ}ÉNÉç
+
+$BaseDir = currentmacrodirectory + "\\CompleteX\\";
+$Migrate = $BaseDir + "V2toV3_runonce.mac";
+if (existfile($Migrate)) execmacro $Migrate;
+writeinistr $BaseDir + "config.txt", "plugin", 0, 0;
+//#x = x;
+//#y = y;
+execmacro   $BaseDir + "CompleteX-Main.mac";
+//moveto #x, #y

@@ -1,0 +1,267 @@
+//
+//		コメント解除マクロ  Uncomment.mac	Version 2.0
+//
+//		Made by IKKI	http://www18.big.or.jp/~fujiwara/ikki/
+//
+
+//	2001/11/25	v1.0	初版
+//	2001/11/26	v1.1	選択範囲の一括解除をサポート
+//	2002/05/08	v2.0	すべて書き直し
+
+//------ 設定 ------------------------------------------------------------------
+
+// コメント内容の前後にスペースがあったらそれも削除 (yes / no)
+#DelSpace = yes;
+
+// コメント内容の前後に改行があったらそれも削除 (yes / no)
+#DelBreak = yes;
+
+// コメント記号と対応する拡張子
+//
+// 	$Suffixes[n] = ".拡張子（半角スペース区切りで並べる）";
+// 	$LineBegin[n] = "行開始";  $RegionBegin[n] = "範囲開始";  $RegionEnd[n] = "範囲終了";
+//
+// n は 0 から順に何個でも。抜けや重なりのないように。
+
+$Suffixes[0] = ".htm .html .shtml";
+$LineBegin[0] = "";	$RegionBegin[0] = "<!--";	$RegionEnd[0] = "-->";
+
+$Suffixes[1] = ".cgi .pl .rb";
+$LineBegin[1] = "#";	$RegionBegin[1] = "";	$RegionEnd[1] = "";
+
+$Suffixes[2] = ".c .h .css";
+$LineBegin[2] = "";	$RegionBegin[2] = "/*";	$RegionEnd[2] = "*/";
+
+$Suffixes[3] = ".cpp .java .js";
+$LineBegin[3] = "//";	$RegionBegin[3] = "/*";	$RegionEnd[3] = "*/";
+
+$Suffixes[4] = ".mac";
+$LineBegin[4] = "//";	$RegionBegin[4] = "";	$RegionEnd[4] = "";
+
+$Suffixes[5] = ".tex";
+$LineBegin[5] = "%";	$RegionBegin[5] = "";	$RegionEnd[5] = "";
+
+$Suffixes[6] = ".ini";
+$LineBegin[6] = ";";	$RegionBegin[6] = "";	$RegionEnd[6] = "";
+
+$Suffixes[7] = ".sql .pls .plb";
+$LineBegin[7] = "--";	$RegionBegin[7] = "";	$RegionEnd[7] = "";
+
+// デバッグモード
+#Debug = no;
+
+
+//------ ここから本体 ----------------------------------------------------------
+
+if (!#Debug) disabledraw;
+call CheckSuffix;
+call MakeRegex;
+$searchbuffer = searchbuffer;  #searchoption = searchoption;
+if (!searchmode) call SetSearchMode 1;
+
+if  (rectselecting) call RectSelecting;
+else if (selecting) call Selecting;
+else                call NoSelecting;
+
+setsearch $searchbuffer, #searchoption;
+if (#searchmodechanged) call SetSearchMode 0;
+endmacro;
+
+
+NoSelecting:		// 範囲選択してないとき
+	#sdc = column;  #sdl = lineno;
+	movetolineno column + 2, lineno;		// カーソル直後も検索対象に
+	while (1) {
+		call Search_b 0;  if (!##return) break;		// 上方のコメント開始部を検索
+		if (strstr($b, $lb) >= 0) {					// 行コメントだったら
+			if (lineno < #sdl) {
+				if ($rb == "") break;
+				else { $lb = "";  continue; }
+			} else if ($rb != "") {						// 　/*　「//」　*/　　┃　
+				moveto #bx1, #by1;						// ↑こういう状況のときは「//」を削除しない
+				searchup $rb;
+				if (result) searchdown $rd;
+				if (result) {
+					if (lineno == #sdl && column > #bc && column + strlen($rd) <= #sdc) break;
+					if (column < #sdc && column + strlen($rd) > #sdc) { $lb = "";  continue; }
+				}
+			}
+			call Delete #bx1, #by1, #bx2, #by2;			// 削除
+		}
+		else if (strstr($b, $rb) >= 0) {			// 範囲コメントだったら
+			call Search_d 1;  if (!##return) break;		// 下方のコメント終了部を検索
+			if (lineno < #sdl || (lineno == #sdl && column <= #sdc)) {
+				if ($lb == "") break;
+				else { $rb = "";  moveto #bx1, #by1;  continue; }
+			}
+			call Delete #dx1, #dy1, #dx2, #dy2;			// 終了部を削除
+			call Delete #bx1, #by1, #bx2, #by2;			// 開始部を削除
+		}
+		break;
+	}
+	movetolineno #sdc + 1, #sdl;
+	return;
+
+
+Selecting:		// 範囲選択してるとき
+	call GetRegion;
+	moveto #sbx, #sby;								// 選択範囲の先頭へ
+	while (1) {
+		call Search_b 1;  if (!##return) break;		// 下方のコメント開始部を検索
+		if (strstr($b, $lb) >= 0) {					// 行コメントだったら
+			if (lineno > #sdl || (lineno == #sdl && #bc + strlen($lb) > #sdc)) break;
+			call Delete #bx1, #by1, #bx2, #by2;			// 削除
+			golineend2;
+		}
+		else if (strstr($b, $rb) >= 0) {			// 範囲コメントだったら
+			call Search_d 1;  if (!##return) break;		// 下方のコメント終了部を検索
+			if (lineno > #sdl || (lineno == #sdl && column > #sdc)) break;
+			call Delete #bx1, #by1, #bx2, #by2;			// 開始部を削除
+			call Search_d 1;							// 位置がずれたからもう一度
+			call Delete #dx1, #dy1, #dx2, #dy2;			// 終了部を削除
+		}
+	}
+	movetolineno #sbc + 1, #sbl;  beginsel;  movetolineno #sdc + 1, #sdl;  endsel;
+	return;
+
+RectSelecting:		// BOX 選択してるとき
+	call GetRegion;
+	moveto #sdx, #sdy;								// 選択範囲の末尾へ
+	while (1) {
+		call Search_b 0;  if (!##return) break;		// 上方のコメント開始部を検索
+		if (strstr($b, $lb) >= 0) {					// 行コメントだったら
+			if (#by1 < #sby) break;
+			if (#bx1 < #sbx || #bx1 + strlen($lb) >= #sdx) continue;
+			call Delete #bx1, #by1, #bx2, #by2;			// 削除
+		}
+		else if (strstr($b, $rb) >= 0) {			// 範囲コメントだったら
+			call Search_d 1;  if (!##return) break;		// 下方のコメント終了部を検索
+			if (#by1 < #sby || #dy2 > #sdy) break;
+			if (#bx1 < #sbx || #dx2 > #sdx || #bx1 + strlen($rb) > #sdx || #dx2 - strlen($rd) < #sbx) { moveto #bx1, #by1;  continue; }
+			call Delete #dx1, #dy1, #dx2, #dy2;			// 終了部を削除
+			call Delete #bx1, #by1, #bx2, #by2;			// 開始部を削除
+		}
+	}
+	moveto #sbx, #sby;  beginrect;  moveto #sdx, #sdy;  endsel;
+	return;
+
+GetRegion:		// 選択範囲を取得
+	#sbx = seltopx;  #sby = seltopy;  #sdx = selendx;  #sdy = selendy;  escape;
+	moveto #sdx, #sdy;  if (column == 0) { up;  golineend2; }  #sdc = column;  #sdl = lineno;
+	moveto #sbx, #sby;                                         #sbc = column;  #sbl = lineno;
+	return;
+
+Search_b:		// コメント開始文字列を検索・取得  引数: 0 = 上方向, 1 = 下方向.
+	if (!##1) searchup    $xb, regular;
+	else      searchdown2 $xb, regular;		// 〔秀丸 v3.11 以降〕
+	if (!result) return false;
+	#bc = column;  #bl = lineno;  #bx1 = seltopx;  #by1 = seltopy;  #bx2 = selendx;  #by2 = selendy;
+	if (#Debug) call Confirm "発見";
+	$b = gettext(#bx1, #by1, #bx2, #by2);
+	moveto #bx2, #by2;
+	return true;
+
+Search_d:		// コメント終了文字列を検索  引数: 0 = 上方向, 1 = 下方向.
+	if (!##1) searchup    $xd, regular;
+	else      searchdown2 $xd, regular;		// 〔秀丸 v3.11 以降〕
+	if (!result) return false;
+	#dc = column;  #dl = lineno;  #dx1 = seltopx;  #dy1 = seltopy;  #dx2 = selendx;  #dy2 = selendy;
+	if (#Debug) call Confirm "発見";
+	moveto #dx2, #dy2;
+	return true;
+
+Delete:		// 削除 (x1, y1) - (x2, y2)
+	moveto ##1, ##2;  ##c1 = column;  ##l1 = lineno;
+	beginsel;
+	moveto ##3, ##4;  ##c2 = column;  ##l2 = lineno;
+	if (#Debug) call Confirm "削除";
+	delete;
+	
+	// 桁補正
+	if ((##l1 != ##l2 && ##l2 == #sdl) || (##l1 == #sdl && ##c1 < #sdc)) {
+		if (##c2 > #sdc) #sdc = ##c1; 
+		else             #sdc = #sdc + ##c1 - ##c2;
+	}
+	// 行補正
+	if (##l1 != ##l2 && ##l2 <= #sdl) #sdl = #sdl - 1;
+	
+	return;
+
+CheckSuffix:		// 拡張子チェック
+	$$filetype = filetype + " ";		// 〔秀丸 v3.09 以降〕
+	while ($Suffixes[##i] != "") {
+		$Suffixes[##i] = $Suffixes[##i] + " ";
+// 		if (#Debug) message("$Suffixes[##i] = '" + $Suffixes[##i] + "'\n$$filetype = '" + $$filetype + "'");
+		if (strstr($Suffixes[##i], $$filetype) >= 0) {
+			$rb = $RegionBegin[##i];
+			$rd = $RegionEnd[##i];
+			$lb = $LineBegin[##i];
+// 			if (#Debug) message "$lb = '" + $lb + "'\n$rb = '" + $rb + "'\n$rd = '" + $rd + "'";
+			if ($lb == "" && $rb == "" && $rd == "") call Undefined;
+			return;
+		}
+		##i = ##i + 1;
+	}
+	call Undefined;
+	return;
+
+Undefined:		// その場で入力
+	question ("コメントが定義されていません。消そうとしているのは行コメントですか？\n\n" + 
+	  "・行コメント（例： // ～ 行末） ⇒ はい(Y)\n" + 
+	  "・範囲コメント（例： /* ～ */） ⇒ いいえ(N)");
+	if (result) {
+		$lb = input("行コメント開始文字列を入力してください", "//");    if (!result) endmacro;
+	} else {
+		$rb = input("範囲コメント開始文字列を入力してください", "/*");  if (!result) endmacro;
+		$rd = input("範囲コメント終了文字列を入力してください", "*/");  if (!result) endmacro;
+	}
+	return;
+
+MakeRegex:		// コメント記号の正規表現を生成
+	if ($lb != "") {
+		call EscapeMetaChar $lb;  $$b = $$return;
+		if (#DelSpace) $$b = $$b + " ?";
+		if ($rb != "") $$b = $$b + "|";
+	}
+	if ($rb != "") {
+		call EscapeMetaChar $rb;  $$b = $$b + $$return;
+		if (#DelSpace) $$b = $$b + " ?";
+		if (#DelBreak) $$b = $$b + "\\n?";
+	}
+	$xb = $$b;
+	
+	if ($rd != "") {
+		call EscapeMetaChar $rd;  $$d = $$return;
+		if (#DelSpace) $$d = " ?"  + $$d;
+		if (#DelBreak) $$d = "\\n?" + $$d;
+	}
+	$xd = $$d;
+	
+	return;
+
+EscapeMetaChar:		// 正規表現のメタキャラクタをエスケープ〔全角文字非対応〕
+	##length = strlen($$1);
+	while (##i < ##length) {
+		$$c = midstr($$1, ##i, 1);
+		if ($$c == "*" || $$c == "+" || $$c == "?" || $$c == "^" || $$c == "$" || $$c == "." || $$c == "[" || $$c == "]" || $$c == "(" || $$c == ")" || $$c == "|" || $$c == "\\") $$e = $$e + "\\" + $$c;
+		else $$e = $$e + $$c;
+		##i = ##i + 1;
+	}
+	return $$e;
+
+SetSearchMode:		// 検索での表示を設定
+	openreg "CURRENTUSER", "Software\\Hidemaruo\\Hidemaru\\Env";
+	writeregnum "SelectFound", ##1;
+	closereg;
+	envchanged;
+	#searchmodechanged = true;
+	return;
+
+Confirm:
+	enabledraw;
+	question($$1);
+	if (!result) endmacro;
+	return;
+
+
+//		(C) IKKI <fujiwara@big.or.jp> 2002

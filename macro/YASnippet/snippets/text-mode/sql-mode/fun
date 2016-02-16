@@ -1,0 +1,9 @@
+
+FUNCTION ${1:function_name}
+RETURN ${2:datatype}
+IS
+    ${3:l_result} ${2:datatype};
+BEGIN
+    $0
+    RETURN ${3:l_result};
+END;

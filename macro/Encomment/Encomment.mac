@@ -1,0 +1,202 @@
+//
+//		コメント挿入マクロ  Encomment.mac	Version 2.1
+//
+//		Made by IKKI	http://www18.big.or.jp/~fujiwara/ikki/
+//
+
+//	2001/10/09	v1.0	初版
+//	2001/11/06	v1.1	スペースの付加を選べるように
+//	2001/11/24	v1.2	改行付加をサポート
+//	2001/11/25	v1.3	ブロック選択をサポート
+//	2001/11/25	v1.4	行選択判定ロジックを簡素化
+//	2002/05/10	v2.0	すべて書き直し
+//	2002/05/18	v2.1	先頭行／最終行を含む範囲選択で無限ループに陥るバグを修正
+
+//------ 設定 ------------------------------------------------------------------
+
+// 範囲コメントと行コメントの両方が定義されてる場合
+// 
+// 	0 : 範囲コメントを使う
+// 	1 : 行コメントを使う
+// 	2 : 範囲選択時のみ範囲コメントを使う
+// 
+#PreferLine = 2;
+
+// コメント内容の前後に半角スペースを入れる (yes / no)
+#AddSpace = yes;
+
+// 行選択時はコメント内容の前後に改行を入れる (yes / no)
+#AddBreak = yes;
+
+// コメント記号と対応する拡張子
+// 
+// 	$Suffixes[n] = ".拡張子（半角スペース区切りで並べる）";
+// 	$LineBegin[n] = "行開始";  $RegionBegin[n] = "範囲開始";  $RegionEnd[n] = "範囲終了";
+// 
+// n は 0 から順に何個でも。抜けや重なりのないように。
+
+$Suffixes[0] = ".htm .html .shtml";
+$LineBegin[0] = "";	$RegionBegin[0] = "<!--";	$RegionEnd[0] = "-->";
+
+$Suffixes[1] = ".cgi .pl .rb";
+$LineBegin[1] = "#";	$RegionBegin[1] = "";	$RegionEnd[1] = "";
+
+$Suffixes[2] = ".c .h .css";
+$LineBegin[2] = "";	$RegionBegin[2] = "/*";	$RegionEnd[2] = "*/";
+
+$Suffixes[3] = ".cpp .java .js";
+$LineBegin[3] = "//";	$RegionBegin[3] = "/*";	$RegionEnd[3] = "*/";
+
+$Suffixes[4] = ".mac";
+$LineBegin[4] = "//";	$RegionBegin[4] = "";	$RegionEnd[4] = "";
+
+$Suffixes[5] = ".tex";
+$LineBegin[5] = "%";	$RegionBegin[5] = "";	$RegionEnd[5] = "";
+
+$Suffixes[6] = ".ini";
+$LineBegin[6] = ";";	$RegionBegin[6] = "";	$RegionEnd[6] = "";
+
+$Suffixes[7] = ".sql .pls .plb";
+$LineBegin[7] = "--";	$RegionBegin[7] = "";	$RegionEnd[7] = "";
+
+
+// デバッグモード
+#Debug = no;
+
+
+//------ ここから本体 ----------------------------------------------------------
+
+if (!#Debug) disabledraw;
+call CheckSuffix;
+
+// 挿入するコメントの種類を決める
+if ($rb != "" && ($lb == "" || (!#PreferLine) || (selecting && #PreferLine == 2))) {
+	#UseLine = no;
+	if (#AddSpace) { $rb = $rb + " ";  $rd = " " + $rd; }
+} else if ($lb != "" && ($rb == "" || #PreferLine)) {
+	#UseLine = yes;
+	if (#AddSpace) $lb = $lb + " ";
+} else {
+	message("コメントが定義されていません");
+	endmacro;
+}
+// 範囲選択状態によって分岐
+if (selecting) {
+	if (!rectselecting) {
+		#sbx = seltopx;  #sby = seltopy;  #sdx = selendx;  #sdy = selendy;  escape;
+		moveto #sdx, #sdy;
+		if (column == 0) {		// 行選択の場合
+			up;  golineend2;
+			if (#AddBreak) { $rb = $rb + "\n";  $rd = "\n" + $rd; }
+		} else {
+			#AddBreak = 0;
+		}
+		#sdc = column;  #sdl = lineno;
+		if (#UseLine) call Selecting_UseLine;
+		else          call Selecting_UseRegion;
+	} else {
+		#sbx = seltopx;  #sby = seltopy;  #sdx = selendx;  #sdy = selendy;  escape;
+		if (#UseLine) call RectSelecting_UseLine;
+		else          call RectSelecting_UseRegion;
+	}
+} else {
+	if (#UseLine) call NoSelecting_UseLine;
+	else          call NoSelecting_UseRegion;
+}
+endmacro;
+
+
+NoSelecting_UseLine:		// 無選択・行コメント
+	insert $lb;
+	return;
+
+NoSelecting_UseRegion:		// 無選択・範囲コメント
+	insert $rb;
+	#sdc = column;  #sdl = lineno;
+	insert $rd;
+	movetolineno #sdc + 1, #sdl;
+	return;
+
+Selecting_UseLine:		// 範囲選択・行コメント
+	moveto #sbx, #sby;
+	#l = lineno;
+	while (#l <= #sdl) {
+		movetolineno 1, #l;
+		insert $lb;
+		#l = #l + 1;
+	}
+	#sdc = #sdc + strlen($lb);
+	moveto #sbx, #sby;  beginsel;  movetolineno #sdc + 1, #sdl;  endsel;
+	return;
+
+Selecting_UseRegion:		// 範囲選択・範囲コメント
+	insert $rd;
+	#sdc = column;  #sdl = lineno;
+	moveto #sbx, #sby;
+	insert $rb;
+	if (lineno == #sdl) #sdc = #sdc + strlen($rb);
+	if (#AddBreak)      #sdl = #sdl + 1;
+	moveto #sbx, #sby;  beginsel;  movetolineno #sdc + 1, #sdl;  endsel;
+	return;
+
+RectSelecting_UseLine:		// BOX 選択・行コメント
+	moveto #sbx, #sby;
+	#y = y;
+	while (#y <= #sdy) {
+		moveto #sbx, #y;
+		if (x < #sbx || lineno == #l) { #y = #y + 1;  continue; }
+		insert $lb;
+		#y = #y + 1;
+		#l = lineno;
+	}
+	#sdx = #sdx + strlen($lb);
+	moveto #sbx, #sby;  beginrect;  moveto #sdx, #sdy;  endsel;
+	return;
+
+RectSelecting_UseRegion:		// BOX 選択・範囲コメント
+	moveto #sdx, #sdy;
+	#y = y;
+	while (#y >= #sby) {
+		moveto #sdx, #y;
+		if (x < #sbx) { #y = #y - 1;  continue; }
+		insert $rd;
+		moveto #sbx, #y;
+		insert $rb;
+		#y = #y - 1;
+	}
+	#sdx = #sdx + strlen($rb) + strlen($rd);
+	moveto #sbx, #sby;  beginrect;  moveto #sdx, #sdy;  endsel;
+	return;
+
+CheckSuffix:		// 拡張子チェック
+	$$filetype = filetype + " ";		// 〔秀丸 v3.09 以降〕
+	while ($Suffixes[##i] != "") {
+		$Suffixes[##i] = $Suffixes[##i] + " ";
+// 		if (#Debug) message("$Suffixes[##i] = '" + $Suffixes[##i] + "'\n$$filetype = '" + $$filetype + "'");
+		if (strstr($Suffixes[##i], $$filetype) >= 0) {
+			$rb = $RegionBegin[##i];
+			$rd = $RegionEnd[##i];
+			$lb = $LineBegin[##i];
+// 			if (#Debug) message "$lb = '" + $lb + "'\n$rb = '" + $rb + "'\n$rd = '" + $rd + "'";
+			if ($lb == "" && $rb == "" && $rd == "") call Undefined;
+			return;
+		}
+		##i = ##i + 1;
+	}
+	call Undefined;
+	return;
+
+Undefined:		// その場で入力
+	question ("コメントが定義されていません。消そうとしているのは行コメントですか？\n\n" + 
+	  "・行コメント（例： // ～ 行末） ⇒ はい(Y)\n" + 
+	  "・範囲コメント（例： /* ～ */） ⇒ いいえ(N)");
+	if (result) {
+		$lb = input("行コメント開始文字列を入力してください", "//");    if (!result) endmacro;
+	} else {
+		$rb = input("範囲コメント開始文字列を入力してください", "/*");  if (!result) endmacro;
+		$rd = input("範囲コメント終了文字列を入力してください", "*/");  if (!result) endmacro;
+	}
+	return;
+
+
+//		(C) IKKI <fujiwara@big.or.jp> 2001-2002

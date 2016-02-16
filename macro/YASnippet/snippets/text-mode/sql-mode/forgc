@@ -1,0 +1,21 @@
+
+l_mtl_parameters mtl_parameters%ROWTYPE;
+
+FUNCTION find_organization(
+    p_organization_code IN mtl_parameters.organization_code%TYPE
+)
+RETURN mtl_parameters%ROWTYPE;
+IS
+    l_result mtl_parameters%ROWTYPE;
+BEGIN
+    SELECT  *
+    INTO    l_result
+    FROM    mtl_parameters
+    WHERE   organization_code = p_organization_code
+    ;
+
+    RETURN l_result;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+    ${1:zn_helper.raise_warn(SQLERRM)};
+END;

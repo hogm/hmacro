@@ -1,0 +1,44 @@
+# =>
+=begin rdoc ... =end
+all? { |...| ... }
+alias_method new, old
+any? { |...| ... }
+if __FILE__ == $PROGRAM_NAME ... end
+Benchmark.bmbm(...) do ... end
+case ... end
+class << self ... end
+classify { |...| ... }
+class ... end
+collect { |...| ... }
+include Comparable; def <=> ... end
+deep_copy(...)
+delete_if { |...| ... }
+detect { |...| ... }
+downto(...) { |n| ... }
+each { |...| ... }
+each_cons(...) { |...| ... }
+each_index { |i| ... }
+each_value { |val| ... }
+each_with_index { |e, i| ... }
+for ... in ...; ... end
+if ... end
+if ... else ... end
+inject(...) { |...| ... }
+def method_missing ... end
+attr_reader ...
+/usr/bin/ruby -wKU
+reject { |...| ... }
+require "..."
+require File.join(File.dirname(__FILE__), ...)
+attr_accessor ...
+select { |...| ... }
+times { |n| ... }
+until ... end
+upto(...) { |n| ... }
+attr_writer ...
+when ... end
+while ... end
+:yields: arguments (rdoc)
+zip(...) { |...| ... }
+(user's email)
+(current time)

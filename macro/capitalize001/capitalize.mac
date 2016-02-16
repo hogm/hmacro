@@ -1,0 +1,51 @@
+
+//指定範囲の英単語先頭を大文字に変換　Ver.0.01
+
+//capitalize.mac
+
+//・abCd は AbCd になります。Abcd にしたい場合には、コードを読んで指示に従って
+//　変更して下さい。
+//・このマクロでは #xyz を #Xyz と変換してしまいます。
+//・あまり詳細に作ってはいません。用途に合うように改変して下さい。
+
+//Author:slide_moon
+//Ver.0.01  2002.XX.XX
+
+	if(!selecting){
+		message "範囲を指定して下さい。";
+		endmacro;
+	}
+
+	disabledraw;
+	disableinvert;
+
+	#x1=seltopx;
+	#y1=seltopy;
+	#x2=selendx;
+	#y2=selendy;
+	escape;
+	moveto #x1, #y1;
+
+	searchdown2 "[A-Za-z]+", regular;
+	while(1){
+		escape;
+		if(y > #y2) break;
+		else if(y == #y2){
+			if(x >= #x2) break;
+		}
+		selectword;
+//		tolower;	//単語の中間部にある大文字をすべて小文字に揃える場合には
+					//注釈記号を除去
+		escape;
+		beginsel;
+		right;
+		toupper;
+		escape;
+		wordright;
+		searchdown2 "[A-Za-z]+", regular;
+	}
+	moveto #x1, #y1;
+	enabledraw;
+	enableinvert;
+	endmacro;
+

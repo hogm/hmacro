@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>Wisteria - 秀丸マクロ - CompleteWord.mac</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex">CompleteX</A> &gt; 
+</UL>
+
+<H2 class="pagetop">CompleteWord.mac</H2>
+
+<DIV class="abst"><P>名前補完マクロ　（<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> 用プラグイン）</P></DIV>
+
+<DIV class="date" align="right">Version 3.1　(2009/09/04)</DIV>
+
+<UL class="subindex">
+	<LI><A href="#download">ダウンロード</A> |
+	<LI><A href="#outline">概要</A> |
+	<LI><A href="#option">設定</A> |
+	<LI><A href="#statements">お約束</A> |
+	<LI><A href="#history">バージョン履歴</A> |
+	<LI><A href="#feedback">フィードバック</A>
+</UL>
+
+
+<H3><A name="download" id="download">ダウンロード</A></H3>
+
+<P><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> に同梱されています。</P>
+
+
+<H3><A name="outline" id="outline">概要</A></H3>
+
+<UL class="sect">
+	<LI>編集中のファイル内で使われている単語を補完します。 Emacs で言う dabbrev-completion （動的略称展開）にあたります。
+	<LI>CompleteX の名前補完モードの実体はこのプラグインです。
+	<UL>
+		<LI>辞書補完モードと名前補完モードを手動で使い分けたい場合など、ユーザーが直接このマクロを実行することもできます。
+		<LI>他のプラグインから内部的に呼び出すこともできます。〈→<A href="reference.html#plugin:nest">CompleteX リファレンス：プラグインの作り方：プラグインの連鎖</A>〉
+	</UL>
+	<LI>秀丸メールでも使えます。
+</UL>
+
+
+<H3><A name="option" id="option">設定</A></H3>
+
+<P>設定は CompleteX の設定ファイル config.txt に追記します。〈→<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/reference.html#inifile">CompleteX リファレンス：設定ファイルの書き方</A>〉</P>
+
+<DL class="sect">
+	<DT>autosave<DD>
+	ファイルから候補を収集する前に現在編集中のファイルを自動的に上書き保存します。（デフォルト = no）
+<PRE>
+autosave=yes
+</PRE>
+	
+	<DT>word.ahead<DD>
+	書きかけの文字列（カーソルより左の部分）で始まる単語のみ収集します。（デフォルト = no）
+<PRE>
+word.ahead=yes
+</PRE>
+	巨大なファイルで候補の収集に時間がかかる場合、この設定を yes にし、単語を途中まで書いてから実行するとレスポンスが向上します。
+	
+	<DT>word.live<DD>
+	候補を編集バッファから直接収集します。ファイルサイズに比例した時間がかかります。（デフォルト = no）
+<PRE>
+word.live=yes　…候補を編集バッファから直接収集する
+word.live=no 　…候補を保存されているファイルから収集する
+</PRE>
+	秀丸メール、新規作成、grep 結果、実行結果、エンコードの種類が UTF-7 のウィンドウでは、この設定にかかわらず候補を編集バッファから直接収集します。
+	
+	<DT>word.usehint<DD>
+	ヒント表示を有効にします。候補となった単語が使われている個所の前後2行がリストボックスの下に表示されます。（デフォルト = yes）
+<PRE>
+word.usehint=no
+</PRE>
+</DL>
+
+
+<H3><A name="statements" id="statements">お約束</A></H3>
+
+<P>動作環境、ライセンス、配布場所は <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A> と同じです。
+
+
+<H3><A name="history" id="history">バージョン履歴</A></H3>
+<DL class="history">
+	<DT>Version 3.1 <SMALL>(2009/09/04)</SMALL><DD>
+	<UL>
+		<LI>秀丸エディタ v7.00 対応 (秀丸エディタ v6.x 以前では使えなくなりました)
+		<LI>アンドゥ関係の動作仕様変更
+		<UL>
+			<LI>確定した場合、アンドゥ 1 回で補完前の状態に戻る
+			<LI>キャンセルした場合、アンドゥ 0 回で補完前の状態に戻る
+			<LI>プラグインとして呼び出された場合の動作は従来通り
+		</UL>
+		<LI>テンポラリ辞書ファイルをシステムの一時フォルダに作る (環境変数 TEMP から取得)
+	</UL>
+	<DT>Version 3.08 <SMALL>(2009/08/26)</SMALL><DD>
+	<UL>
+		<LI>固定ヒント機能に対応 (undocumented)
+	</UL>
+	<DT>Version 3.01 <SMALL>(2006/10/23)</SMALL><DD>
+	<UL>
+		<LI>候補を編集バッファから直接収集できるようにした
+		<LI>設定項目 <CODE>word.live=</CODE> を追加
+		<LI>ヒント表示を追加
+		<LI>設定項目 <CODE>word.usehint=</CODE> を追加
+		<LI>関係ないパラメータヒントが表示されることがあるバグ修正
+	</UL>
+	<DT>Version 3.0 <SMALL>(2006/10/01)</SMALL><DD>
+	<UL>
+		<LI>CompleteX v3 対応正式版
+	</UL>
+</DL>
+
+
+<H3><A name="feedback" id="feedback">フィードバック</A></H3>
+
+<P>ご意見、ご感想、バグ報告、ツッコミなどは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> へどうぞ。</P>
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/">CompleteX</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_completeword.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" border="0" alt="">
+	<ADDRESS>(C) IKKI 2006-2009</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

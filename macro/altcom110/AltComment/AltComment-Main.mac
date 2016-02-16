@@ -1,0 +1,696 @@
+// 
+//  	AltComment
+//  	Version 1.10  (2008/10/12)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$IniFile = currentmacrodirectory + "\\AltComment.ini";
+$Default = currentmacrodirectory + "\\AltComment-Default.ini";
+
+// #debug = 3;
+call Initialize;
+call Main;
+call Finalize;
+endmacro;
+
+Main:
+	if (readonly || browsemode) call Error;
+	$type = filetype;
+	loaddll "TKInfo.dll";
+	if (result) {
+		if (dllfunc("IsTuruKame")) $type = "turukame";
+		freedll;
+	}
+	if (!existfile($IniFile)) writeinistr $IniFile, "", 0, 0;
+	call GetIni "with";
+	#Space  = (strstr($$return, "space")  >= 0);		// スペース付加
+	#Indent = (strstr($$return, "indent") >= 0);		// インデント
+	call GetIni "line";     if ($$return == "yes") { #SelLine = 1;  #ForLine = 2; }		// 行単位（略記）
+	call GetIni "selline";  if ($$return != "") #SelLine = val($$return);	// 行単位に拡大する最小選択行数
+	call GetIni "forline";  if ($$return != "") #ForLine = val($$return);	// 無選択は行単位  1:行末以外  2:常時
+	call GetIni "change";      #Change  = val($$return);	// 2番を使う最小選択行数
+// 	call GetIni "onlycolors";  $OnlyColors = $$return;		// 限定色（インデントされてるとまずい）
+	call GetIni "skipcolors";  $SkipColors = $$return;		// 除外色
+	
+	if  (rectselecting) call RectSelected;
+	else if (selecting) call Selected;
+	else                call NoSelected;
+	
+	call GetIni "autosave";		// 自動保存
+	if ($$return == "yes" && filename != "") save;
+	return;
+
+NoSelected:
+	#acc = column;  #acl = lineno;
+	if (lineno >= linecount2) { call AddTrailingBreak 1;  ##trailingbreakadded = 1; }
+	call Prepare #acc, #acl, #acc, #acl;
+	call SelectComment;
+	if (selecting) {
+		escape;
+		##sbc = seltopcolumn;  ##sbl = seltoplineno;  ##sdc = selendcolumn;  ##sdl = selendlineno;
+	} else if ((column == linelen2) < #ForLine) {
+		##sbc = 0;  ##sbl = lineno;  ##sdc = 0;  ##sdl = lineno + 1;		// 行選択化
+	} else {
+		##sbc = column;  ##sbl = lineno;  ##sdc = column;  ##sdl = lineno;
+	}
+	movetolineno ##sdc + 1, ##sdl;  beginsel;  movetolineno ##sbc + 1, ##sbl;  endsel;
+	call AlternateComment;
+	if (##trailingbreakadded) call AddTrailingBreak 0;
+	escape;
+	movetolineno #acc + 1, #acl;
+	return;
+
+Selected:
+	if (#SelLine) call SelectWholeLine #SelLine;
+	##dtob = (x == seltopx && y == seltopy);
+	escape;
+	##sbc = seltopcolumn;  ##sbl = seltoplineno;  ##sdc = selendcolumn;  ##sdl = selendlineno;
+	movetolineno ##sbc + 1, ##sbl;
+	if (##sdl >= linecount2) { call AddTrailingBreak 1;  ##trailingbreakadded = 1; }
+	call Prepare ##sbc, ##sbl, ##sdc, ##sdl;
+	#NewLine = (##sbc == 0 && ##sdc == 0);		// 行選択 ⇒ 改行付加
+	if ($Tok[1] == "") {
+		call SelectComment;
+		if (selecting) {
+			##sbc = seltopcolumn;  ##sbl = seltoplineno;
+		}
+	}
+	movetolineno ##sdc + 1, ##sdl;  beginsel;  movetolineno ##sbc + 1, ##sbl;  endsel;
+	call AlternateComment;
+	if (##trailingbreakadded) call AddTrailingBreak 0;
+	if (##dtob) { movetolineno #adc + 1, #adl;  beginsel;  movetolineno #abc + 1, #abl;  endsel; }
+	else        { movetolineno #abc + 1, #abl;  beginsel;  movetolineno #adc + 1, #adl;  endsel; }
+	return;
+
+RectSelected:
+	##dtob = (x == seltopx && y == seltopy);
+	escape;
+	##sbx = seltopx;  ##sby = seltopy;		// 浮いてるかもしれないのでカーソルを動かす前に取得
+	##sdx = selendx;  ##sdy = selendy;
+	moveto ##sdx, ##sdy;
+	if (lineno >= linecount2) { call AddTrailingBreak 1;  ##trailingbreakadded = 1; }
+	moveto ##sbx, ##sby;
+	call Prepare column, lineno, column + ##sdx - ##sbx, lineno + ##sdy - ##sby;
+	// 列挙
+	moveto ##sbx, ##sby;
+	while (y <= ##sdy) {
+		if (#debug) beginsel;
+		moveto ##sdx, y;
+		if (x == ##sdx - 1 && code > 0xFF) moveto ##sdx + 1, y;		// 全角文字の真ん中
+		if (x >= ##sbx) {
+			##k = ##k + 1;
+			##bp[##k] = ##sbx + y * 0x1000;  ##dp[##k] = x + y * 0x1000;
+			if (#debug) call Confirm "\n(" + str(##bp[##k] % 0x1000) + "," + str(##bp[##k] / 0x1000) + ") - (" + str(##dp[##k] % 0x1000) + "," + str(##bp[##k] / 0x1000) + ")";
+		}
+		if (#debug) endsel;
+		golineend2;
+		moveto ##sbx, y + 1;
+	}
+	if (##k == 0) call Error "エラーです\n発生位置: RectSelected";
+	if (#debug) disabledraw;
+	// 実行
+	while (##k > 0) {
+		moveto ##bp[##k] % 0x1000, ##bp[##k] / 0x1000;  beginsel;  moveto ##dp[##k] % 0x1000, ##dp[##k] / 0x1000;  endsel;
+		if (!##sdl) { ##sdc = column;  ##sdl = lineno; }
+		call AlternateComment;
+		if (!##ddl) { ##ddc = #adc;  ##ddl = #adl; }
+		##k = ##k - 1;
+	}
+	#adc = ##ddc;  #adl = ##ddl;
+	if (##trailingbreakadded) call AddTrailingBreak 0;
+	if (##dtob) { movetolineno #adc + 1, #adl;  beginrect;  movetolineno #abc + 1, #abl;  endsel; }
+	else        { movetolineno #abc + 1, #abl;  beginrect;  movetolineno #adc + 1, #adl;  endsel; }
+	return;
+
+Prepare:		// 設定読み込み＆対象トークン特定
+	// (##1, ##2), (##3, ##4) = 選択してた範囲 (column, lineno)
+	if (selecting) { escape;  moveto seltopx, seltopy; }
+	##ox = x;  ##oy = y;
+	// ユーザー設定ファイルに 1L が定義されてたらデフォルト設定ファイルは読まない
+	$$s = $IniFile;
+	while (true) {
+		while (true) {
+			call GetIniStrOfType $$s, str(##i + 1) + "L";  if ($$return == "") break;
+			call RegexEscape $$return;  $$t[##i][0] = $$return;
+			call GetIniStrOfType $$s, str(##i + 1) + "R";
+			call RegexEscape $$return;  $$t[##i][1] = $$return;
+			call GetIniStrOfType $$s, str(##i + 1) + "LX";  $$p[##i][0] = $$return;
+			call GetIniStrOfType $$s, str(##i + 1) + "RX";  $$p[##i][1] = $$return;
+			call GetIniStrOfType $$s, str(##i + 1) + "SX";  $$f[##i]    = $$return;
+			##i = ##i + 1;
+		}
+		if ($$s == $IniFile && $$t[0][0] == "") $$s = $Default;  // continue;
+		else break;
+	}
+	##i = ##i - 1;
+	if (##i < 0) {
+		call EasyConfig;  if (!##return) call Error;
+		##i = 0;
+		$$t[0][0] = $Tok[0];
+		$$t[0][1] = $Tok[1];
+	}
+	if (##i > 0) {
+		// 複数種類あるときは上方直近の有効なトークンを採用
+		while (##i >= 0) {
+			$Tok[0] = $$t[##i][0];
+			$Tok[1] = $$t[##i][1];
+			$Ptn[0] = $$p[##i][0];
+			$Ptn[1] = $$p[##i][1];
+			#Flg = (strstr($$f[##i], "word") >= 0) * 0x01 + (strstr($$f[##i], "casesense") >= 0) * 0x02 + 0x10;
+			call SelectComment;
+			if (#debug) $$msg = str(##i)  + "  0x" + hex(##return)+ "\t" + $Tok[0] + "  " + $Tok[1] + "\n" + $$msg;
+			if (##return >= ##max) { ##m = ##i;  ##max = ##return; }
+			escape;
+			moveto ##ox, ##oy;
+			##i = ##i - 1;
+		}
+	}
+	if (#debug) $$msg = "Prepare\n" + $$msg + "max = " + str(##m);
+	// 範囲頭がコメント外で見かけの選択行数が #Change 以上のときは2番を採用
+	if (##2 == ##4) ##lines = (##1 != ##3); else ##lines = ##4 - ##2 + (##3 > 0);
+	if (##max == 0 && $$t[1][0] != "" && #Change && ##lines >= #Change) {
+		##m = 1;
+		if (#debug) $$msg = $$msg + " -> changed to 1";
+	}
+	$Tok[0] = $$t[##m][0];
+	$Tok[1] = $$t[##m][1];
+	$Ptn[0] = $$p[##m][0];
+	$Ptn[1] = $$p[##m][1];
+	#Flg = (strstr($$f[##m], "word") >= 0) * 0x01 + (strstr($$f[##m], "casesense") >= 0) * 0x02 + 0x10;
+	if (#debug) call Confirm $$msg + "\n\n$Tok = " + $Tok[0] + "  " + $Tok[1] + "\n$Ptn = " + $Ptn[0] + "  " + $Ptn[1] + "\n#Flg = 0x" + hex(#Flg);
+	return;
+
+SelectWholeLine:		// 選択範囲を行単位に拡大
+	// ##1: 見かけの選択範囲が ##1 行以上のときに限る
+	if (!selecting) { beginsel;  endsel; }
+	##dtob = (x == seltopx && y == seltopy);
+	escape;
+	moveto seltopx, seltopy;  ##bc = column;  ##bl = lineno;
+	moveto selendx, selendy;  ##dc = column;  ##dl = lineno;
+	if (##dl - ##bl + (##dc > 0) >= ##1) {
+		##bc = 0;
+		if (##dc > 0) {
+			if (##dl < linecount2) {
+				##dl = ##dl + 1;
+				##dc = 0;
+			} else {
+				golineend2;
+				##dc = column;
+			}
+		}
+	}
+	if (##dtob) { movetolineno ##dc + 1, ##dl;  beginsel;  movetolineno ##bc + 1, ##bl;  endsel; }
+	else        { movetolineno ##bc + 1, ##bl;  beginsel;  movetolineno ##dc + 1, ##dl;  endsel; }
+	return;
+
+AddTrailingBreak:		// ファイル末尾に改行を付加
+	// ##1 = 1:入れる  0:消す
+	if (selecting) escape;
+	##ox = x;  ##oy = y;
+	gofileend;
+	if (##1) insert "\n"; else backspace;
+	moveto ##ox, ##oy;
+	return;
+
+//.----- 検出ルーチン --------------------------------------------------------------------------
+
+SelectComment:		// コメント有効範囲選択
+	// ##return = 上方直近のトークンの座標 (x + y * 0x1000)
+	// [グローバル変数]
+	// $Tok[0] = コメント開始トークン
+	// $Ptn[0] = コメント開始パターン（省略可）
+	// $Tok[1] = コメント終了トークン
+	// $Ptn[1] = コメント終了パターン（省略可）
+	// #Space  = スペース付加
+	// #Indent = インデント
+	if ($Tok[1] == "") call SelectCommentInline;
+	else               call SelectCommentRegion;
+	if (#debug) call Confirm "SelectComment\n$Tok = " + $Tok[0] + "  " + $Tok[1] + "\n$Ptn = " + $Ptn[0] + "  " + $Ptn[1] + "\n#Flg = 0x" + hex(#Flg) + "\n" + "pos = 0x" + hex(##return);
+	return ##return;
+
+SelectCommentInline:		// 行コメント有効範囲選択
+	if ($Ptn[0] != "") {
+		$$ptn[0] = $Ptn[0];
+	} else if (!#Indent) {
+		$$ptn[0] = "^" + $Tok[0] + "[ \\t]*|" + $Tok[0];
+	} else {
+		$$ptn[0] = "^[ \\t]*" + $Tok[0] + "[ \\t]*|" + $Tok[0];
+	}
+	if (selecting) moveto seltopx, seltopy;
+	escape;
+	##oc = column;  ##ol = lineno;
+	call SearchUpLongest $$ptn[0], #Flg;
+	if (##return && lineno == ##ol) {
+		##tbp = seltopx + seltopy * 0x1000;
+		movetolineno 1, ##ol + 1;  beginsel;  moveto ##tbp % 0x1000, ##tbp / 0x1000;  endsel;
+		return ##tbp;
+	}
+	movetolineno ##oc + 1, ##ol;
+	return -1;
+
+SelectCommentRegion:		// 範囲コメント有効範囲選択
+	if (!#Space) {
+		$$ptn[0] = $Tok[0];
+		$$ptn[1] = $Tok[1];
+	} else {
+		$$ptn[0] = $Tok[0] + " ?";
+		$$ptn[1] = " ?" + $Tok[1];
+	}
+	if ($Ptn[0] != "") {
+		$$ptn[0] = $Ptn[0];
+		$$ptn[1] = $Ptn[1];
+	} else if (!#Indent) {
+		$$ptn[0] = "^" + $$ptn[0] + "[ \\t]*\\n?|" + $$ptn[0];
+		$$ptn[1] = "^" + $$ptn[1] + "[ \\t]*\\n?|" + $$ptn[1];
+	} else {
+		$$ptn[0] = "^[ \\t]*" + $$ptn[0] + "[ \\t]*\\n?|" + $$ptn[0];
+		$$ptn[1] = "^[ \\t]*" + $$ptn[1] + "[ \\t]*\\n?|" + $$ptn[1];
+	}
+	if (selecting) moveto seltopx, seltopy;
+	escape;
+	##op = x + y * 0x1000;
+	call SearchUpLongest $$ptn[0], #Flg;
+	if (##return) {
+		##tbp = seltopx + seltopy * 0x1000;
+		##tdp = selendx + selendy * 0x1000;
+		if (##tbp <= ##op) ##t = 1;		// 開始トークン上
+		if (##tdp <= ##op) ##t = 2;		// 内側
+		call SearchDown2 $$ptn[1], #Flg;
+		if (##return) {
+			##ubp = seltopx + seltopy * 0x1000;
+			##udp = selendx + selendy * 0x1000;
+		} else {
+			gofileend;
+			##ubp = x + y * 0x1000;
+			##udp = x + y * 0x1000;
+		}
+		if (##ubp <= ##op) ##t = 3;		// 終了トークン上
+		if (##udp <= ##op) ##t = 0;		// 外側
+	}
+	if (##t > 0) {
+		moveto ##udp % 0x1000, ##udp / 0x1000;  beginsel;  moveto ##tbp % 0x1000, ##tbp / 0x1000;  endsel;
+		if (##t == 3) return ##ubp;
+		return ##tbp;
+	}
+	moveto ##op % 0x1000, ##op / 0x1000;
+	return -1;
+
+//.----- 実行ルーチン --------------------------------------------------------------------------
+
+AlternateComment:		// コメント反転
+	// [グローバル変数]
+	// $Tok[0] = コメント開始トークン
+	// $Ptn[0] = コメント開始パターン（省略可）
+	// $Tok[1] = コメント終了トークン
+	// $Ptn[1] = コメント終了パターン（省略可）
+	// #Space = スペース付加
+	// #Indent = インデント
+	// #NewLine = 改行
+	if (rectselecting) { message "マクロのバグです";  endmacro; }
+	if (#debug) call Confirm "\nBegin AlternateComment";
+	if ($Tok[1] == "") call AlternateCommentInline;
+	else               call AlternateCommentRegion;
+	if (#debug) call Confirm "\nEnd AlternateComment";
+	return;
+
+AlternateCommentInline:		// 行コメント反転
+	if (!#Space) {
+		$$ins[0] = $Tok[0];
+		$$del[0] = $Tok[0];
+	} else {
+		$$ins[0] = $Tok[0] + " ";
+		$$del[0] = $Tok[0] + " ?";
+	}
+	if ($Ptn[0] != "") {
+		$$ptn[0] = $Ptn[0];
+	} else if (!#Indent) {
+		$$ptn[0] = "^" + $$del[0] + "[ \\t]*|" + $$del[0];
+	} else {
+		$$ptn[0] = "^[ \\t]*" + $$del[0] + "[ \\t]*|" + $$del[0];
+	}
+	if (!selecting) { beginsel;  endsel; }
+	escape;
+	moveto selendx, selendy;  #adc = column;  #adl = lineno;
+	moveto seltopx, seltopy;  #abc = column;  #abl = lineno;
+	while (true) {
+		##c = column;  ##l = lineno;  ##p = x + y * 0x1000;
+		call SearchUpLongest $$ptn[0], #Flg;
+		if (##return && seltopx + seltopy * 0x1000 <= ##p && selendx + selendy * 0x1000 > ##p) {		// 右結合
+			call AdaptiveDelete $$del[0], #Indent, 0;
+		} else {
+			movetolineno ##c + 1, ##l;
+			call AdaptiveInsert $$ins[0], #Indent, 0;
+		}
+		movetolineno 1, ##l + 1;
+		if (lineno > #adl || (lineno == #adl && #adc == 0) || lineno >= linecount2) break;
+	}
+	movetolineno #adc + 1, #adl;  beginsel;  movetolineno #abc + 1, #abl;  endsel;
+	return;
+
+AlternateCommentRegion:		// 範囲コメント反転
+	if (!#Space) {
+		$$ins[0] = $Tok[0];
+		$$del[0] = $Tok[0];
+		$$ins[1] = $Tok[1];
+		$$del[1] = $Tok[1];
+	} else {
+		$$ins[0] = $Tok[0] + " ";
+		$$del[0] = $Tok[0] + " ?";
+		$$ins[1] = " "  + $Tok[1];
+		$$del[1] = " ?" + $Tok[1];
+	}
+	if ($Ptn[0] != "") {
+		$$ptn[0] = $Ptn[0];
+		$$ptn[1] = $Ptn[1];
+	} else if (!#Indent) {
+		$$ptn[0] = "^" + $$del[0] + "[ \\t]*\\n?|" + $$del[0];
+		$$ptn[1] = "^" + $$del[1] + "[ \\t]*\\n?|" + $$del[1];
+	} else {
+		$$ptn[0] = "^[ \\t]*" + $$del[0] + "[ \\t]*\\n?|" + $$del[0];
+		$$ptn[1] = "^[ \\t]*" + $$del[1] + "[ \\t]*\\n?|" + $$del[1];
+	}
+	
+	if (!selecting) { beginsel;  endsel; }
+	escape;
+	moveto selendx, selendy;  #adc = column;  #adl = lineno;
+	moveto seltopx, seltopy;  #abc = column;  #abl = lineno;  ##abp = x + y * 0x1000;
+	// 先頭
+	call SearchUpLongest $$ptn[0], #Flg;
+	if (##return) {
+		if (seltopx + seltopy * 0x1000 <= ##abp) ##t = 1;		// 開始トークン上		// 右結合
+		if (selendx + selendy * 0x1000 <= ##abp) ##t = 2;		// 内側
+		##tbx = seltopx;  ##tby = seltopy;
+		call SearchDown2 $$ptn[1], #Flg;
+		if (##return) {
+			if (seltopx + seltopy * 0x1000 <= ##abp) ##t = 3;		// 終了トークン上
+			if (selendx + selendy * 0x1000 <= ##abp) ##t = 0;		// 外側
+			if (##t != 3) moveto ##tbx, ##tby;
+		}
+	}
+	##i = (##t == 0 || ##t == 3);
+	if (##t == 1 || ##t == 3) {
+		call AdaptiveDelete $$del[##i], #Indent, #NewLine;
+	} else {
+		movetolineno #abc + 1, #abl;
+		call AdaptiveInsert $$ins[!##i], #Indent, #NewLine;
+		##bdp = x + y * 0x1000;		// 自分で書いたのは覚えとく
+	}
+	// 中間
+	while (true) {
+		##i = !##i;
+		call SearchDown2 $$ptn[##i], #Flg;
+		if (!##return) break;
+		moveto selendx, selendy;
+		if (lineno > #adl || (lineno == #adl && column >= #adc)) break;
+		moveto seltopx, seltopy;
+		call AdaptiveReplace $$del[##i], $$ins[!##i], #Flg;
+	}
+	// 末尾
+	movetolineno #adc + 1, #adl;  ##adp = x + y * 0x1000;
+	call SearchUpLongest $$ptn[##i], #Flg;
+	if (##return && seltopx + seltopy * 0x1000 < ##adp && selendx + selendy * 0x1000 >= ##adp		// 左結合
+	 && seltopx + seltopy * 0x1000 > ##bdp) {		// 自分で書いたのは消さない（無選択時）
+		call AdaptiveDelete $$del[##i], #Indent, #NewLine;
+	} else {
+		movetolineno #adc + 1, #adl;
+		call AdaptiveInsert $$ins[!##i], #Indent, #NewLine, 1;		// カーソル前寄せ
+	}
+	movetolineno #adc + 1, #adl;  beginsel;  movetolineno #abc + 1, #abl;  endsel;
+	return;
+
+AdaptiveDelete:		// 削除
+	// $$1 = 削除パターン
+	// ##2 = 
+	// ##3 = 改行（行頭でのみ有効）
+	if (!(##3 && column == 0)) {
+		call AdaptiveReplace $$1, "", 0x10;
+	} else {
+		call AdaptiveReplace "^[ \\t]*" + $$1 + "[ \\t]*\\n|" + $$1, "", 0x10;
+	}
+	return;
+
+AdaptiveInsert:		// 挿入
+	// $$1 = 挿入パターン
+	// ##2 = インデント（行頭でのみ有効）
+	// ##3 = 改行（行頭でのみ有効）
+	// ##4 = 0:カーソル後寄せ  1:カーソル前寄せ
+	if (!(##2 && column == 0)) {
+// 		call AdaptiveReplace "()", $$1 + leftstr("\n", (##3 && column == 0)), 0x10, ##4;		// JRE32 だと "()" が全角文字の前にヒットしない
+		call AdaptiveReplace "", $$1 + leftstr("\n", (##3 && column == 0)), 0x10, ##4;
+	} else if (!(##3 && column == 0)) {
+		call AdaptiveReplace "^[ \\t]*", "\\0" + $$1, 0x10, ##4;
+	} else {
+		searchdown2 "^[ \\t]*", regular;
+		if (!selecting) { beginsel;  endsel; }
+		if ($indentstr == "") $indentstr = gettext(seltopx, seltopy, selendx, selendy, true);
+		$$indentstr = gettext(seltopx, seltopy, selendx, selendy);
+		// AdaptiveReplace 内の finddown2 が同じ行頭にヒットするよう、ここで連続検索フラグがリセットされる必要がある。
+		// if (result && selecting) $$indentstr = gettext(); じゃダメ。
+		call AdaptiveReplace "^", $indentstr + $$1 + "\n", 0x10, ##4;
+	}
+	return;
+
+AdaptiveReplace:		// 座標補正置換
+	// $$1 = 検索パターン  "":カーソル位置に挿入
+	// $$2 = 置換パターン
+	// ##3 = 検索オプション（ask, linknext は無効）
+	// ##4 = 位置補正方法  0:後寄せ  1:前寄せ
+	// [グローバル変数]
+	// (#abc, #abl), (#adc, #adl) = 補正する範囲 (column, lineno)
+	// (#acc, #acl)               = 補正する位置 (column, lineno)
+	escape;
+	if (#debug >= 2) call Confirm "AdaptiveReplace\nsrc = " + $$1 + "\nrep = " + $$2 + "\nflg = 0x" + hex(##3);
+	if ($$1 == "") {
+		// 挿入
+		##fbc = column;  ##fbl = lineno;
+		##fdc = column;  ##fdl = lineno;
+		setsearch ".|\\n", ##3 & 0x33 | 0x04;
+		setreplace $$2 + "\\0";
+		finddown2;
+		if (!result) call Error "マクロのバグです\n発生位置: AdaptiveReplace";
+		left;
+	} else {
+		// 検索
+		setsearch $$1, ##3 & 0x33;
+		finddown2;
+		if (!result) return false;
+		##fbc = column;  ##fbl = lineno;
+		if (selecting) { moveto selendx, selendy;  escape; }
+		##fdc = column;  ##fdl = lineno;
+		movetolineno ##fbc + 1, ##fbl;
+		// 置換
+		setsearch $$1, ##3 & 0x33 | 0x04;
+		setreplace $$2;
+		finddown2;
+	}
+	##rdc = column;  ##rdl = lineno;
+	// 範囲始端補正（拡大前寄せ）
+	if (#abl < ##fdl || (#abl == ##fdl && #abc <= ##fdc)) {
+		if (#abl > ##fbl || (#abl == ##fbl && #abc >= ##fbc)) #abc = ##fbc;
+	} else if (#abl == ##fdl) #abc = #abc - ##fdc + ##rdc;
+	if (#abl <= ##fdl) {
+		if (#abl >= ##fbl) #abl = ##fbl;
+	} else #abl = #abl - ##fdl + ##rdl;
+	// 範囲終端補正（拡大後寄せ）
+	if (#adl < ##fdl || (#adl == ##fdl && #adc <= ##fdc)) {
+		if (#adl > ##fbl || (#adl == ##fbl && #adc >= ##fbc)) #adc = ##rdc;
+	} else if (#adl == ##fdl) #adc = #adc - ##fdc + ##rdc;
+	if (#adl <= ##fdl) {
+		if (#adl >= ##fbl) #adl = ##rdl;
+	} else #adl = #adl - ##fdl + ##rdl;
+	// 位置補正
+	if (#acl < ##fdl || (#acl == ##fdl && (#acc < ##fdc || (##4 && #acc == ##fdc)))) {
+		if (#acl > ##rdl || (#acl == ##rdl && #acc > ##rdc)) #acc = ##rdc;
+	} else if (#acl == ##fdl) #acc = #acc - ##fdc + ##rdc;
+	if (#acl < ##fdl || (##4 && #acl == ##fdl)) {
+		if (#acl > ##rdl) #acl = ##rdl;
+	} else #acl = #acl - ##fdl + ##rdl;
+	return true;
+
+//.----- 共通サブルーチン ----------------------------------------------------------------------
+
+SearchUpLongest:		// 上検索（最長一致、カーソル位置を含む、非選択状態で返る）
+	// 上へ n 回検索する。 n - 1 回目を包含しなくなるまで繰り返し、 n - 1 回目の結果を返す。
+	// $$1 = 検索パターン
+	// ##2 = 検索オプション
+	escape;
+	##ox = x;  ##oy = y;
+	right;
+	call SearchDown2 $$1, ##2, -1;
+	if (!##return) {
+		moveto ##ox, ##oy;
+		return false;
+	}
+	while (##return && (selendy > ##dy || (selendy == ##dy && selendx >= ##dx))) {
+		##bx = seltopx;  ##by = seltopy;  ##dx = selendx;  ##dy = selendy;
+		call SearchDown2 $$1, ##2, -1;
+	}
+	moveto ##dx, ##dy;  beginsel;  moveto ##bx, ##by;  endsel;
+	escape;
+	return true;
+
+SearchDown2:		// 検索（非選択状態で返る）
+	// $$1 = 検索パターン
+	// ##2 = 検索オプション
+	// ##3 < 0:上へ  == 0:下へ（カーソル位置から）  > 0:下へ
+	// [グローバル変数]
+	// $OnlyColors = 限定色（カンマ区切り文字列）…優先
+	// $SkipColors = 除外色（カンマ区切り文字列）
+	escape;
+	##ox = x;  ##oy = y;
+	setsearch $$1, ##2 & 0x33;
+	while (true) {
+		if (##3 < 0) findup; else if (##3 > 0) finddown; else finddown2;
+		##result = result;
+		if (!##result) {
+			escape;
+			moveto ##ox, ##oy;
+			break;
+		}
+		if ($OnlyColors != "") {
+			if (strstr("," + $OnlyColors + ",", "," + str(colorcode & 0x1f) + ",") <  0) continue;
+		} else if ($SkipColors != "") {
+			if (strstr("," + $SkipColors + ",", "," + str(colorcode & 0x1f) + ",") >= 0) continue;
+		}
+		break;
+	}
+	if (!selecting) { beginsel;  endsel; }
+	escape;
+	return ##result;
+
+//.----- 設定読み書きルーチン ------------------------------------------------------------------
+
+GetIni:		// 設定を取得
+	call GetIniStrOfType $IniFile, $$1;
+	if ($$return == "") call GetIniStrOfType $Default, $$1;
+	return $$return;
+
+GetIniStrOfType:		// INI ファイルからファイルタイプ別の設定値を取得
+	// $$1 = INI ファイル名
+	// $$2 = キー名
+	// [グローバル変数]
+	// $type = セクション名
+	$$t = $type;
+	while ($$t != "") {
+		$$v = getinistr($$1, $$t, $$2);
+		if ($$v != "") break;
+		$$t = getinistr($$1, $$t, "@");
+	}
+	if ($$v == "") $$v = getinistr($$1, "default", $$2);
+	return $$v;
+
+EasyConfig:		// 簡易設定ウィザード
+	$$prompt = "拡張子 " + filetype + " のコメントは未定義です\nコメント開始文字列を入力してください（例：「#」「/*」など）";
+	while ($$t[0] == "") {
+		$$t[0] = input($$prompt, "");
+		if (!result) return false;
+		if (rightstr($$t[0], 1) == " ") #Space = yes;
+		call Trim $$t[0];  $$t[0] = $$return;
+		$$prompt = "コメント開始文字列は省略できません\n拡張子 " + filetype + " のコメント開始文字列を入力してください（例：「#」「/*」など）";
+	}
+	
+	$$prompt = "コメント終了文字列を入力してください（例：「*/」など）\n改行までがコメントとなる場合は入力不要です";
+	$$t[1] = input($$prompt, "");
+	if (!result) return false;
+	call Trim $$t[1];  $$t[1] = $$return;
+	
+	call RegexEscape $$t[0];  $Tok[0] = $$return;
+	call RegexEscape $$t[1];  $Tok[1] = $$return;
+	
+	$$prompt = "この設定を保存しますか？\n\n    拡張子:    \t" + filetype + "\n    コメント開始:\t" + $$t[0] +  "\n";
+	if ($$t[1] != "") $$prompt = $$prompt + "    コメント終了:\t" + $$t[1] + "\n";
+	else              $$prompt = $$prompt + "    コメント終了:\t（改行まで）\n";
+	if (#Space)       $$prompt = $$prompt + "    オプション:\tスペース付加\n";
+	$$prompt = $$prompt + "\n※あとで変更するには設定ファイルを編集します。詳しくはマニュアルを読んでください。\n　設定ファイル: " + $IniFile;
+	question $$prompt;
+	if (!result) return true;
+	
+	writeinistr $IniFile, filetype, "1L", $Tok[0];
+	if ($Tok[1] != "") writeinistr $IniFile, filetype, "1R", $Tok[1];
+	else               writeinistr $IniFile, filetype, "1R", 0;
+	if (#Space)        writeinistr $IniFile, filetype, "with", "space";
+	return true;
+
+RegexEscape:		// 正規表現エスケープ
+	##i = strlen($$1);
+	while (##i > 0) {
+		##c = ascii(rightstr($$1, ##i));
+		if (strstr("$()*+.?[\\]^|{}", char(##c)) >= 0) $$r = $$r + "\\" + char(##c);
+		else if (##c >= ' ')  $$r = $$r + char(##c);
+		else if (##c >= 0x07 && ##c <= 0x0b) $$r = $$r + "\\" + midstr("       abtnv", ##c, 1);
+		else if (##c != 0x0d) $$r = $$r + "\\x" + hex(##c);
+		##i = ##i - strlen(char(##c));
+	}
+	return $$r;
+
+Trim:		// ホワイトスペース除去
+	while (ascii(leftstr($$1, 1))  <= ' ' && ascii(leftstr($$1, 1)) > 0) $$1 = rightstr($$1, strlen($$1) - 1);
+	while (ascii(rightstr($$1, 1)) <= ' ' && ascii(rightstr($$1, 1)) > 0) $$1 = leftstr($$1, strlen($$1) - 1);
+	return $$1;
+
+
+//.----- 初期化・後始末・エラー処理 ------------------------------------------------------------
+
+Initialize:		// 初期化
+	if (!#debug) disabledraw;
+	setcompatiblemode 0x020f;
+	$searchbuffer  = searchbuffer;
+	#searchoption  = searchoption;
+	$replacebuffer = replacebuffer;
+	call GetHidemaruEnv "CursorBreakCR";
+	if (##return == 0)   { call SetHidemaruEnv "CursorBreakCR", 1; #cursorbreakchanged = 1; }		// 「行末<->次の行の行頭」移動を許可
+	if (freecursor) { freecursorswitch;  #freecursorswitched = 1; }
+	if (overwrite)  { overwriteswitch;   #overwriteswitched  = 1; }
+	begingroupundo;
+	return;
+
+Finalize:		// 後始末
+	if (!#debug) enabledraw;
+	setcompatiblemode 0x0000;
+	setsearch  $searchbuffer, #searchoption;
+	setreplace $replacebuffer;
+	if (#cursorbreakchanged) call SetHidemaruEnv "CursorBreakCR", 0;
+	if (#freecursorswitched) freecursorswitch;
+	if (#overwriteswitched)  overwriteswitch;
+	endgroupundo;
+	return;
+
+SetHidemaruEnv:		// 動作環境設定
+	// $$1 = キー名
+	// ##2 = 値
+	openreg "CURRENTUSER", "Software\\Hidemaruo\\Hidemaru\\Env";
+	writeregnum $$1, ##2;
+	closereg;
+	envchanged;
+	return;
+
+GetHidemaruEnv:		// 動作環境取得
+	// $$1 = キー名
+	// ##return = 値
+	openreg "CURRENTUSER", "Software\\Hidemaruo\\Hidemaru\\Env";
+	##r = getregnum($$1);
+	closereg;
+	return ##r;
+
+GetHidemaruEnvStr:		// 動作環境取得（文字列）
+	// $$1 = キー名
+	// $$return = 値
+	openreg "CURRENTUSER", "Software\\Hidemaruo\\Hidemaru\\Env";
+	$$r = getregstr($$1);
+	closereg;
+	return $$r;
+
+Error:		// エラー処理
+	enabledraw;
+	if ($$1 != "") message currentmacrobasename + ": " + $$1;
+	call Finalize;
+	endmacro;
+
+Confirm:		// デバッグ用
+	enabledraw;
+	question currentmacrobasename + ": " + $$1;
+	if (result) return;
+	call Finalize;
+	endmacro;
+
+//  		(C) IKKI <fujiwara@big.jp> 2004-2008

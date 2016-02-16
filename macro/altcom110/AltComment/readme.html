@@ -1,0 +1,768 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML lang="ja">
+
+<HEAD>
+	<META http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<META http-equiv="Content-Style-Type" content="text/css">
+	<LINK rel="stylesheet" type="text/css" href="http://www18.big.or.jp/~fujiwara/ikki/wisteria-std.css">
+	<TITLE>Wisteria - 秀丸マクロ - AltComment</TITLE>
+</HEAD>
+<BODY>
+
+<UL class="headnavi">
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A> &gt; 
+	<LI><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A> &gt; 
+</UL>
+
+<H2 class="pagetop">AltComment</H2>
+
+<DIV class="abst"><P>面倒すぎて誰も作らなかった全自動コメント反転マクロ</P></DIV>
+
+<DIV class="date" align="right">Version 1.10　2008/10/12</DIV>
+
+<DIV class="layout"><TABLE width="98%"><TR><TD class="subindex" valign="top">
+	
+	<H4 class="top">目次</H4>
+	<UL>
+		<LI><A href="#download">ダウンロード</A>
+		<LI><A href="#outline">概要と特長</A>
+		<LI><A href="#restriction">できないこと</A>
+		<LI><A href="#setup">セットアップ</A>
+		<LI><A href="#usage">使い方</A>
+		<LI><A href="#behavior">動作</A>
+		<LI><A href="#option">設定</A>
+		<LI><A href="#example">高度な設定例</A>
+		<LI><A href="#preset">プリセット一覧</A>
+		<LI><A href="#fellows">コメントマクロ比較</A>
+		<LI><A href="#statements">お約束</A>
+		<LI><A href="#history">バージョン履歴</A>
+		<LI><A href="#feedback">フィードバック</A>
+	</UL>
+	
+</TD><TD class="body">
+	
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/altcom1.png" width="580" height="55" alt="| printf(&quot;hogehoge&quot;); ←→ //| printf(&quot;hogehoge&quot;);"></DIV>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/altcom2.png" width="580" height="108" alt=""></DIV>
+	
+</TD></TR></TABLE></DIV>
+
+
+<H3><A name="download" id="download">ダウンロード</A></H3>
+
+<UL class="files">
+	<LI class="lzh"><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/altcom110.lzh">altcom110.lzh</A>　Version 1.10　(2008/10/12)
+</UL>
+
+
+<H3><A name="outline" id="outline">概要と特長</A></H3>
+
+<UL class="sect">
+	<LI>秀丸エディタ用のコメント反転マクロです。コメント化マクロとコメント解除マクロを統合しました。
+	<UL>
+		<LI>「地の文だった場所をコメント化したい」
+		<LI>「コメントだった場所を地の文に戻したい」
+	</UL>
+	というユーザーの意図を汲み、ひとつのマクロで両方の処理ができます。コメントマクロはこれ1本で済むでしょう。
+	
+	<LI>秀丸がカラー表示できる言語はほとんど設定済み。面倒な設定をせずに使い始められます。
+	
+	<LI>使用するコメント記号はファイルタイプ（拡張子）ごとに定義されます。
+	<UL>
+		<LI>「<CODE>//</CODE> から改行まで」のような<DFN>行コメント</DFN>
+		<LI>「<CODE>/*</CODE> から <CODE>*/</CODE> まで」のような<DFN>範囲コメント</DFN>
+	</UL>
+	それぞれ何種類でも定義でき、ひとつのファイルタイプに混在も可能。混在してる場合はどれについて反転するのか自動判別します。
+	
+	<LI>編集中のあらゆる状態に対応します。
+	<UL>
+		<LI>無選択時はカーソル位置を反転。
+		<LI>文字列選択時は選択範囲内を交互に反転。
+		<LI>BOX 選択時は行ごとに反転。
+	</UL>
+	BOX 選択だと使えないとか、行が折り返してると変な結果になるとか、そういう本質的でない制限は一切ありません。
+	
+	<LI>インデントを意識した処理を行います。
+	
+	<LI>アンドゥ1回で元に戻ります。
+	
+</UL>
+
+
+<H3><A name="restriction">できないこと</A></H3>
+
+<UL class="sect">
+	<LI>Pascal/Delphi や SQL のようにネスト可能なコメントは対象外です。ネストしてなければ正しく処理できます。
+	<LI>Fortran77 や COBOL のように桁位置が意味を持つ言語は対象外です。コメント記号の挿入／削除により桁がずれます。
+	<LI>飾りコメントの類を扱うようには設計されていません。
+	<LI>フリーカーソルはサポートされません。起動時に強制的に OFF になり、終了時に元に戻ります。
+</UL>
+
+
+<H3><A name="setup" id="setup">セットアップ</A></H3>
+
+<H4><A name="setup:install" id="setup:install">インストール</A></H4>
+<OL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> ver 7.00 以降をお使いですね？
+	<LI>マクロフォルダの位置を確認します。（マクロフォルダは秀丸の [その他(O)]-[動作環境(E)...]-[パス]-[環境]-[マクロファイル用のフォルダ(M)] で指定されているフォルダです。無指定なら Hidemaru.exe と同じフォルダです）
+	<LI>ダウンロードしたアーカイブをマクロフォルダに解凍します。
+	<LI>[マクロ(M)]-[マクロ登録(E)...] で AltComment.mac を適当な番号に登録します。
+	<LI>[その他(O)]-[キー割り当て(K)...] で適当なキーに割り当てます。
+	<LI>割り当てたキーを押して実行します。ユーザー設定ファイルが自動的に作られます。
+</OL>
+<P>インストール後のファイル構成は次のようになります。</P>
+<PRE>
+■<VAR>マクロフォルダ</VAR>\
+│・AltComment.mac              …起動マクロ
+│
+└─■AltComment\
+　　　・AltComment-Main.mac     …本体
+　　　・AltComment.ini          …ユーザー設定ファイル
+　　　・AltComment-Default.ini  …デフォルト設定ファイル
+</PRE>
+
+
+<H4><A name="setup:update" id="setup:update">アップデート</A></H4>
+<OL class="sect">
+	<LI>新しいアーカイブをマクロフォルダに上書き解凍します。ユーザー設定ファイルはそのまま引き継がれます。
+</OL>
+
+<H4><A name="setup:uninstall" id="setup:uninstall">アンインストール</A></H4>
+<OL class="sect">
+	<LI>インストール時と同じ方法でキー割り当てを解除します。
+	<LI>同様にマクロ登録も解除します。
+	<LI>AltComment.mac および AltComment フォルダ以下の全ファイルを削除します。レジストリは使っていません。
+</OL>
+
+
+<H3><A name="usage">使い方</A></H3>
+
+<UL class="sect">
+	<LI>反転したい位置にカーソルを置いてマクロを実行します。
+	<LI>反転したい範囲を選択してマクロを実行します。
+</UL>
+
+
+<H3><A name="behavior">動作</A></H3>
+
+<H4><A name="behavior:noselecting">無選択時</A></H4>
+<P>カーソル位置が地の文ならコメントに、コメント内なら地の文にします。設定により行単位で処理することもできます。〈→<A href="#option">設定</A>〉</P>
+<DL>
+	<DT>行コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/nosel-inline.png" width="580" height="55" alt="aa|aa ←→ aa//|aa"></DIV>
+	<DT>範囲コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/nosel-region.png" width="580" height="55" alt="aa|aa ←→ aa/*|*/aa"></DIV>
+	<DT>両方あるとき<DD>
+	カーソル位置がコメント内なら上方直近の有効なコメント記号を削除します。地の文なら設定に従って決められたコメント記号を挿入します。
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/nosel-both-region.png" width="580" height="108" alt=""></DIV>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/nosel-both-inline.png" width="580" height="108" alt=""></DIV>
+</DL>
+
+<H4><A name="behavior:selecting">文字列選択時</A></H4>
+<P>選択範囲内の地の文をコメントに、コメントを地の文にします。</P>
+<DL>
+	<DT>行コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/sel-inline-alt.png" width="580" height="108" alt="[aa] ←→ [//aa]"></DIV>
+	<DT>範囲コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/sel-region-alt.png" width="580" height="108" alt="[aa/*aa*/] ←→ [/*aa*/aa]"></DIV>
+	行選択時は最初と最後のコメント記号が1行を占めるようにします。
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/linesel-region.png" width="580" height="108" alt=""></DIV>
+	<DT>両方あるとき<DD>
+	選択範囲の先頭を基準として自動判別します。
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/sel-both-region.png" width="580" height="108" alt=""></DIV>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/sel-both-inline.png" width="580" height="108" alt=""></DIV>
+</DL>
+
+<H4><A name="behavior:rectselecting">BOX 選択時</A></H4>
+<P>1行ごとに分割し、文字列選択時の動作を適用します。全角文字やタブ文字をまたいでも大丈夫です。折り返してる2行目以降は無視されます。</P>
+<DL>
+	<DT>行コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/rectsel-inline.png" width="580" height="108"></DIV>
+	<DT>範囲コメント<DD>
+	<DIV class="img"><IMG src="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/rectsel-region.png" width="580" height="108"></DIV>
+	<DT>両方あるとき<DD>
+	選択範囲の先頭を基準として自動判別します。
+</DL>
+
+
+<H3><A name="option">設定</A></H3>
+
+<P>秀丸がカラー表示に対応している言語はほとんどプリセットされてます。〈→<A href="#preset">プリセット一覧</A>〉　プリセットに満足できないときはユーザー設定ファイル AltComment.ini に記述を加えます。ここではその方法を説明します。</P>
+<P>設定は拡張子ごとに行います。また、複数の拡張子をひとつのファイルタイプと見なし、ファイルタイプごとに設定することもできます。詳しくはデフォルト設定ファイル AltComment-Default.ini を参考にするか、 CompleteX のマニュアルを参照してください。〈→<A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/completex/reference.shtml#inifile">CompleteX リファレンス：設定ファイルの書き方</A>〉</P>
+<P>設定ファイルの中身はだいたいこんな感じになります。</P>
+<DIV class="samptitle">AltComment.ini　記述例</DIV>
+<PRE>
+[.c]
+1L=/*
+1R=*/
+2L=//
+with=space,indent
+line=yes
+change=3
+skipcolors=20
+</PRE>
+<P>設定項目は次のとおりです。「<CODE>…</CODE>」以下は説明文なので実際の設定ファイルに書いてはいけません。</P>
+
+<H4><A name="option:definition" id="option:definition">定義</A></H4>
+<DL class="sect">
+	<DT>1L, 1R, 2L, 2R, ...<DD>
+	コメント記号を定義します。 1L, 2L, ... はコメント開始記号（必須）、 1R, 2R, ... はコメント終了記号（行コメントの場合は省略）です。
+	<DIV class="samptitle">例</DIV>
+<PRE>
+1L=//    …行コメント開始記号
+2L=/*    …範囲コメント開始記号
+2R=*/    …範囲コメント終了記号
+; 以下同様
+</PRE>
+	<P>数字は優先順位です。1から連番になっていなければなりません。挿入時は原則として 1L, 1R に指定されたコメント記号が使われます。（後述する <CODE>change=</CODE> の設定によっては 2L, 2R も使えます）</P>
+	
+	<DT>with<DD>
+	付加文字列を指定します。（デフォルト = なし）
+<PRE>
+with=space     …挿入時：コメント記号の内側（コメント内容との間）に半角スペースを付加する
+               　削除時：コメント記号の内側に半角スペースがあったらそれも削除する
+with=indent    …挿入時：地の文に合わせてコメント記号をインデントする
+               　削除時：インデントされたコメント記号も削除する
+with=space,indent    …両方
+</PRE>
+	インデントは処理位置が行頭の場合のみ有効です。
+	
+	<DT>change<DD>
+	挿入時に使うコメント記号を選択します。（デフォルト = 0）
+<PRE>
+change=0    …常に 1L, 1R を使う
+change=1    …無選択時は 1L, 1R を、文字列選択時は 2L, 2R を使う
+change=<VAR>n</VAR>    …選択範囲が <VAR>n</VAR> 行未満のときは 1L, 1R を、それ以上のときは 2L, 2R を使う
+</PRE>
+	BOX 選択時は見かけの選択行数で判断されます。この設定にかかわらず、処理範囲の先頭がコメント内だった場合はそのコメント記号が使われます。
+	
+	<DT>skipcolors<DD>
+	コメント記号と見なさない色をカラーコードで指定します。（デフォルト = なし）
+<PRE>
+skipcolors=20,11,5    …文字定数、URL、特に強調1 は除外
+</PRE>
+	カラーコードは秀丸マクロヘルプの [内部的な値を表現するキーワード]-[カーソル関連キーワード] を参照してください。カンマ区切りで複数指定できます。（カンマの前後にスペースなどを入れてはいけません）
+	
+	<DT>1LX, 1RX, 2LX, 2RX, ...<DD>
+	判定用の検索パターンを正規表現で記述します。通常の設定で対応できないときに使います。〈→<A href="#example">高度な設定例</A>〉
+	
+	<DT>1SX, 2SX, ...<DD>
+	判定用の検索オプションを指定します。コメント記号がアルファベットのときに使います。〈→<A href="#example">高度な設定例</A>〉
+</DL>
+
+<H4><A name="option:line" id="option:line">処理範囲</A></H4>
+<DL class="sect">
+	<DT>line<DD>
+	行単位で処理するかどうか指定します。（デフォルト = no）
+<PRE>
+line=yes    …行単位で処理
+line=no     …文字列単位で処理
+</PRE>
+	行の途中からコメント化することがない場合は <CODE>line=yes</CODE> を指定します。すると無選択時は行全体がコメント化され、範囲選択時は選択範囲が行単位に拡大されます。これは後述する <CODE>forline=2</CODE> と <CODE>selline=1</CODE> をともに指定するのと同じです。無選択時のコメント解除動作はこの設定に影響されません。
+	
+	<DT>forline<DD>
+	無選択時のコメント化範囲を指定します。 <CODE>line=</CODE> の指定を上書きします。（デフォルト = 0）
+<PRE>
+forline=0    …カーソル位置
+forline=1    …行全体（カーソル位置が行末の場合を除く）
+forline=2    …行全体（常に）
+</PRE>
+	コメント解除動作はこの設定に影響されません。
+	
+	<DT>selline<DD>
+	文字列選択時の処理範囲を指定します。 <CODE>line=</CODE> の指定を上書きします。（デフォルト = 0）
+<PRE>
+selline=0    …選択範囲そのまま
+selline=1    …選択範囲を行単位に拡大
+selline=<VAR>n</VAR>    …選択範囲が <VAR>n</VAR> 行以上のときは行単位に拡大
+</PRE>
+</DL>
+
+<H4><A name="option:behavior" id="option:behavior">その他の動作</A></H4>
+<DL class="sect">
+	<DT>autosave<DD>
+	実行後、自動的に上書き保存するかどうか指定します。（デフォルト = no）
+<PRE>
+autosave=yes    …保存する
+autosave=no     …保存しない
+</PRE>
+</DL>
+
+<H4><A name="option:syntax" id="option:syntax">参照記法</A></H4>
+<DL class="sect">
+	<DT>@<DD>
+	デフォルト値として他のセクションを参照します。他のセクションの設定をオーバーライドし、差分だけを書くことができます。
+	<DIV class="samptitle">例</DIV>
+<PRE>
+[HTML/XML]
+1L=&lt;!--
+1R=--&gt;
+with=space
+
+[.rhtml]
+@=HTML/XML
+with=indent
+</PRE>
+	<P>この例だと拡張子 rhtml に対し　<CODE>1L=&lt;!--</CODE>　<CODE>1R=--&gt;</CODE>　<CODE>with=indent</CODE>　が設定されます。参照できるのは同じ設定ファイル内にあるセクションだけです。設定を誤ると無限ループします。</P>
+</DL>
+
+<H4><A name="option:overriding" id="option:overriding">ユーザー設定とデフォルト設定</A></H4>
+
+<P>AltComment の設定はユーザー設定ファイル AltComment.ini とデフォルト設定ファイル AltComment-Default.ini の2段構えになっています。ユーザーごとの設定はユーザー設定ファイルに書きます。デフォルト設定ファイルはバージョンアップのたびに上書きされるので、いじらない方がいいです。
+<P>コメント記号の定義（<CODE>1L=</CODE>, <CODE>1R=</CODE>, <CODE>1LX=</CODE>, <CODE>1RX=</CODE>, <CODE>1SX=</CODE>, ...）は<EM>一括して</EM>、ユーザー設定ファイルに <CODE>1L=</CODE> が定義されていればユーザー設定が、そうでなければデフォルト設定が採用されます。ふたつの設定ファイルの定義が混ざることはありません。</P>
+<P>その他の設定（<CODE>with=</CODE>, <CODE>line=</CODE>, <CODE>change=</CODE>, ...）は<EM>項目ごとに</EM>、ユーザー設定ファイルに値が書かれてればそれが、書かれてなければデフォルト設定が採用されます。デフォルト設定ファイルに書かれた値を打ち消したいときはユーザー設定ファイルにデフォルト値（<CODE>selline=0</CODE> など）または解釈不能な値（<CODE>with=none</CODE> など）を書いてください。</P>
+
+
+<H3><A name="example" id="example">高度な設定例</A></H3>
+
+<P>判定用の検索パターンや検索オプションを別途指定しなければならない例を挙げます。これらの設定はマクロ内部のアルゴリズムを理解していないと難しいので、なるべくプリセットに含めておきたいと思います。通常の設定で対応できない例があったら作者に教えてください。〈→<A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru">談話室</A>〉</P>
+<P><CODE>1LX=</CODE>, <CODE>1RX=</CODE>, <CODE>1SX=</CODE>, <CODE>2LX=</CODE>, <CODE>2RX=</CODE>, <CODE>2SX=</CODE>, ... を用いるには、対応するコメント記号 <CODE>1L=</CODE>, <CODE>1R=</CODE>, <CODE>2L=</CODE>, <CODE>2R=</CODE>, ... が同じ設定ファイルに定義されていなければなりません。</P>
+
+<H4>例1： TeX</H4>
+<P>TeX はコメント記号をエスケープできます。エスケープされた「\%」はコメント記号ではないので無視しなければなりません。このような場合は検索パターンを正規表現で記述します。</P>
+<PRE>
+[.tex]
+1L=%
+1LX=(?&lt;!\\)%[ \t]*
+</PRE>
+<P>この設定はプリセットに含まれています。</P>
+
+<H4>例2： C++</H4>
+<P>C++ で「//*」という文字列がある場合、これは行コメントですが、範囲コメントの開始と勘違いすることがあります。勘違いを防ぐには次のように指定します。</P>
+<PRE>
+[C/Java]
+1L=//
+2L=/*
+2R=*/
+2LX=(?&lt;!/)/\*[ \t]*
+2RX=[ \t]*\*/
+[.c]
+@=C/Java
+[.h]
+@=C/Java
+[.cpp]
+@=C/Java
+</PRE>
+<P>この設定はプリセットに含まれています。</P>
+
+<H4>例3： Fortran77</H4>
+<P>Fortran77 のコメント記号は<EM>行頭にある</EM>「C」または「*」です。行頭以外の「C」や「*」は無視しなければなりません。文は行単位なので <CODE>line=yes</CODE> も指定しておきましょう。</P>
+<PRE>
+[.f77]
+1L=C
+1LX=^C
+2L=*
+2LX=^\*
+line=yes
+</PRE>
+<P>この設定はプリセットに含まれています。なお、実際に Fortran77 でこのマクロを使う際は桁ずれにご注意ください。</P>
+
+<H4>例4： Windows コマンドスクリプト</H4>
+<P>コマンドスクリプト（バッチファイル）は REM 命令がコメント開始記号になります。もし「REMOVE」なんてコマンドがあってもヒットしないよう、検索オプションとして <CODE>word</CODE> を指定します。コマンドは行単位なので <CODE>line=yes</CODE> も指定しておきましょう。</P>
+<PRE>
+[.cmd]
+1L=REM
+with=space    …スペース付加
+1LX=^REM      …検索パターン（単語の検索を行うため「^REM[ \t]*」とはしない）
+1SX=word      …単語の検索
+line=yes
+</PRE>
+<P>この設定はプリセットに含まれています。なお、大文字小文字を区別するときは <CODE>casesense</CODE> を指定します。</P>
+<PRE>
+1SX=casesense         …大文字小文字を区別する
+1SX=word,casesense    …単語の検索、大文字小文字を区別する
+</PRE>
+
+
+<H3><A name="preset" id="preset">プリセット一覧</A></H3>
+
+<P>プリセット（配布時の設定）はデフォルト設定ファイル AltComment-Default.ini に記述されています。内容は次のとおりです。</P>
+
+<DIV class="table"><TABLE frame="box" rules="all" cellpadding="4">
+<TR>
+	<TH>ファイルタイプ</TH>
+	<TH>拡張子</TH>
+	<TH>コメント開始</TH>
+	<TH>コメント終了</TH>
+	<TH>オプション</TH>
+</TR>
+<TR>
+	<TD rowspan="1">[MAIL]</TD>
+	<TD rowspan="1">秀丸メール, 新規作成, .txt</TD>
+	<TD>&gt;</TD>
+	<TD></TD>
+	<TD rowspan="1">1LX=^&gt; ?<BR>with=space<BR>line=yes</TD>
+</TR><TR>
+	<TD rowspan="1">[HTML/XML]</TD>
+	<TD rowspan="1">.html, .htm, .shtml, .xml, .xsl</TD>
+	<TD>&lt;!--</TD>
+	<TD>--&gt;</TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="4">[ASP]</TD>
+	<TD rowspan="4">.asp, .aspx, .jsp, .php, .php3, .php4</TD>
+	<TD>//</TD>
+	<TD></TD>
+	<TD rowspan="4"></TD>
+	</TR><TR>
+	<TD>/*</TD>
+	<TD>*/</TD>
+	</TR><TR>
+	<TD>#</TD>
+	<TD></TD>
+	</TR><TR>
+	<TD>&lt;!--</TD>
+	<TD>--&gt;</TD>
+</TR><TR>
+	<TD rowspan="2">[ColdFusion]</TD>
+	<TD rowspan="2">.cfm, .cfml</TD>
+	<TD>&lt;!---</TD>
+	<TD>---&gt;</TD>
+	<TD rowspan="2"></TD>
+	</TR><TR>
+	<TD>&lt;!--</TD>
+	<TD>--&gt;</TD>
+</TR><TR>
+	<TD rowspan="2">[C/Java]</TD>
+	<TD rowspan="2">.c, .h, .cpp, .hpp, .stl, .java, .js, .rc, .y</TD>
+	<TD>//</TD>
+	<TD></TD>
+	<TD rowspan="2">2LX=(?&lt;!/)/\*[ \t]*<BR>2RX=[ \t]*\*/</TD>
+	</TR><TR>
+	<TD>/*</TD>
+	<TD>*/</TD>
+</TR><TR>
+	<TD rowspan="4">[C#]</TD>
+	<TD rowspan="4">.cs</TD>
+	<TD>///</TD>
+	<TD></TD>
+	<TD rowspan="4">2LX=(?&lt;!/)/\*[ \t]*<BR>2RX=[ \t]*\*/</TD>
+	</TR><TR>
+	<TD>/**</TD>
+	<TD>*/</TD>
+	</TR><TR>
+	<TD>//</TD>
+	<TD></TD>
+	</TR><TR>
+	<TD>/*</TD>
+	<TD>*/</TD>
+</TR><TR>
+	<TD rowspan="2">[Verilog]</TD>
+	<TD rowspan="2">.v, .va</TD>
+	<TD>//</TD>
+	<TD></TD>
+	<TD rowspan="2"></TD>
+	</TR><TR>
+	<TD>/*</TD>
+	<TD>*/</TD>
+</TR><TR>
+	<TD rowspan="2">[SQL]</TD>
+	<TD rowspan="2">.sql</TD>
+	<TD>/*</TD>
+	<TD>*/</TD>
+	<TD rowspan="2"></TD>
+	</TR><TR>
+	<TD>--</TD>
+	<TD></TD>
+</TR><TR>
+	<TD rowspan="1">[CSS]</TD>
+	<TD rowspan="1">.css</TD>
+	<TD>/*</TD>
+	<TD>*/</TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="1">[Hidemaru]</TD>
+	<TD rowspan="1">.mac, .hilight</TD>
+	<TD>//</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="1">[UNIX]</TD>
+	<TD rowspan="1">.cgi, .pl, .pm, .py, .rb, .rm, .awk, .sh, .mak</TD>
+	<TD>#</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="1">[DOS]</TD>
+	<TD rowspan="1">.bat, .cmd</TD>
+	<TD>REM</TD>
+	<TD></TD>
+	<TD rowspan="1">1LX=^REM<BR>1LS=word<BR>with=space<BR>line=yes</TD>
+</TR><TR>
+	<TD rowspan="1">[Basic]</TD>
+	<TD rowspan="1">.bas, .frm, .cls, .vbs</TD>
+	<TD>'</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="3">[Pascal]</TD>
+	<TD rowspan="3">.pas</TD>
+	<TD>{</TD>
+	<TD>}</TD>
+	<TD rowspan="3"></TD>
+	</TR><TR>
+	<TD>(*</TD>
+	<TD>*)</TD>
+	</TR><TR>
+	<TD>//</TD>
+	<TD></TD>
+</TR><TR>
+	<TD rowspan="1">[ASM]</TD>
+	<TD rowspan="1">.asm, .s, .as</TD>
+	<TD>;</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="1">[INI]</TD>
+	<TD rowspan="1">.ini, .reg, .hpt</TD>
+	<TD>;</TD>
+	<TD></TD>
+	<TD rowspan="1">1LX=^;<BR>line=yes</TD>
+</TR><TR>
+	<TD rowspan="2">[LISP]</TD>
+	<TD rowspan="2">.lsp, .l</TD>
+	<TD>;</TD>
+	<TD></TD>
+	<TD rowspan="2"></TD>
+	</TR><TR>
+	<TD>;|</TD>
+	<TD>|;</TD>
+</TR><TR>
+	<TD rowspan="1">[VHDL]</TD>
+	<TD rowspan="1">.vhd</TD>
+	<TD>--</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR><TR>
+	<TD rowspan="1">[TeX]</TD>
+	<TD rowspan="1">.tex, .sty, .bib</TD>
+	<TD>%</TD>
+	<TD></TD>
+	<TD rowspan="1">1LX=(?&lt;!\\)%[ \t]*</TD>
+</TR><TR>
+	<TD rowspan="1">[Fortran90]</TD>
+	<TD rowspan="1">.f90, .for, .f</TD>
+	<TD>!</TD>
+	<TD></TD>
+	<TD rowspan="1"></TD>
+</TR>
+</TR><TR>
+	<TD rowspan="2">[Fortran77]</TD>
+	<TD rowspan="2">.f77</TD>
+	<TD>C</TD>
+	<TD></TD>
+	<TD rowspan="2">1LX=^C<BR>2LX=^\*<BR>line=yes</TD>
+	</TR><TR>
+	<TD>*</TD>
+	<TD></TD>
+</TR>
+</TABLE></DIV>
+
+
+<H3><A name="fellows" id="fellows">コメントマクロ比較</A></H3>
+
+<P>コメントを扱う秀丸マクロはたくさんあります。わかる範囲でピックアップしてみました。　（2005/03/13 現在）</P>
+
+<DIV class="table"><TABLE frame="box" rules="all" cellpadding="2"><TR>
+	<TH rowspan="2">マクロ名</TH>
+	<TH rowspan="2">作者</TH>
+	<TH rowspan="2">挿入／削除</TH>
+	<TH colspan="2">コメント形式</TH>
+	<TH rowspan="2">処理範囲</TH>
+</TR><TR>
+	<TH>行コメント</TH>
+	<TH>範囲コメント</TH>
+</TR><TR>
+	<TD><A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/">AltComment</A><BR>※このマクロです</TD>
+	<TD><A href="http://www18.big.or.jp/~fujiwara/ikki/">IKKI</A></TD>
+	<TD align="center">自動判別<BR>（交互反転）</TD>
+	<TD align="center" colspan="2">自動判別<BR>（拡張子ごと／複数可）</TD>
+	<TD align="center">カーソル位置<BR>行単位<BR>文字列範囲<BR>BOX 範囲</TD>
+</TR><TR>
+	<TD>kbComment.mac</TD>
+	<TD><A href="http://kb2001.hp.infoseek.co.jp/">kotobuki-chive</A> さん</TD>
+	<TD align="center">自動判別<BR>（先頭基準）</TD>
+	<TD align="center">自動判別<BR>（拡張子ごと）</TD>
+	<TD align="center">―</TD>
+	<TD align="center">カーソル位置<BR>文字列範囲</TD>
+</TR><TR>
+	<TD>kbCommentB.mac</TD>
+	<TD><A href="http://kb2001.hp.infoseek.co.jp/">kotobuki-chive</A> さん</TD>
+	<TD align="center">自動判別<BR>（先頭基準／<BR>手動選択可）</TD>
+	<TD align="center">―</TD>
+	<TD align="center">自動判別<BR>（拡張子ごと）</TD>
+	<TD align="center">文字列範囲</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/cpp_comment101.html">C++ コメントブロックマクロ</A></TD>
+	<TD>sasak さん</TD>
+	<TD align="center">別マクロ</TD>
+	<TD align="center"><CODE>//</CODE> 専用</TD>
+	<TD align="center">―</TD>
+	<TD align="center">行単位</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/linyo152a.html">行頭引用符挿入＆削除マクロ</A></TD>
+	<TD><A href="http://www.ne.jp/asahi/iam/sas/">SAS</A> さん</TD>
+	<TD align="center">手動選択<BR>（別マクロ）</TD>
+	<TD align="center">手動選択</TD>
+	<TD align="center">―</TD>
+	<TD align="center">行単位</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/ikki_comment.html">多形式対応コメント挿入／解除</A></TD>
+	<TD><A href="http://www18.big.or.jp/~fujiwara/ikki/">IKKI</A></TD>
+	<TD align="center">別マクロ</TD>
+	<TD align="center" colspan="2">自動判別<BR>（拡張子ごと）</TD>
+	<TD align="center">カーソル位置<BR>文字列範囲<BR>BOX 範囲</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/cmnt100.html">自動判別コメント挿入／削除マクロ</A></TD>
+	<TD>Kuro さん</TD>
+	<TD align="center">自動判別<BR>（先頭基準）</TD>
+	<TD align="center" colspan="2">手動選択<BR>（ウィンドウごと）</TD>
+	<TD align="center">行単位</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/cbledit.html">COBOL 編集用マクロ集</A></TD>
+	<TD>せーた さん</TD>
+	<TD align="center">別マクロ</TD>
+	<TD align="center" colspan="2">COBOL 専用</TD>
+	<TD align="center">行単位</TD>
+</TR><TR>
+	<TD><A href="http://hide.maruo.co.jp/lib/macro/comment031.html">コメント挿入削除マクロ</A></TD>
+	<TD>FJI さん</TD>
+	<TD align="center">別マクロ</TD>
+	<TD align="center" colspan="2">自動判別<BR>（拡張子ごと／COBOL 対応）<BR>※範囲コメントは挿入のみ</TD>
+	<TD align="center">行単位</TD>
+
+</TR></TABLE></DIV>
+
+<P>この比較表に間違いがあったら教えてください。〈→<A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru">談話室</A>〉</P>
+
+
+<H3><A name="statements" id="statements">お約束</A></H3>
+
+<H4>動作環境</H4>
+<UL class="sect">
+	<LI><A href="http://hide.maruo.co.jp/software/hidemaru.html">秀丸エディタ</A> v7.10β9 + HMJRE.DLL v1.92 で動作確認しました。
+	<LI>JRE32.DLL では使えません。
+	<LI>BRegIf.dll + {BREGEXP.DLL, bregonig.dll} はサポート外です。
+</UL>
+
+<H4>ライセンス</H4>
+<UL class="sect">
+	<LI>このマクロはフリーウェアです。自由に利用、改変、再配布することができます。
+	<LI>改変したものを公に再配布するときは次のことを明記してください。
+	<UL class="p">
+		<LI>改変したものである旨（できれば改変内容も）
+		<LI>改変元の名称、バージョン、一次配布場所
+	</UL>
+</UL>
+
+<H4>配布場所</H4>
+<P>一次配布場所は <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/altcom/">Wisteria - 秀丸マクロ - AltComment</A> です。二次配布は次のところで行われています。</P>
+<UL>
+	<LI><A href="http://hide.maruo.co.jp/lib/macro/">秀丸エディタのマクロライブラリ</A>
+	<LI><A href="http://www.vector.co.jp/vpack/filearea/win95/writing/edit/hm/">Vector - Windows95/98/Me &gt; 文書作成 &gt; テキストエディタ &gt; 秀丸エディタ</A>
+</UL>
+
+<H4>謝辞</H4>
+<UL class="sect">
+	<LI>プリセット内容は <A href="http://www2.noritz.co.jp/anchor/">Peggy</A> の対応言語詳細 (<A href="http://www2.noritz.co.jp/anchor/ashp/peggy/dll/langlist.pdf">langlist.pdf</A>) を参考にさせていただきました。
+</UL>
+
+
+<H3><A name="history" id="history">バージョン履歴</A></H3>
+
+<DL class="history">
+	<DT>Version 1.10 <SMALL>(2008/10/12)</SMALL><DD>
+	<UL>
+		<LI>秀丸エディタ v7.10 対応
+		<UL>
+			<LI>アンドゥ1回で元に戻る
+			<LI>折りたたみ／部分編集をなるべく維持
+			<LI>JRE32.DLL サポート廃止
+		</UL>
+	</UL>
+	<DT>Version 1.06 <SMALL>(2006/03/05)</SMALL><DD>
+	<UL>
+		<LI>デフォルト設定ファイルの見直し
+		<UL>
+			<LI>秀丸エディタ v6.00β に合わせて定義を追加（LISP に <SAMP>;| ～ |;</SAMP> 、 Pascal に <SAMP>//</SAMP>）
+			<LI>HmJre.dll 用と JRE32.DLL 用に分ける（自動選択）
+			<LI>HmJre.dll 用には前方不一致を使った高度な設定をプリセット
+		</UL>
+	</UL>
+	<DT>Version 1.05 <SMALL>(2005/08/09)</SMALL><DD>
+	<UL>
+		<LI>ドキュメントの「鶴亀メール」を「秀丸メール」に修正（アーカイブは次のバージョンまで更新されません）
+	</UL>
+	<DT>Version 1.05 <SMALL>(2005/03/04)</SMALL><DD>
+	<UL>
+		<LI>「/*」が「/\*」になるなど、正規表現のメタキャラクタがらみのバグ修正（v1.04 でエンバグした）
+	</UL>
+	<DT>Version 1.04 <SMALL>(2005/02/27)</SMALL><DD>
+	<UL>
+		<LI><CODE>line=yes</CODE> が適用されてなかったバグ修正
+		<LI>JRE32.DLL で2バイト文字の前にコメント記号が挿入されない事象（JRE32.DLL のバグ）に対処
+		<LI>↑の副作用として、コメント記号挿入処理を高速化（数百か所あると体感できるかも程度）
+	</UL>
+	<DT>Version 1.03 <SMALL>(2005/02/20)</SMALL><DD>
+	<UL>
+		<LI>正式版（今までβを外すタイミングを逸してた。 beta 9 が v1.00 相当ということ）
+		<LI>「行末&lt;-&gt;次の行の行頭」の設定が元に戻らないバグ修正
+		<LI>行単位処理の簡略指定 <CODE>line=yes</CODE> を追加
+		<LI>ドキュメント見直し
+	</UL>
+	<DT>Version 1.0 beta 11 <SMALL>(2004/10/11)</SMALL><DD>
+	<UL>
+		<LI>コメント記号に関してはユーザー設定ファイルとデフォルト設定ファイルの定義を混ぜない
+		<LI>ドキュメントのバグ修正（「高度な設定例」に書いてある通り設定すると期待した動作にならなかった）
+		<LI>ドキュメント追記（設定ファイルの仕様について）
+	</UL>
+	<DT>Version 1.0 beta 10 <SMALL>(2004/10/04)</SMALL><DD>
+	<UL>
+		<LI>範囲コメントが閉じてないと変な結果になるバグ修正
+	</UL>
+	<DT>Version 1.0 beta 9 <SMALL>(2004/06/22)</SMALL><DD>
+	<UL>
+		<LI><CODE>selline=<VAR>n</VAR></CODE> で選択範囲が1行ずつ増えるバグ修正
+	</UL>
+	<DT>Version 1.0 beta 8 <SMALL>(2004/05/04)</SMALL><DD>
+	<UL>
+		<LI>範囲コメントで無選択でカーソルが行頭で SmartUndo が有効だと処理範囲が上の行とつながって変な結果になるバグ修正
+		<LI>↑にともなう仕様変更：　最終行末が EOF の場合はアンドゥ4回で元に戻る
+		<LI>範囲コメントで行選択で <CODE>with=space,indent</CODE> だとインデントされた終了記号が削除されず変な結果になるバグ修正（上方向最長一致検索の実装が中途半端だった）
+		<LI>無選択でカーソルが行頭以外のとき <CODE>change=1</CODE> により文字列選択時の設定が適用されてしまうバグ修正
+		<LI>BOX 選択時も <CODE>change=<VAR>n</VAR></CODE> による切り替えを有効にする（見かけの行数で判断）
+	</UL>
+	<DT>Version 1.0 beta 5 <SMALL>(2004/03/07)</SMALL><DD>
+	<UL>
+		<LI>設定ファイル書式変更：　<CODE>1L</CODE>, <CODE>1R</CODE>, <CODE>2L</CODE>, <CODE>2R</CODE>, ... は正規表現のメタキャラクタをエスケープしない
+		<LI>最終行末が EOF の場合のバグ修正
+	</UL>
+	<DT>Version 1.0 beta 4 <SMALL>(2004/03/03)</SMALL><DD>
+	<UL>
+		<LI>自動保存機能
+		<LI>いくつかバグ修正
+		<LI>ドキュメント加筆
+	</UL>
+	<DT>Version 1.0 beta 1 <SMALL>(2004/02/28)</SMALL><DD>
+	<UL>
+		<LI>ドキュメントを書いて公開
+	</UL>
+</DL>
+
+
+<H3><A name="feedback" id="feedback">フィードバック</A></H3>
+
+<P>設定例の提供、バグ報告、ツッコミなどは <A href="http://www18.big.or.jp/~fujiwara/ikki/forum/hidemaru/">談話室</A> へどうぞ。</P>
+
+
+<DIV class="footer" align="right">
+	<UL class="footnavi">
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/hidemaru/">秀丸マクロ</A>
+		<LI>&lt; <A href="http://www18.big.or.jp/~fujiwara/ikki/">Wisteria</A>
+	</UL>
+	<HR>
+	<IMG src="/cgi-bin/Count.cgi?df=fujiwara_ikki_altcomment1.dat&amp;pad=N&amp;dd=A&amp;ft=0&amp;trgb=000000&amp;srgb=00FF00&amp;prgb=606060" height="20" border="0" alt="">
+	<ADDRESS>(C) IKKI 2004-2008</ADDRESS>
+</DIV>
+
+</BODY>
+</HTML>

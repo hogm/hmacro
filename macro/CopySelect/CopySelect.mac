@@ -1,0 +1,32 @@
+//補足：copy2は範囲選択解除されないが、コピーしたアクションが分からないため、
+//      故意に範囲選択解除⇒範囲選択をする
+
+//範囲未選択は終了
+if (selecting == 0 && rectselecting == 0){
+    endmacro;
+}
+
+if (rectselecting == 1){
+    #rectselecting = 1;
+}
+
+//範囲選択状態保管
+#seltopx = seltopx;
+#selendx = selendx;
+#seltopy = seltopy;
+#selendy = selendy;
+
+copy;
+
+moveto #seltopx, #seltopy;
+
+//範囲選択状態復元
+if (#rectselecting == 1){
+    beginrect;
+}
+else{
+    beginsel;
+}
+
+moveto #selendx, #selendy;
+endsel;

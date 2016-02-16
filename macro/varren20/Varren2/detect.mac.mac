@@ -1,0 +1,42 @@
+// 変数名を取得
+if (!selecting) {
+	call SearchHere "(|##?|\\$\\$?)[_a-zA-Z0-9]+";
+}
+$name = gettext(seltopx, seltopy, selendx, selendy, true);
+if ($name != "") {
+	// スコープを範囲選択
+	if (leftstr($name, 2) == "##" || leftstr($name, 2) == "$$") {
+		selectcfunc;
+	} else {
+		selectall;
+	}
+}
+// 変数名を返す
+endmacro $name;
+
+SearchHere: // カーソル位置を含む検索
+	// $$1 = 正規表現
+	escape;
+	##ox = x;
+	##oy = y;
+	right;
+	searchup $$1, word, casesense, regular, nohilight;
+	while (result && (##oy < foundendy || (##oy == foundendy && ##ox <= foundendx))) {
+		##bx = foundtopx;
+		##by = foundtopy;
+		##dx = foundendx;
+		##dy = foundendy;
+		findup;
+	}
+	if (##dx || ##dy) {
+		moveto ##dx, ##dy;
+		beginsel;
+		moveto ##bx, ##by;
+		endsel;
+		return true;
+	}
+	moveto ##ox, ##oy;
+	beginsel;
+	endsel;
+	escape;
+	return false;

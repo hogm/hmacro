@@ -1,0 +1,172 @@
+// 
+//  	コードスニペットプラグイン  Snippet.mac
+//  	Version 3.02  (2007/02/07)
+//  	Made by IKKI  http://www18.big.or.jp/~fujiwara/ikki/
+// 
+
+$CfgFile = currentmacrodirectory + "\\config.txt";
+$Type    = filetype;		// プラグインの連鎖には非対応
+
+$BgnSeq  = "\\\\v";
+$EndSeq  = "\\\\f";
+$BgnMark = "\x0b";
+$EndMark = "\x0c";
+
+// #debug = 1;
+call LoadDLL;
+call Main;
+call FreeDLL;
+endmacro;
+
+Main:
+	call GetCfgAsPath "snippet.dic";
+	$SubDic = $$return;
+	call GetCfg "source";  $src = $$return;
+	if ($src == "self") {
+		call MixMode;
+	} else if ($src == "list") {
+		call GetCfg "list";   $dic  = $$return;
+		call GetCfg "hints";  $hint = $$return;
+		call Listbox;
+	} else {		// デフォルト (auto mode)
+		call GetCfgAsPath "dic",  ".dic";   $dic  = $$return;
+		call GetCfgAsPath "hint", ".hint";  $hint = $$return;
+		if      ($src == "dic") call Listbox;
+		else if ($dic == "")    call MixMode;
+		else if ($src == "mix") call MixMode;
+		else                    call Listbox;
+	}
+	return;
+
+Listbox:		// リストボックス起動
+	$$prmfile = currentmacrodirectory + "\\system\\listbox.param";
+	writeinistr $$prmfile, "Parameter", "cfgfile", $CfgFile;
+	execmacro currentmacrodirectory + "\\system\\listbox.mac";
+	$instr = getinistr($$prmfile, "Return", "instr");
+	#result = getininum($$prmfile, "Return", "result");
+	writeinistr $$prmfile, "Parameter", 0, 0;
+	call InsertSnippet;
+	return;
+
+MixMode:		// 混合補完
+	writeinistr $CfgFile, "plugin", "type", "plugin";
+	writeinistr $CfgFile, "plugin", "@", $Type;
+	writeinistr $CfgFile, "plugin", "word.mix", $dic;
+	execmacro currentmacrodirectory + "\\CompleteWord.mac";
+	$instr  = getinistr($CfgFile, "plugin", "instr");
+	#result = getininum($CfgFile, "plugin", "result");
+	call InsertSnippet;
+	return;
+
+InsertSnippet:		// スニペットを挿入＆マーク位置にカーソルを移動
+	$$searchbuffer = searchbuffer;
+	##searchoption = searchoption;
+	$snip = getinistr($SubDic, "snippet", $instr);
+	if ($snip == "") return false;
+	undo;
+	call Unescape $snip;
+	$snip = $$return;
+	##p = strstr($snip, $BgnMark);
+	if (##p < 0) {
+		// マークなし
+		insert $snip;
+	} else if (strstr(midstr($snip, ##p + 1, 8192), $BgnMark) < 0 && strstr($snip, $EndMark) < 0) {
+		// 開始マーク1個のみ
+		insertfix $snip;
+		searchdown2 $BgnMark;
+		##cx = x;  ##cy = y;
+		undo;
+		insertfix dllfuncstr("GSUB", $snip, "[" + $BgnMark + $EndMark + "]", "");
+		moveto ##cx, ##cy;
+		setsearch $$searchbuffer, ##searchoption;
+	} else {
+		insertfix $snip;
+		searchdown2 $BgnMark + "([^" + $BgnMark + $EndMark + "]*" + $EndMark + ")?", regular, hilight;
+		// マークに可読文字を使うなら…
+// 		$$b1 = dllfuncstr("GSUB", $BgnMark, "([\\\\\\^$()\\[\\]{}|*+.?])", "\\\\\\1");		// 正規表現エスケープ
+// 		$$d1 = dllfuncstr("GSUB", $EndMark, "([\\\\\\^$()\\[\\]{}|*+.?])", "\\\\\\1");
+// 		$$b2 = dllfuncstr("GSUB", $BgnMark, "([\\\\\\\\\\^\\-\\[\\]])", "\\\\\\1");		// 正規表現（キャラクタクラス）エスケープ
+// 		$$d2 = dllfuncstr("GSUB", $EndMark, "([\\\\\\\\\\^\\-\\[\\]])", "\\\\\\1");
+// 		searchdown2 $$b1 + "([^" + $$b2 + $$d2 + "]*" + $$d1 + ")?", regular, hilight;
+	}
+	if (#result == 9 || #result == 13 || #result >= 32) {		// 最後に入力された文字を書き込む
+		insert char(#result);
+	}
+	return true;
+
+Unescape:		// エスケープシーケンスを展開
+	if (indentstate) {		// 自動インデントが ON のとき
+		$$indent = dllfuncstr("MATCHSTR", gettext2(0, lineno, column, lineno), "^([ \\t]+)", "\\1");
+	}
+	$$s = $$1;
+	$$s = dllfuncstr("GSUB", $$s, "\\\\\\\\", "\x7f");
+	$$s = dllfuncstr("GSUB", $$s, "\\\\t", "\x09");
+	$$s = dllfuncstr("GSUB", $$s, "\\\\n", "\x0a" + $$indent);
+	$$s = dllfuncstr("GSUB", $$s, $BgnSeq, $BgnMark);
+	$$s = dllfuncstr("GSUB", $$s, $EndSeq, $EndMark);
+	$$s = dllfuncstr("GSUB", $$s, "\\\\", "");		// 余計な \ は消す
+	$$s = dllfuncstr("GSUB", $$s, "\x7f", "\\\\");
+	return $$s;
+
+//------ 共通サブルーチン ------------------------------------------------------
+
+GetCfgAsPath:		// 設定をファイル名として取得
+	// $$1 = キー名
+	// $$2 = デフォルト拡張子
+	call GetCfg $$1;
+	$$v = $$return;
+	if ($$v == "" && $$2 != "") {
+		$$d = currentmacrodirectory + "\\" + midstr($Type, strstr($Type, ".") + 1, 255) + $$2;
+		if (existfile($$d)) return $$d;		// ベースフォルダ\拡張子.$$2 があればそれを返す
+	}
+	if ($$v == "") return "";
+	if (midstr($$v, 1, 2) != ":\\" && leftstr($$v, 2) != "\\\\") {
+		$$v = leftstr($CfgFile, dllfunc("STRRSTR", $CfgFile, "\\") + 1) + $$v;		// INI ファイルからの相対パス
+	}
+	if (!existfile($$v)) {
+		call Error "指定されたファイルがありません\n"
+		 + $$v + "\n\n"
+		 + "設定ファイル: " + $CfgFile;
+	}
+	return $$v;
+
+GetCfg:		// ファイルタイプ別の設定を取得
+	// $CfgFile = INI ファイル名
+	// $Type = セクション名
+	// $$1 = キー名
+	$$t = $Type;
+	while ($$t != "") {
+		$$v = getinistr($CfgFile, $$t, $$1);
+		if ($$v != "") break;
+		$$t = getinistr($CfgFile, $$t, "@");
+	}
+	if ($$v == "") $$v = getinistr($CfgFile, "default", $$1);
+	return $$v;
+
+LoadDLL:		// DLL ロード
+	if (rightstr(loaddllfile, 13) != "\\macrodll.dll") {
+		loaddll currentmacrodirectory + "\\system\\macrodll.dll";
+		if (!result) {
+			call Error "macrodll.dll がロードできません\n"
+			 + "CompleteX を再インストールしてみてください\n\n"
+			 + currentmacrodirectory + "\\system\\macrodll.dll";
+		}
+		if (!dllfunc("SETHMJREDLL", hidemarudir + "\\HmJre." + "dll")) {
+			call Error "HmJre." + "dll が見つかりません\n"
+			 + "秀丸エディタを再インストールしてみてください\n"
+			 + hidemarudir + "\\HmJre." + "dll";
+		}
+		#basestat = #basestat | 0x01;
+	}
+	return;
+
+FreeDLL:		// DLL 解放
+	if (#basestat & 0x01) freedll;
+	return;
+
+Error:		// エラー処理
+	if ($$1 != "") message currentmacrobasename + ":  " + $$1;
+	freedll;
+	endmacro;
+
+//  		(C) IKKI <fujiwara@big.jp> 2006
