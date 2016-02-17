@@ -1,0 +1,40 @@
+105,.AELSE
+105,.AENDI
+105,.AENDR
+105,.AENDW
+105,.AIF
+105,.AIFDEF
+105,.ALIMIT
+105,.AREPEAT
+105,.ASSIGNA
+105,.ASSIGNC
+105,.AWHILE
+105,.BEQU
+105,.CPU
+41,.DATA.B
+41,.DATA.L
+41,.DATA.W
+105,.DEFINE
+105,.END
+105,.EQU
+105,.EXITM
+105,.EXPORT
+105,.IMPORT
+105,.INCLUDE
+105,.INSTR
+105,.LEN
+105,.LIST
+105,.MACRO
+105,.ORG
+105,.REPEAT
+41,.RES.B
+41,.RES.L
+41,.RES.W
+105,.SECTION
+105,.SUBSTR
+105,.UNTIL
+21,^[_a-zA-Z][^\(=;:]* [_a-zA-Z][_a-zA-Z0-9]*\([^;]*$
+21,^[_a-zA-Z][^\(=;:]* operator[^\(;]+\([^;]*$
+21,^[_a-zA-Z][^\(=;:]*::[^\(;]+\([^;]*$
+21,^[_a-zA-Z][_a-zA-Z0-9]*[a-z]+[_a-zA-Z0-9]* *\([^;]*$
+19,^[_a-zA-Z0-9]*:

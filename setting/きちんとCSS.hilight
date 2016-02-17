@@ -1,0 +1,136 @@
+//======================================================
+//      きっちりCSS強調定義 Ver0.90 取扱説明書
+//            2005/10/17  かめいんこ制作
+//======================================================
+
+//======================================================
+//値 [強調1]////////////////////////////////////////////
+//======================================================
+17,url\([^;\)]+\.[^;\)]+\)
+49,auto|normal|none|default|inherit
+49,show|hide
+49,fixed|scroll
+49,left|center|right|top|bottom|justify|both|baseline|middle|text-top|text-bottom|super|sub
+49,repeat(-x|-y)?|no-repeat
+49,italic|oblique|small-caps
+49,bold|lighter|bolder
+49,(xx-|x-)?(small|large)|medium|smaller|larger|thin|thick
+49,sans-serif|serif|cursive|fantasy|monospace
+49,distribute|distribute-all-lines|inter-cluster|inter-ideograph|inter-word|kashida|newspaper
+49,underline|overline|line-through|blink
+49,above|below
+49,capitalize|lowercase|uppercase
+49,pre|nowrap
+49,ideograph-(alpha|numeric|parenthesis|space)|
+49,strict|break-all|keep-all|break-word
+49,hidden|solid|double|groove|rigde|inset|outset|dashed|dotted
+49,visible|hidden|collapse|scroll|rect\(.+\)
+49,static|relative|absolute|fixed
+49,inline|block|list-item|run-in|compact|marker|table|inline-table|table(-((caption|cell)|(footer|header)-group|(row|column)(-group)?))?
+49,ltr|rtl|embed|bidi-override|lr-tb|tb-rl
+49,collapse|separate
+49,disc|circle|square|lower-roman|upper-roman|lower-greek|decimal|decimal-leading-zero|lower-latin|lower-alpha|upper-latin|upper-alpha|cjk-ideographic|hiragana|katakana|hiragana-iroha|katakana-iroha|hebrew|armenian|georgian
+49,outside|inside
+49,counter(.*)|attr(.*)|open-quote|close-quote|no-open-quote|no-close-quote
+49,all-scroll|colsize|crosshair|default|hand|help|move|no-drop|not-allowed|pointer|progress|text|vertical-text|wait|(e|n|ne|nw|s|se|sw|row|w)-resize
+49,always|avoid
+49,active|inactive|disabled
+49,(alpha|blur|chroma|dropshadow|fliph|flipv|glow|invert|mask|shadow|wave|xray)\(.*\)
+49,distribute-letter|distribute-space|line-edge|whitespace|line|char|loose|fix
+
+
+//======================================================
+//プロパティ[強調2]/////////////////////////////////////
+//======================================================
+89,(color|background(-(attachment|color|image|position|repeat))?)[ \t]*:
+89,font(-(family|size|size-adjust|stretch|style|variant|weight))?[ \t]*:
+89,(letter-spacing|line-(break|height)|vertical-align|white-space|word-(break|spacing|wrap))[ \t]*:
+89,text-(align|autospace|decoration|indent|justify|shadow|transform|underline-position)[ \t]*:
+89,((max|min)-)?(width|height)[ \t]*:
+89,(margin|padding)(-(top|right|bottom|left))?[ \t]*:
+89,border(-(left|right|top|bottom))?(-(color|width|style))?[ \t]*:
+89,(bottom|clear|clip|direction|display|float|left|overflow(-x|-y)?|position|right|top|unicode-bidi|visibility|writing-mode|z-index)[ \t]*:
+89,(border-(collapse|spacing)|caption-side|empty-cells|table-layout)[ \t]*:
+89,(list-style(-(image|position|type)?|marker-offset)?)[ \t]*:
+89,(content|counter-(increment|reset)|quotes)[ \t]*:
+89,(outline(-(color|style|width))?)[ \t]*:
+89,cursor[ \t]*:
+89,(marks|orphans|page(-break-(after|before|inside))?|size|widows)[ \t]*:
+89,ime-mode[ \t]*:
+89,scrollbar-(3dlight|arrow|base|darkshadow|face|highlight|shadow|track)-color[ \t]*:
+89,(filter|zoom)[ \t]*:
+89,(include-source|layer-background-(color|image))[ \t]*:
+89,ruby-(align|overhang|position)[ \t]*:
+89,layout-grid(-(char|line|mode|type))?[ \t]*:
+89,behavior[ \t]*:
+89,(azimuth|elevation|play-during|richness|speech-rate|stress|voice-family|volume|((cue|pause)(-(after|before))?)|(pitch(-range)?)|(speak(-(header|numeral|punctuation)?)))[ \t]*:
+
+
+//======================================================
+//filter(値の中の値)[強調3]/////////////////////////////
+//======================================================
+185,(add|positive)=([01]|false|true)|style=[0-3]|color=[#0-9a-z]+|(direction|finishopacity|lightstrength|opacity|phase)=[0-9]{0,3}|(offx|offy|freq|startx|starty|finishx|finishy|strength)=[0-9]+
+
+
+//======================================================
+//数値+単位 [強調4]/////////////////////////////////////
+//======================================================
+241,(?<!((z-index|font-weight|zoom)[ \t]*: ?|(style|add|positive|direction|finishopacity|lightstrength|opacity|phase|offx|offy|freq|startx|starty|finishx|finishy|strength)=|[0-9\.]))((-?[0-9]+(\.[0-9]+)?)|(\.[0-9]+))(ex|em|px|cm|mm|pc|in|pt|%)
+241,(?<=((z-index|font-weight|line-height)[ \t]*: ?|(style|add|positive|direction|finishopacity|lightstrength|opacity|phase|offx|offy|freq|startx|starty|finishx|finishy|strength)=)) ?[0-9]+(\.[0-9]+)?
+241,(?<=(zoom[ \t]*: ?))[0-9]+(\.[0-9]+)?%?
+225,0
+
+
+//======================================================
+//色 [強調5]////////////////////////////////////////////
+//======================================================
+283,\#[0-9a-f]{3,6}
+283,rgb\([0-9]+%?,[0-9]+%?,[0-9]+%?\)
+315,transparent|invert
+315,white(?!-)
+315,aliceblue|antiquewhite|aqua|aquamarine|azure|beige|bisque|black|blanchedalmond|blue|blueviolet|brown|burlywood|cadetblue|chartreuse|chocolate|coral|cornflowerblue|cornsilk|crimson|cyan|darkblue|darkcyan|darkgoldenrod|darkgray|darkgreen|darkkhaki
+315,darkmagenta|darkolivegreen|darkorange|darkorchid|darkred|darksalmon|darkseagreen|darkslateblue|darkslategray|darkturquoise|darkviolet|deeppink|deepskyblue|dimgray|dodgerblue|firebrick|floralwhite|forestgreen|fuchsia|gainsboro|ghostwhite|gold
+315,goldenrod|gray|green|greenyellow|honeydew|hotpink|indianred|indigo|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgreen|lightgrey|lightpink|lightsalmon|lightseagreen|lightskyblue
+315,lightslategray|lightsteelblue|lightyellow|lime|limegreen|linen|magenta|maroon|mediamaquamarine|mediumblue|mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumspringgreen|mediumturquoise|mediumvioletred|midnightblue|mintcream|mistyrose
+315,moccasin|navajowhite|navy|oldlace|olive|olivedrab|orange|orangered|orchid|palegolderod|palegreen|paleturquoise|palevioletred|papayawhip|peachpuff|peru|pink|plum|powderblue|purple|red|rosybrown|royalblue|saddlebrown|salmon|sandybrown|seagreen
+315,seashell|sienna|silver|skyblue|slateblue|slategray|snow|springgreen|steelblue|tan|teal|thistle|tomato|turquoise|violet|wheat|whitesmoke|yellow|yellowgreen
+315,(?<!-)(activeborder|activecaption|appworkspace|background|buttonface|buttonhighlight|buttonshadow|buttontext|captiontext|graytext|highlight|highlighttext|inactiveborder|inactivecaption|inactivecaptiontext)(?!(-|:| :))
+315,(?<!-)(infobackground|infotext|menu|menutext|scrollbar|threeddarkshadow|threedface|threedhighlight|threedlightshadow|threedshadow|window|windowframe|windowtext)(?!(-|:| :))
+
+
+//======================================================
+//!important [強調7]////////////////////////////////////
+//======================================================
+411,(?<!(; |;))! ?important
+
+
+//======================================================
+//voice-family [行の強調1]//////////////////////////////
+//======================================================
+29,voice-family ?[ \t]*: ?.+ ?;
+
+
+//======================================================
+//セレクタ [特に強調1]//////////////////////////////////
+//======================================================
+27,^[0-9a-z:#,_' >/@=~"\.\t\-\+\^\?\*\[\]\(\)\|]+?({|, ?$)
+
+
+//======================================================
+//メディアタイプ、疑似要素 [特に強調2]//////////////////
+//======================================================
+123,(?<!-)all|aural|braille|embossed|handheld|print|projection|screen|tty|tv|@import|@media|@charset|@page|@font-face
+91,:(first-child|link|visited|hover|active|focus|lang|first-line|first-letter|before|after)(?!-)
+
+
+//======================================================
+//一般的なタグ [特に強調3]//////////////////////////////
+//======================================================
+187,(?<!([0-9_#"/\(\.\-]))(a|abbr|acronym|address|area|b|base|bdo|bgsound|blockquote|body|button|caption|cite|code|col|colgroup|dd|del|dfn|div|dl|dt|em|fieldset|form|frame|frameset|h[1-6]|hr|i|iframe|img|input|ins|kbd|label|legend|li)(?!([0-9\-;]))
+187,(?<!([0-9_#"/\(\.\-]))(map|noembed|noframes|nolayer|noscript|object|ol|optgroup|option|p|param|pre|q|rb|rp|rt|ruby|samp|script|select|span|strong|sub|sup|table|tbody|td|textarea|tfoot|th|thead|tr|tt|ul|var|small|big|html|title)(?!([0-9\-;]))
+
+
+//======================================================
+//括弧{} [特に強調4]////////////////////////////////////
+//======================================================
+219,{|}|;

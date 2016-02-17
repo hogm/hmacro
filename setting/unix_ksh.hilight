@@ -1,0 +1,47 @@
+67, = 
+03, -a 
+67, -eq 
+67, -ge 
+67, -gt 
+67, -le 
+67, -lt 
+67, -ne 
+03, -o 
+03,$
+193,(
+193,)
+65,. 
+193,[
+193,]
+193,{
+193,}
+25,<
+09,>
+03,\
+169,2>&1
+97,awk
+97,banner
+97,case
+97,cat
+33,clear
+97,cut
+161,do
+161,done
+97,echo
+161,elif
+161,else
+97,esac
+97,exit
+97,expr
+161,fi
+161,for
+97,ftp
+97,grep
+161,if
+97,ls
+97,rm
+97,sed
+225,set
+161,then
+97,touch
+161,while

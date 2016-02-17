@@ -1,0 +1,2352 @@
+// 
+// Ruby言語のソースコードのための強調表示定義ファイル
+// 
+//                                    @version 1.8.6 patchlevel 1
+//                                    @date  February 22, 2008
+//                                    @author Kazuhiro Fujie
+// 
+
+// 強調表示番号         プログラム中で表示する箇所
+// ---------------------------------------------------------------------
+// 強調表示 1           キーワード（予約語）
+//                       + α（文法的意味を持つ重要語句）
+// 
+// 強調表示 2           未定義
+//
+// 強調表示 3           クラス名、モジュール名
+//                        + 添付ライブラリ クラス、モジュール名（一部のみ）
+// 
+// 強調表示 4           変数 = 組み込み変数
+// 
+// 強調表示 5           例外クラス
+//                          + 添付ライブラリの例外クラス（一部のみ）
+// 
+// 強調表示 6           未定義
+// 
+// 強調表示 7           メソッド（関数）
+//                        = 組み込み関数 + 組み込みクラス、モジュールのメソッド
+//                          + 添付ライブラリのメソッド（一部のみ）
+// 
+// 強調表示 8           定数
+//                        = 組み込み定数 + 組み込みクラス、モジュールの定数
+//                          + 添付ライブラリの定数（一部のみ）
+
+// 参考：
+// オブジェクト指向スクリプト言語 Ruby リファレンスマニュアル
+// <URL:http://www.ruby-lang.org/ja/man/>
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 1. キーワード（予約語）+ α（文法的意味を持つ重要語句）
+
+// キーワード（予約語）
+// keyword
+33,BEGIN
+33,END
+33,alias
+33,and
+33,begin
+33,break
+33,case
+33,class
+33,def
+33,defined?
+33,do
+33,else
+33,elsif
+33,end
+33,ensure
+33,false
+33,for
+33,if
+33,in
+33,module
+33,next
+33,nil
+33,not
+33,or
+33,redo
+33,rescue
+33,retry
+33,return
+33,self
+33,super
+33,then
+33,true
+33,undef
+33,unless
+33,until
+33,when
+33,while
+33,yield
+
+// 文法的意味を持つ関数など、重要語句
+// semi-keyword, significant word
+
+// embedded method
+33,catch
+33,throw
+33,raise
+49,exit[!]?
+
+// Module class
+33,attr
+33,attr_accessor
+33,attr_reader
+33,attr_writer
+33,extend
+33,include
+33,private
+33,protected
+33,public
+
+// Class class
+33,new
+33,superclass
+
+
+
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 2. 未定義
+
+
+
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 3. クラス名、モジュール名
+
+// class name
+161,Object
+161,Array
+161,Values
+161,Binding
+161,Continuation
+161,Data
+// 161,Exception
+161,Dir
+161,FalseClass
+161,Stat
+161,Hash
+161,IO
+161,File
+161,MatchData
+161,Method
+161,UnboundMethod
+161,Module
+161,Class
+161,Numeric
+161,Integer
+161,Bignum
+161,Fixnum
+161,Float
+161,Proc
+161,Status
+161,Range
+161,Regexp
+161,String
+161,Struct
+161,Symbol
+161,Thread
+161,ThreadGroup
+161,Time
+161,TrueClass
+161,NilClass
+
+// module name
+161,Comparable
+161,Enumerable
+// 161,Errno
+161,Constants
+161,FileTest
+161,GC
+161,Kernel
+161,Marshal
+161,Math
+161,ObjectSpace
+161,Precision
+161,Process
+161,GID
+161,Sys
+161,UID
+161,Signal
+
+// ---------------------------------------------
+// 添付ライブラリ クラス名（一部のみ）
+// attached library class name
+161,CSV
+161,Reader
+161,StringReader
+161,IOReader
+161,Writer
+161,BasicWriter
+
+161,Rational
+
+161,Date
+161,DateTime
+
+161,Generic
+161,FTP
+161,HTTP
+161,HTTPS
+161,LDAP
+161,MailTo
+
+161,Test
+161,Unit
+161,TestCase
+// 161,Assertions
+161,AutoRunner
+
+
+// ---------------------------------------------
+// 添付ライブラリ モジュール名（一部のみ）
+// attached library module name
+161,FileUtils
+161,Verbose
+161,NoWrite
+161,DryRun
+161,ParseDate
+161,URI
+
+161,OpenURI
+161,OpenRead
+161,Meta
+
+161,Assertions
+
+// ---------------------------------------------------------------------
+// 
+// 
+// 強調表示 4. 変数
+
+// 組み込み変数
+// embedded variable
+// 
+//49,\$[0-9_&~`'+?!@=/\\,;.<>*$:"]
+
+// local scope
+225,$_
+225,$&
+225,$~
+225,$`
+225,$'
+225,$+
+241,\$[1-9]
+
+// thread local scope
+225,$?
+225,$!
+225,$@
+225,$SAFE
+
+// global scope
+225,$=
+225,$/
+225,$\
+225,$,
+225,$;
+225,$.
+225,$<
+225,$deferr
+225,$>
+225,$defout
+225,$0
+225,$PROGRAM_NAME
+225,$*
+225,$$
+225,$:
+225,$LOAD_PATH
+225,$"
+225,$LOADED_FEATURES
+225,$DEBUG
+225,$FILENAME
+225,$stdin
+225,$stdout
+225,$stderr
+225,$VERBOSE
+225,$KCODE
+
+// option variable
+//241,\$-[0adFiIKlpvwW]
+225,$-0
+225,$-a
+225,$-d
+225,$-F
+225,$-i
+225,$-I
+225,$-K
+225,$-l
+225,$-p
+225,$-v
+225,$-w
+225,$-W
+
+// para-variable  擬似変数
+// 225,self
+// 225,nil
+// 225,true
+// 225,false
+225,__FILE__
+225,__LINE__
+
+
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 5. 例外クラス（一部のみ）
+
+// デフォルト色は、「赤色」。
+// 文字列定数と同じ色になってしまうため。
+// 
+// Exception クラスだけ記載することとする。
+
+// Exception class name
+291,Exception
+291,Interrupt
+291,NoMemoryError
+291,ScriptError
+291,LoadError
+291,NameError
+291,NotImplementedError
+291,SyntaxError
+291,SignalException
+291,StandardError
+291,ArgumentError
+291,IndexError
+291,KeyError
+291,IOError
+291,EOFError
+291,LocalJumpError
+291,NameError
+291,NoMethodError
+291,RangeError
+291,FloatDomainError
+291,RegexpError
+291,RuntimeError
+291,SecurityError
+291,SystemCallError
+291,Errno
+291,SystemStackError
+291,ThreadError
+291,TypeError
+291,ZeroDivisionError
+291,SystemExit
+291,fatal
+
+// Exception method
+291,exception
+291,backtrace
+291,message
+291,set_backtrace
+
+// Errno inner class
+291,ERROR
+291,EPERM
+291,ENOENT
+291,ESRCH
+291,EINTR
+291,EIO
+291,ENXIO
+291,E2BIG
+291,ENOEXEC
+291,EBADF
+291,ECHILD
+291,EAGAIN
+291,ENOMEM
+291,EACCES
+291,EFAULT
+291,ENOTBLK
+291,EBUSY
+291,EEXIST
+291,EXDEV
+291,ENODEV
+291,ENOTDIR
+291,EISDIR
+291,EINVAL
+291,ENFILE
+291,EMFILE
+291,ENOTTY
+291,ETXTBSY
+291,EFBIG
+291,ENOSPC
+291,ESPIPE
+291,EROFS
+291,EMLINK
+291,EPIPE
+291,EDOM
+291,ERANGE
+291,EDEADLK
+291,ENAMETOOLONG
+291,ENOLCK
+291,ENOSYS
+291,ENOTEMPTY
+291,ELOOP
+291,EWOULDBLOCK
+291,ENOMSG
+291,EIDRM
+291,ECHRNG
+291,EL2NSYNC
+291,EL3HLT
+291,EL3RST
+291,ELNRNG
+291,EUNATCH
+291,ENOCSI
+291,EL2HLT
+291,EBADE
+291,EBADR
+291,EXFULL
+291,ENOANO
+291,EBADRQC
+291,EBADSLT
+291,EDEADLOCK
+291,EBFONT
+291,ENOSTR
+291,ENODATA
+291,ETIME
+291,ENOSR
+291,ENONET
+291,ENOPKG
+291,EREMOTE
+291,ENOLINK
+291,EADV
+291,ESRMNT
+291,ECOMM
+291,EPROTO
+291,EMULTIHOP
+291,EDOTDOT
+291,EBADMSG
+291,EOVERFLOW
+291,ENOTUNIQ
+291,EBADFD
+291,EREMCHG
+291,ELIBACC
+291,ELIBBAD
+291,ELIBSCN
+291,ELIBMAX
+291,ELIBEXEC
+291,EILSEQ
+291,ERESTART
+291,ESTRPIPE
+291,EUSERS
+291,ENOTSOCK
+291,EDESTADDRREQ
+291,EMSGSIZE
+291,EPROTOTYPE
+291,ENOPROTOOPT
+291,EPROTONOSUPPORT
+291,ESOCKTNOSUPPORT
+291,EOPNOTSUPP
+291,EPFNOSUPPORT
+291,EAFNOSUPPORT
+291,EADDRINUSE
+291,EADDRNOTAVAIL
+291,ENETDOWN
+291,ENETUNREACH
+291,ENETRESET
+291,ECONNABORTED
+291,ECONNRESET
+291,ENOBUFS
+291,EISCONN
+291,ENOTCONN
+291,ESHUTDOWN
+291,ETOOMANYREFS
+291,ETIMEDOUT
+291,ECONNREFUSED
+291,EHOSTDOWN
+291,EHOSTUNREACH
+291,EALREADY
+291,EINPROGRESS
+291,ESTALE
+291,EUCLEAN
+291,ENOTNAM
+291,ENAVAIL
+291,EISNAM
+291,EREMOTEIO
+291,EDQUOT
+
+
+// ---------------------------------------------
+// 添付ライブラリ 例外クラス
+// attached library exception class
+
+// URI exception class name
+291,Error
+291,InvalidURIError
+291,InvalidComponentError
+291,BadURIError
+
+
+
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 6. 未定義
+// デフォルト色は、「緑色」。
+// コメントと同じ色になってしまうため。
+
+
+
+
+// ---------------------------------------------------------------------
+// 
+// 強調表示 7. メソッド（関数）
+
+
+// ---------------------------------------------
+// 組み込み関数 
+// embedded method
+419,abort
+419,at_exit
+// 419,autoload
+// 419,autoload?
+435,autoload[?]?
+419,binding
+419,caller
+419,callcc
+// move to significant word
+// 419,catch
+// 419,chop
+// 419,chop!
+435,chop[!]?
+// 419,chomp
+// 419,chomp!
+435,chomp[!]?
+419,eval
+419,exec
+// move to significant word
+// 419,exit
+// 419,exit!
+// 435,exit[!]?
+419,fork
+419,gets
+419,readline
+419,global_variables
+// 419,gsub
+// 419,gsub!
+435,gsub[!]?
+419,iterator?
+419,load
+419,local_variables
+419,loop
+419,open
+419,p        // a matter for consideration
+419,print
+419,printf
+419,proc
+419,lambda
+419,putc
+419,puts
+// move to significant word
+// 419,raise
+419,fail
+419,rand
+419,readlines
+419,require
+419,scan
+419,select
+419,set_trace_func
+//419,event
+//419,file
+//419,line
+//419,id
+//419,line
+//419,call
+//419,return
+//419,c-call
+//419,c-return
+//419,class
+//419,end
+//419,raise
+//419,binding
+//419,klass
+419,sleep
+419,spawn
+419,split
+419,sprintf
+419,format
+419,srand
+// 419,sub
+// 419,sub!
+435,sub[!]?
+419,syscall
+419,system
+419,test
+// move to significant word
+// 419,throw
+419,trace_var
+//419,trap
+419,untrace_var
+419,warn
+
+
+// ---------------------------------------------
+// 組み込みクラスのメソッド
+// embedded class method
+
+// Object class
+
+// Object method
+// 419,type
+419,clone
+419,dup
+419,display
+419,eql?
+419,equal?
+// 419,extend
+419,freeze
+419,frozen?
+419,hash
+// 419,__id__
+419,object_id
+419,inspect
+419,instance_eval
+419,instance_of?
+419,instance_variable_get
+419,instance_variable_set
+419,instance_variables
+419,is_a?
+419,kind_of?
+// 419,method
+// 419,methods
+435,method[s]?
+419,method_missing
+419,public_methods
+419,private_methods
+419,protected_methods
+419,nil?
+419,respond_to?
+419,send
+419,__send__
+419,singleton_methods
+419,taint
+419,tainted?
+// 419,to_a // obsolete
+419,to_ary
+419,to_hash
+419,to_int
+419,to_s
+419,to_str
+419,untaint
+// Object private method
+419,initialize
+419,initialize_copy
+419,remove_instance_variable
+419,singleton_method_added
+419,singleton_method_removed
+419,singleton_method_undefined
+
+
+// Array class
+
+// Array method
+// 419,self
+419,assoc
+419,at
+419,clear
+// 419,clone
+// 419,dup
+419,collect! 
+419,map! 
+// 419,compact
+// 419,compact!
+435,compact[!]?
+419,concat
+419,delete
+419,delete_at
+419,delete_if
+419,reject!
+419,each
+419,each_index
+419,empty?
+// 419,eql?
+419,fetch
+419,fill
+419,first
+//419,flatten
+//419,flatten!
+435,flatten[!]?
+// 419,include?
+419,index
+// 419,indexes // obsolete
+// 419,indices // obsolete
+419,insert
+419,join
+419,last
+419,length
+// 419,size
+419,nitems
+419,pack
+419,pop
+419,push
+419,rassoc
+419,replace
+// 419,reverse
+// 419,reverse!
+435,reverse[!]?
+419,reverse_each
+419,rindex
+419,shift
+// 419,slice
+// 419,slice!
+435,slice[!]?
+// 419,sort
+// 419,sort!
+435,sort[!]?
+419,to_a
+// 419,to_ary
+// 419,to_s
+419,transpose
+// 419,uniq
+// 419,uniq!
+435,uniq[!]?
+419,unshift
+419,values_at
+
+// Binding class
+
+// Binding method
+// 419,eval
+
+// Continuation class
+
+// Continuation method
+// 419,self
+419,call
+
+// Dir class
+
+// Dir class method
+// 419,Dir
+//419,Dir.glob
+//419,Dir::glob
+435,Dir([.]?|[:][:])glob
+// 419,Dir.chdir
+435,Dir([.]?|[:][:])chdir
+// 419,Dir.chroot
+435,Dir([.]?|[:][:])chroot
+// 419,Dir.delete
+435,Dir([.]?|[:][:])delete
+// 419,Dir.rmdir
+435,Dir([.]?|[:][:])rmdir
+// 419,Dir.unlink
+435,Dir([.]?|[:][:])unlink
+// 419,Dir.entries
+435,Dir([.]?|[:][:])entries
+// 419,Dir.foreach
+435,Dir([.]?|[:][:])foreach
+// 419,Dir.getwd
+435,Dir([.]?|[:][:])getwd
+// 419,Dir.pwd
+435,Dir([.]?|[:][:])pwd
+// 419,Dir.mkdir
+435,Dir([.]?|[:][:])mkdir
+// 419,Dir.new
+// 419,Dir.open
+435,Dir([.]?|[:][:])open
+
+// Dir method
+// same as IO
+// 419,close
+// 419,each
+// 419,path
+// 419,pos
+// 419,tell
+// 419,seek
+// 419,read
+// 419,rewind
+
+
+// File::Stat class
+
+// File::Stat method
+419,ftype
+419,dev
+419,dev_major
+419,dev_minor
+419,ino
+419,mode
+419,nlink
+419,uid
+419,gid
+419,rdev
+419,rdev_major
+419,rdev_minor
+// 419,size
+419,blksize
+419,blocks
+// 
+// same as File
+// 419,atime
+// 419,mtime
+// 419,ctime
+// 
+// same as FileTest
+// 419,directory?
+// 419,readable?
+// 419,readable_real?
+// 419,writable?
+// 419,writable_real?
+// 419,executable?
+// 419,executable_real?
+// 419,file?
+// 419,zero?
+// 419,size?
+// 419,owned?
+// 419,grpowned?
+// 419,pipe?
+// 419,symlink?
+// 419,socket?
+// 419,blockdev?
+// 419,chardev?
+// 419,setuid?
+// 419,setgid?
+// 419,sticky?
+
+
+// Hash class
+
+// Hash class method
+// 419,Hash
+
+// Hash method
+419,store
+// same as Array
+// 419,clear
+// 419,clone
+// 419,dup
+419,default
+419,default_proc
+// 419,delete
+// 419,delete_if
+// 419,reject
+// 419,reject!
+// 419,each
+419,each_pair
+419,each_key
+419,each_value
+// 419,empty?
+// 419,fetch
+419,has_key?
+// 419,key
+// 419,key?
+// 419,keys
+435,key[?s]?
+// same as Enumerable
+// 419,member?
+419,has_value?
+419,value?
+// 419,index
+// 419,indexes   // obsolete
+// 419,indices   // obsolete
+419,invert
+// 419,length
+// 419,size
+// 419,merge
+// 419,merge!
+435,merge[!]?
+419,rehash
+419,replace
+// 419,shift
+// 419,to_a
+419,to_hash
+419,update
+419,values
+// 419,values_at
+
+
+
+
+// IO class
+
+// IO class method
+// 419,IO.new
+// 419,IO.for_fd
+435,IO([.]?|[:][:])for_fd
+// 419,IO.open
+435,IO([.]?|[:][:])open
+// 419,IO.foreach
+435,IO([.]?|[:][:])foreach
+// 419,IO.pipe
+435,IO([.]?|[:][:])pipe
+// 419,IO.popen
+435,IO([.]?|[:][:])popen
+// 419,IO.read
+435,IO([.]?|[:][:])read
+// 419,IO.readlines
+435,IO([.]?|[:][:])readlines
+// 419,IO.select
+435,IO([.]?|[:][:])select
+// 419,IO.sysopen
+435,IO([.]?|[:][:])sysopen
+
+// IO method
+419,binmode
+// 419,clone
+// 419,dup
+419,close
+419,close_read
+419,close_write
+419,closed?
+// 419,each
+419,each_line
+419,each_byte
+// 419,eof
+// 419,eof?
+435,eof[?]?
+419,fcntl
+419,fsync
+419,fileno
+419,to_i
+419,flush
+419,getc
+// 419,gets
+419,ioctl
+419,isatty
+419,tty?
+419,lineno
+419,pid
+419,pos
+419,tell
+// 419,print
+// 419,printf
+419,putc
+419,puts
+419,read
+419,readchar
+419,readline
+419,readlines
+419,readpartial
+419,reopen
+419,rewind
+419,seek
+419,stat
+419,sync
+419,sysread
+419,sysseek
+419,syswrite
+419,to_io
+419,ungetc
+419,write
+
+
+// File class
+
+// File class method
+// 419,File.atime
+435,File([.]?|[:][:])atime
+// 419,File.ctime
+435,File([.]?|[:][:])ctime
+// 419,File.mtime
+435,File([.]?|[:][:])mtime
+// 419,File.basename
+435,File([.]?|[:][:])basename
+// 419,File.chmod
+435,File([.]?|[:][:])chmod
+// 419,File.lchmod
+435,File([.]?|[:][:])lchmod
+// 419,File.chown
+435,File([.]?|[:][:])chown
+// 419,File.lchown
+435,File([.]?|[:][:])lchown
+// 419,File.delete
+435,File([.]?|[:][:])delete
+// 419,File.unlink
+435,File([.]?|[:][:])unlink
+// 419,File.dirname
+435,File([.]?|[:][:])dirname
+// 419,File.expand_path
+435,File([.]?|[:][:])expand_path
+// 419,File.extname
+435,File([.]?|[:][:])extname
+// 435,File.fnmatch[?]?
+435,File([.]?|[:][:])fnmatch[?]?
+// 419,File.ftype
+435,File([.]?|[:][:])ftype
+// 419,File.join
+435,File([.]?|[:][:])join
+// 419,File.link
+435,File([.]?|[:][:])link
+// 419,File.new
+/// 419,File.open
+435,File([.]?|[:][:])open
+// 419,File.readlink
+435,File([.]?|[:][:])readlink
+// 419,File.rename
+435,File([.]?|[:][:])rename
+// 419,File.split
+435,File([.]?|[:][:])split
+// 419,File.stat
+435,File([.]?|[:][:])stat
+// 419,File.lstat
+435,File([.]?|[:][:])lstat
+// 419,File.symlink
+435,File([.]?|[:][:])symlink
+// 419,File.truncate
+435,File([.]?|[:][:])truncate
+// 419,File.umask
+435,File([.]?|[:][:])umask
+// 419,File.utime
+435,File([.]?|[:][:])utime
+// 
+// same as FileTest
+// 419,File.blockdev?
+// 419,File.chardev?
+// 419,File.directory?
+// 419,File.executable?
+// 419,File.executable_real?
+// 419,File.exist?
+// 419,File.file?
+// 419,File.grpowned?
+// 419,File.owned?
+// 419,File.pipe?
+// 419,File.readable?
+// 419,File.readable_real?
+// 419,File.setgid?
+// 419,File.setuid
+// 419,File.size
+// 435,File.size[?]?
+// 419,File.socket?
+// 419,File.sticky?
+// 419,File.symlink?
+// 419,File.writable?
+// 419,File.writable_real?
+// 419,File.zero?
+
+// File method
+419,atime
+419,ctime
+419,mtime
+419,chmod
+419,chown
+419,flock
+419,path
+419,lstat
+419,truncate
+
+
+// MatchData class
+
+// MatchData method
+// 419,begin
+// 419,end
+419,captures
+// 419,length
+// 419,size
+419,offset
+419,post_match
+419,pre_match
+// 419,slect
+// 419,string
+// 419,to_a
+// 419,to_s
+// 419,values_at
+
+
+// Method class
+
+// Method method
+// 419,call
+419,arity
+// 419,inspect
+419,to_proc
+419,unbind
+
+
+// UnboundMethod class
+
+// UnboundMethod method
+// 419,call
+419,bind
+// 419,to_proc
+// 419,unbind
+
+
+
+// Module class
+
+// Module class method
+// 419,Module.constants
+435,Module([.]?|[:][:])constants
+// 419,Module.nesting
+435,Module([.]?|[:][:])nesting
+
+// Module method
+419,ancestors
+// autoload
+419,class_eval
+419,class_variables
+419,const_defined?
+419,const_get
+419,const_missing
+419,const_set
+419,constants
+// 419,include?
+419,included_modules
+419,instance_method
+419,method_defined?
+419,module_eval
+419,name
+//419,to_s
+419,instance_methods
+419,public_instance_methods
+419,private_instance_methods
+419,protected_instance_methods
+419,private_class_method
+419,public_class_method
+419,private_method_defined?
+419,protected_method_defined?
+419,public_method_defined?
+
+// Module private method
+// 419,alias_method
+// 419,append_features
+// 
+// move to significant word
+// 419,attr
+// 419,attr_accessor
+// 419,attr_reader
+// 419,attr_writer
+419,class_variable_get
+419,class_variable_set
+419,define_method
+419,extend_object
+419,extended
+// 419,include
+419,included
+419,method_added
+419,method_removed
+419,method_undefined
+419,module_function
+// 419,private
+// 419,protected
+// 419,public
+419,remove_class_variable
+419,remove_const
+419,remove_method
+419,undef_method
+
+// Class class
+
+// Class method
+419,allocate
+// 
+// move to significant word
+// 419,new
+// 419,superclass
+// Class private method
+419,inherited
+
+
+// Numeric class
+
+// Numeric method
+419,abs
+419,ceil
+419,floor
+419,round
+// 419,truncate
+// 419,clone
+// 419,dup
+419,coerce
+419,div
+419,quo
+419,divmod
+419,integer?
+419,modulo
+419,remainder
+419,nonzero?
+// 419,to_int
+419,step
+
+// Integer class
+
+// Integer class method
+// 419,Integer.induced_from
+435,Integer([.]?|[:][:])induced_from
+
+// Integer method
+419,chr
+419,downto
+// 419,next
+419,succ
+// 419,step
+419,times
+// 419,to_i
+// 419,to_int
+// 419,size
+419,to_f
+// 419,to_s
+419,upto
+
+// Fixnum class
+
+// Fixnum method
+419,id2name
+419,to_sym
+
+// Float class
+
+// Float class method
+// 419,Float.induced_from
+435,Float([.]?|[:][:])induced_from
+
+// Fixnum method
+419,finite?
+419,infinite?
+419,nan?
+// 419,to_f
+// 419,to_i
+// 419,truncate
+
+
+// Proc class
+
+// Proc method
+// 419,call
+// 419,arity
+// 419,binding
+// 419,to_proc
+// 419,to_s
+// 419,yield
+
+
+// Process::Status class
+
+// Process::Status method
+// 419,pid
+// 419,to_i
+// 419,to_int
+// 419,to_s
+419,exited?
+419,exitstatus
+// 419,inspect
+419,stopped?
+419,stopsig
+419,signaled?
+419,termsig
+419,coredump?
+
+
+// Range class
+
+// Range method
+// 419,include?
+// 419,begin
+// 419,first
+// 419,each
+// 419,end
+// 419,last
+419,exclude_end?
+// 419,length
+// 419,size
+// 419,step
+
+// Regexp class
+
+// Regexp class method
+// 419,Regexp.compile
+435,Regexp([.]?|[:][:])compile
+// 419,Regexp.new
+// 419,Regexp.escape
+435,Regexp([.]?|[:][:])escape
+// 419,Regexp.quote
+435,Regexp([.]?|[:][:])quote
+// 419,Regexp.last_match
+435,Regexp([.]?|[:][:])last_match
+// 419,Regexp.union
+435,Regexp([.]?|[:][:])union
+
+// Regexp method
+419,casefold?
+419,kcode
+419,match
+419,options
+419,source
+// 419,to_s
+
+
+// String class
+
+// String method
+// 419,concat
+// 419,capitalize
+// 419,capitalize!
+435,capitalize[!]?
+419,casecmp
+419,center
+419,ljust
+419,rjust
+// 419,chomp
+// 419,chomp!
+// 419,chop
+// 419,chop!
+// 419,clear
+// 419,clone
+// 419,dup
+419,count
+419,crypt
+// 419,delete
+419,delete!
+// 419,downcase
+// 419,downcase!
+435,downcase[!]?
+// 419,dump
+// 419,each
+// 419,each_line
+// 419,each_byte
+// 419,empty?
+// 419,gsub
+// 419,gsub!
+419,hex
+// 419,include?
+// 419,index
+// 419,insert
+419,intern
+// 419,to_sym
+// 419,length
+// 419,size
+// 419,next
+419,next!
+// 419,succ
+419,succ!
+419,oct
+// 419,replace
+// 419,reverse
+// 419,reverse!
+// 419,rindex
+// 419,scan
+// 419,slice
+// 419,slice!
+// 419,split
+// 419,squeeze
+// 419,squeeze!
+435,squeeze[!]?
+// 419,strip
+// 419,strip!
+435,strip[!]?
+// 419,lstrip
+// 419,lstrip!
+435,lstrip[!]?
+// 419,rstrip
+// 419,rstrip!
+435,rstrip[!]?
+// 419,sub
+// 419,sub!
+419,sum
+// 419,swapcase
+// 419,swapcase!
+435,swapcase[!]?
+// 419,to_f
+// 419,to_i
+// 419,to_s
+// 419,to_str
+// 419,tr
+// 419,tr!
+435,tr[!]?
+// 419,tr_s
+// 419,tr_s!
+435,tr_s[!]?
+419,unpack
+// 419,upcase
+// 419,upcase!
+435,upcase[!]?
+// 419,upto
+
+
+// Struct class
+
+// Struct method
+// 419,each
+// 419,each_pair
+// 419,length
+// 419,size
+419,members
+// 419,values
+// 419,to_a
+// 419,values_at
+
+
+// Symbol class
+
+// Symbol class method
+// 419,Symbol.all_symbols
+435,Symbol([.]?|[:][:])all_symbols
+
+// Symbol method
+// 419,to_sym
+// 419,id2name
+// 419,to_s
+// 419,to_i
+
+
+// Thread class
+
+// Thread class method
+// 419,Thread.abort_on_exception
+435,Thread([.]?|[:][:])abort_on_exception
+// 419,Thread.critical
+435,Thread([.]?|[:][:])critical
+// 419,Thread.current
+435,Thread([.]?|[:][:])current
+// 419,Thread.exit
+435,Thread([.]?|[:][:])exit
+// 419,Thread.kill
+435,Thread([.]?|[:][:])kill
+// 419,Thread.list
+435,Thread([.]?|[:][:])list
+// 419,Thread.main
+435,Thread([.]?|[:][:])main
+// 419,Thread.start
+435,Thread([.]?|[:][:])start
+// 419,Thread.fork
+435,Thread([.]?|[:][:])fork
+// 419,Thread.pass
+435,Thread([.]?|[:][:])pass
+// 419,Thread.stop
+435,Thread([.]?|[:][:])stop
+
+// Thread method
+// 419,abort_on_exception
+419,alive?
+// 419,exit
+// 419,kill
+419,terminate
+419,group
+// 419,join
+// 419,key?
+// 419,keys
+419,priority
+// 419,raise
+419,run
+419,safe_level
+419,status
+419,stop?
+419,value
+419,wakeup
+
+
+// ThreadGroup class
+
+// ThreadGroup method
+419,add
+419,enclose
+419,enclosed?
+// 419,list
+
+
+// Time class
+
+// Time class method
+// 419,Time.at
+435,Time([.]?|[:][:])at
+// 419,Time.gm
+435,Time([.]?|[:][:])gm
+// 419,Time.utc
+435,Time([.]?|[:][:])utc
+// 419,Time.local
+435,Time([.]?|[:][:])local
+// 419,Time.mktime
+435,Time([.]?|[:][:])mktime
+// 419,Time.new
+// 419,Time.now
+435,Time([.]?|[:][:])now
+// 419,Time.times // obsolete
+
+// Time method
+419,asctime
+// 419,ctime
+419,gmt?
+419,utc?
+419,getgm
+419,getutc
+419,getlocal
+419,gmtime
+// 419,utc
+419,localtime
+419,strftime
+419,sec
+// 419,min
+419,hour
+419,mday
+419,day
+419,mon
+419,month
+419,year
+419,wday
+419,yday
+419,isdst
+419,dst?
+419,zone
+// 419,succ
+419,utc_offset
+419,gmt_offset
+419,gmtoff
+// 419,to_a
+// 419,to_f
+// 419,to_i
+419,tv_sec
+// 419,to_s
+419,usec
+419,tv_usec
+
+
+// NilClass class
+
+// NilClass method
+// 419,nil?
+// 419,to_a
+// 419,to_f
+// 419,to_i
+// 419,to_s
+
+
+
+// ---------------------------------------------
+// 組み込みモジュールのメソッド
+// embedded module method
+
+// Comparable method
+419,between?
+
+// Enumerable method
+419,all?
+419,any?
+// 483,collect
+// 499,collect[\s]*[{]*
+435,collect[^!]
+// 499,map[\s]*[{]*
+435,map[^!]
+419,each_with_index
+419,find
+419,detect
+419,find_all
+// 419,select
+419,grep
+419,inject
+419,member?
+419,include?
+419,max
+419,max_by
+419,min
+419,min_by
+419,partition
+419,reject
+// 419,sort
+419,sort_by
+// 419,to_a
+419,entries
+419,zip
+
+
+// FileTest method
+419,blockdev?
+419,chardev?
+419,executable?
+419,executable_real?
+419,exist?
+419,grpowned?
+419,directory?
+419,file?
+419,pipe?
+419,socket?
+419,owned?
+419,readable?
+419,readable_real?
+419,setuid?
+419,setgid?
+435,size[?]?
+419,sticky?
+419,symlink?
+419,writable?
+419,writable_real?
+419,zero?
+
+// GC module method
+419,disable
+419,enable
+419,start
+
+// GC method
+419,garbage_collect
+
+// Marshal module method
+419,dump
+419,load
+419,restore
+
+// Marshal method
+419,_dump
+419,_load
+419,marshal_dump
+419,marshal_load
+
+// Math module method
+419,acos
+419,asin
+419,atan
+419,atan2
+419,acosh
+419,asinh
+419,atanh
+419,cos
+419,sin
+419,tan
+419,cosh
+419,sinh
+419,tanh
+419,erf
+419,erfc
+419,exp
+419,frexp
+419,hypot
+419,ldexp
+419,log
+419,log10
+419,sqrt
+
+
+// ObjectSpace module method
+419,_id2ref
+419,define_finalizer
+419,each_object
+// 419,garbage_collect
+419,undefine_finalizer
+// 419,add_finalizer // obsolete
+// 419,call_finalizer // obsolete
+// 419,finalizers // obsolete
+// 419,remove_finalizer // obsolete
+
+// Precision module method
+// 419,included
+// 419,induced_from
+
+// Precision method
+419,prec
+419,prec_i
+419,prec_f
+
+
+// Process module method
+// 419,abort
+419,daemon
+419,detach
+// 419,exit
+// 419,exit!
+// 419,fork
+419,getrlimit
+419,setrlimit
+// 419,spawn
+
+// Process module attribute
+419,egid
+419,euid
+// 419,gid
+419,groups
+419,maxgroups
+// 419,pid
+419,ppid
+// 419,uid
+
+// Process module function
+419,getpgid
+419,getpgrp
+419,getpriority
+419,initgroups
+// 419,kill
+419,setpgrp
+419,setpgid
+419,setpriority
+419,setsid
+419,wait
+419,wait2
+419,waitall
+419,waitpid
+419,waitpid2
+
+
+// Process::Sys module function
+419,getuid
+419,geteuid
+419,getgid
+419,getegid
+419,setuid
+419,setgid
+419,setruid
+419,setrgid
+419,seteuid
+419,setegid
+419,setreuid
+419,setregid
+419,setresuid
+419,setresgid
+419,issetugid
+
+
+// Process::Sys module function
+419,rid
+419,eid
+419,change_privilege
+419,grant_privilege
+419,re_exchange
+419,re_exchangeable?
+419,sid_available?
+419,switch
+
+
+// Singnal module function
+// 419,list
+419,trap
+
+
+// ---------------------------------------------
+// 添付ライブラリ クラスのメソッド
+// attached library class method
+
+// CSV class
+
+// CSV class method
+// 419,CSV.open
+435,CSV([.]?|[:][:])open
+// 419,CSV.foreach
+435,CSV([.]?|[:][:])foreach
+// 419,CSV.read
+435,CSV([.]?|[:][:])read
+// 419,CSV.readlines
+435,CSV([.]?|[:][:])readlines
+// 419,CSV.generate
+435,CSV([.]?|[:][:])generate
+// 419,CSV.parse
+435,CSV([.]?|[:][:])parse
+// 419,CSV.parse_line
+435,CSV([.]?|[:][:])parse_line
+// 419,CSV.generate_line
+435,CSV([.]?|[:][:])generate_line
+// 419,CSV.parse_row
+435,CSV([.]?|[:][:])parse_row
+// 419,CSV.generate_row
+435,CSV([.]?|[:][:])generate_row
+
+// CSV::Reader class
+
+// CSV::Reader class method
+// 419,CSV::Reader.parse
+435,CSV::Reader([.]?|[:][:])parse
+// 419,CSV::Reader.create
+435,CSV::Reader([.]?|[:][:])create
+
+// CSV::Reader method
+// 419,each
+// 419,shift
+// 419,close
+
+// CSV::StringReader class
+
+// CSV::IOReader class
+// CSV::IOReader method
+419,close_on_terminate
+
+
+// CSV::Writer class
+// CSV::Writer class method
+// 419,CSV::Writer.generate
+435,CSV::Writer([.]?|[:][:])generate
+// 419,CSV::Writer.create
+435,CSV::Writer([.]?|[:][:])create
+
+// CSV::Writer method
+419,add_row
+// 419,close
+
+
+// CSV::BasicWriter class
+// CSV::BasicWriter method
+// 419,close_on_terminate
+
+// Rational class
+// Re:define of Integer class method
+419,power!
+419,to_r
+419,gcd
+419,lcm
+419,gcdlcm
+
+
+// Date class
+
+// Date class method
+// 419,Date.civil
+435,Date([.]?|[:][:])civil
+// 419,Date.commercial
+435,Date([.]?|[:][:])commercial
+// 419,Date.jd
+435,Date([.]?|[:][:])jd
+// 419,Date.ordinal
+435,Date([.]?|[:][:])ordinal
+// 419,Date.parse
+435,Date([.]?|[:][:])parse
+// 419,Date.strptime
+435,Date([.]?|[:][:])strptime
+// 419,Date.today
+435,Date([.]?|[:][:])today
+// 419,Date.valid_civil?
+435,Date([.]?|[:][:])valid_civil?
+// 419,Date.valid_date?
+435,Date([.]?|[:][:])valid_date?
+// 419,Date.valid_commercial?
+435,Date([.]?|[:][:])valid_commercial?
+// 419,Date.valid_jd?
+435,Date([.]?|[:][:])valid_jd?
+// 419,Date.valid_ordinal?
+435,Date([.]?|[:][:])valid_ordinal?
+
+// Date method
+// 419,asctime
+// 419,ctime
+419,cwday
+419,cweed
+419,cwyear
+// 419,downto
+419,england
+419,gregorian
+419,italy
+// 419,jd
+419,julian
+419,leap?
+// 419,mday
+// 419,day
+419,mjd
+// 419,mon
+// 419,month
+419,new_start
+// 419,start
+// 419,step
+// 419,strftime
+// 419,succ
+// 419,next
+// 419,to_s
+// 419,upto
+// 419,wday
+// 419,yday
+// 419,year
+
+
+// DateTime class
+
+// DateTime class method
+// 419,DateTime.civil
+435,DateTime([.]?|[:][:])civil
+// 419,DateTime.commercial
+435,DateTime([.]?|[:][:])commercial
+// 419,DateTime.jd
+435,DateTime([.]?|[:][:])jd
+// 419,DateTime.now
+435,DateTime([.]?|[:][:])now
+// 419,DateTime.ordinal
+435,DateTime([.]?|[:][:])ordinal
+
+// DateTime method
+// 419,hour
+// 419,min
+419,new_offset
+// 419,offset
+// 419,sec
+// 419,zone
+
+
+// (Extended) Time class
+
+// Time class method
+// 419,Time.parse
+435,Time([.]?|[:][:])parse
+// 419,Time.rfc2822
+435,Time([.]?|[:][:])rfc2822
+// 419,Time.rfc822
+435,Time([.]?|[:][:])rfc822
+// 419,Time.httpdate
+435,Time([.]?|[:][:])httpdate
+// 419,Time.xmlschema
+435,Time([.]?|[:][:])xmlschema
+// 419,Time.iso8601
+435,Time([.]?|[:][:])iso8601
+
+// Time method
+// 419,rfc2822
+// 419,rfc822
+// 419,httpdate
+// 419,xmlschema
+// 419,iso8601
+
+
+// URI class method
+// 419,URI.splitdefault_port
+435,URI([.]?|[:][:])splitdefault_port
+
+// URI::Generic class
+
+// URI::Generic class method
+// 419,URI::Generic.default_port
+435,URI::Generic([.]?|[:][:])default_port
+// 419,URI::Generic.component
+435,URI::Generic([.]?|[:][:])component
+// 419,URI::Generic.use_registry
+435,URI::Generic([.]?|[:][:])use_registry
+// 419,URI::Generic.build2
+435,URI::Generic([.]?|[:][:])build2
+// 419,URI::Generic.build
+435,URI::Generic([.]?|[:][:])build
+
+// URI::Generic method
+// 419,default_port
+// 419,component
+419,scheme
+419,userinfo
+419,user
+419,password
+419,host
+419,port
+419,registry
+// 419,path
+419,query
+419,opaque
+419,fragment
+419,hierarchical?
+419,absolute?
+419,relative?
+// 419,merge
+419,route_from
+419,route_to
+// 419,normalize
+// 419,#normalize!
+435,normalize[!]?
+// 419,to_s
+// 419,to_str
+// 419,to_a
+// 419,to_ary
+
+// URI::FTP class
+
+// URI::FTP class method
+// 419,URI::FTP.build
+435,URI::FTP([.]?|[:][:])build
+// 419,URI::FTP.typecode
+435,URI::FTP([.]?|[:][:])typecode
+
+// URI::HTTP class
+
+// URI::HTTP class method
+// 419,URI::HTTP.build
+435,URI::HTTP([.]?|[:][:])build
+
+// URI::HTTP method
+419,request_uri
+
+// URI::LDAP class
+
+// URI::LDAP class method
+// 419,URI::LDAP.build
+435,URI::LDAP([.]?|[:][:])build
+// 419,URI::LDAP.dn
+435,URI::LDAP([.]?|[:][:])dn
+// 419,URI::LDAP.attributes
+435,URI::LDAP([.]?|[:][:])attributes
+// 419,URI::LDAP.scope
+435,URI::LDAP([.]?|[:][:])scope
+// 419,URI::LDAP.filter
+435,URI::LDAP([.]?|[:][:])filter
+// 419,URI::LDAP.extensions
+435,URI::LDAP([.]?|[:][:])extensions
+
+// URI::MailTo class
+
+// URI::MailTo class method
+// 419,URI::MailTo.build
+435,URI::MailTo([.]?|[:][:])build
+
+// URI::MailTo method
+419,to
+419,headers
+419,to_mailtext
+419,to_rfc822text
+
+
+// Test::Unit::TestCase class
+
+// Test::Unit::TestCase method
+419,setup
+419,teardown
+
+// Test::Unit::AutoRunner class
+
+// Test::Unit::AutoRunner method
+// 419,run
+
+
+// ---------------------------------------------
+// 添付ライブラリ モジュールのメソッド
+// attached library module method
+
+// FileUtils module
+
+// FileUtils module function
+// 419,FileUtils.cd
+435,FileUtils([.]?|[:][:])cd
+// 419,FileUtils.chmod
+435,FileUtils([.]?|[:][:])chmod
+// 419,FileUtils.chmod_R
+435,FileUtils([.]?|[:][:])chmod_R
+// 419,FileUtils.chown
+435,FileUtils([.]?|[:][:])chown
+// 419,FileUtils.chown_R
+435,FileUtils([.]?|[:][:])chown_R
+// 419,FileUtils.cmp
+435,FileUtils([.]?|[:][:])cmp
+// 419,FileUtils.compare_file
+435,FileUtils([.]?|[:][:])compare_file
+// 419,FileUtils.identical?
+435,FileUtils([.]?|[:][:])identical?
+// 419,FileUtils.compare_stream
+435,FileUtils([.]?|[:][:])compare_stream
+// 419,FileUtils.copy_entry
+435,FileUtils([.]?|[:][:])copy_entry
+// 419,FileUtils.copy_file
+435,FileUtils([.]?|[:][:])copy_file
+// 419,FileUtils.copy_stream
+435,FileUtils([.]?|[:][:])copy_stream
+// 419,FileUtils.cp
+435,FileUtils([.]?|[:][:])cp
+// 419,FileUtils.copy
+435,FileUtils([.]?|[:][:])copy
+// 419,FileUtils.cp_r
+435,FileUtils([.]?|[:][:])cp_r
+// 419,FileUtils.install
+435,FileUtils([.]?|[:][:])install
+// 419,FileUtils.ln
+435,FileUtils([.]?|[:][:])ln
+// 419,FileUtils.link
+435,FileUtils([.]?|[:][:])link
+// 419,FileUtils.ln_s
+435,FileUtils([.]?|[:][:])ln_s
+// 419,FileUtils.symlink
+435,FileUtils([.]?|[:][:])symlink
+// 419,FileUtils.ln_sf
+435,FileUtils([.]?|[:][:])ln_sf
+// 419,FileUtils.mkdir
+435,FileUtils([.]?|[:][:])mkdir
+// 419,FileUtils.mkdir_p
+435,FileUtils([.]?|[:][:])mkdir_p
+// 419,FileUtils.mkpath
+435,FileUtils([.]?|[:][:])mkpath
+// 419,FileUtils.makedirs
+435,FileUtils([.]?|[:][:])makedirs
+// 419,FileUtils.mv
+435,FileUtils([.]?|[:][:])mv
+// 419,FileUtils.move
+435,FileUtils([.]?|[:][:])move
+// 419,FileUtils.pwd
+435,FileUtils([.]?|[:][:])pwd
+// 419,FileUtils.getwd
+435,FileUtils([.]?|[:][:])getwd
+// 419,FileUtils.rm
+435,FileUtils([.]?|[:][:])rm
+// 419,FileUtils.remove
+435,FileUtils([.]?|[:][:])remove
+// 419,FileUtils.rm_f
+435,FileUtils([.]?|[:][:])rm_f
+// 419,FileUtils.safe_unlink
+435,FileUtils([.]?|[:][:])safe_unlink
+// 419,FileUtils.rm_r
+435,FileUtils([.]?|[:][:])rm_r
+// 419,FileUtils.rm_rf
+435,FileUtils([.]?|[:][:])rm_rf
+// 419,FileUtils.rmtree
+435,FileUtils([.]?|[:][:])rmtree
+// 419,FileUtils.rmdir
+435,FileUtils([.]?|[:][:])rmdir
+// 419,FileUtils.remove_entry
+435,FileUtils([.]?|[:][:])remove_entry
+// 419,FileUtils.remove_entry_secure
+435,FileUtils([.]?|[:][:])remove_entry_secure
+// 419,FileUtils.remove_file
+435,FileUtils([.]?|[:][:])remove_file
+// 419,FileUtils.touch
+435,FileUtils([.]?|[:][:])touch
+// 419,FileUtils.uptodate?
+435,FileUtils([.]?|[:][:])uptodate?
+
+
+// ParseDate module
+
+// ParseDate module function
+419,parsedate
+
+// OpenURI module
+
+// OpenURI module function
+419,OpenURI.open_uri
+
+// OpenURI::OpenRead module method
+// 419,open
+// 419,read
+
+// OpenURI::Meta module method
+419,last_modified
+419,content_type
+419,charset
+419,content_encoding
+// 419,status
+419,base_uri
+419,meta
+
+// URI module
+
+// URI module method
+// 419,split
+// 419,parse
+// 419,join
+419,extract
+419,regexp
+// 419,escape
+419,encode
+419,unescape
+419,decode
+
+
+// Test::Unit::Assertions module
+
+// Test::Unit::Assertions method
+419,assert
+419,assert_equal
+419,assert_not_equal
+419,assert_instance_of
+419,assert_nil
+419,assert_not_nil
+419,assert_kind_of
+419,assert_respond_to
+419,assert_match
+419,assert_no_match
+419,assert_same
+419,assert_not_same
+419,assert_operator
+419,assert_raise
+419,assert_nothing_raised
+419,flunk
+419,assert_throws
+419,assert_nothing_thrown
+419,assert_in_delta
+419,assert_send
+419,assert_block
+
+
+// ---------------------------------------------------------------------
+// 強調表示 8. 定数
+// 
+
+// ---------------------------------------------
+// 組み込み定数
+// embedded constant
+483,TRUE
+483,FALSE
+483,NIL
+483,STDIN
+483,STDOUT
+483,STDERR
+483,ENV
+483,ARGF
+483,ARGV
+483,DATA
+483,TOPLEVEL_BINDING
+483,RUBY_VERSION
+483,RUBY_RELEASE_DATE
+483,RUBY_PLATFORM
+//483,VERSION
+//483,RELEASE_DATE
+//483,PLATFORM
+483,SCRIPT_LINES__
+
+
+// ---------------------------------------------
+// 組み込みクラスの定数
+// embedded class constant
+
+// IO class constant
+483,SEEK_CUR
+483,SEEK_END
+483,SEEK_SET
+
+// File class constant
+483,ALT_SEPARATOR
+483,PATH_SEPARATOR
+483,SEPARATOR
+483,Separator
+
+// Float class constant
+483,DIG
+483,EPSILON
+483,MANT_DIG
+483,MAX
+483,MIN
+483,MAX_10_EXP
+483,MIN_10_EXP
+483,MAX_EXP
+483,MIN_EXP
+483,RADIX
+483,ROUNDS
+
+
+// Regexp class constant
+483,EXTENDED
+483,IGNORECASE
+483,MULTILINE
+
+
+// ThreadGroup class constant
+483,Default
+
+
+// ---------------------------------------------
+// 組み込みモジュールの定数
+// embedded module constant
+
+// File::Constants
+483,LOCK_SH
+483,LOCK_EX
+483,LOCK_UN
+483,LOCK_NB
+483,RDONLY
+483,WRONLY
+483,RDWR
+483,APPEND
+483,CREAT
+483,EXCL
+483,NONBLOCK
+483,TRUNC
+483,NOCTTY
+483,BINARY
+483,SYNC
+483,FNM_NOESCAPE
+483,FNM_PATHNAME
+483,FNM_PERIOD
+483,FNM_CASEFOLD
+483,FNM_DOTMATCH
+
+// Marshal constant
+483,MAJOR_VERSION
+483,MAJOR_VERSION
+
+// Math constant
+483,E
+483,PI
+
+// Process module constant
+483,PRIO_PROCESS
+483,PRIO_PGRP
+483,PRIO_USER
+483,RLIMIT_AS
+483,RLIMIT_CORE
+483,RLIMIT_CPU
+483,RLIMIT_DATA
+483,RLIMIT_FSIZE
+483,RLIMIT_MEMLOCK
+483,RLIMIT_NOFILE
+483,RLIMIT_NPROC
+483,RLIMIT_RSS
+483,RLIMIT_SBSIZE
+483,RLIMIT_STACK
+483,RLIM_INFINITY
+483,RLIM_SAVED_CUR
+483,RLIM_SAVED_MAX
+483,WNOHANG
+483,WUNTRACED
+
+
+// ---------------------------------------------
+// 添付ライブラリ クラスの定数
+// attached library class constant
+
+// Date class
+483,MONTHNAMES
+483,DAYNAMES
+483,ABBR_MONTHNAMES
+483,ABBR_DAYNAMES
+
+// ---------------------------------------------
+// 添付ライブラリ モジュールの定数
+// attached library module constant
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------------------------
+// メモランダム
+
+
+// 強調表示色一覧（デフォルトでの黒い背景色の場合）
+// 
+// 強調表示の           （黒い背景色の場合の）
+// 番号                  最初の色
+// 
+// 強調表示1		白色
+// 強調表示2		黄色
+// 強調表示3		若草色
+// 強調表示4		桃色
+// 強調表示5		赤色（リテラル及び正規表現で使用される）
+// 強調表示6		緑色（コメントで使用される）
+// 強調表示7		青色
+// 強調表示8		灰色
+
+
+// 強調表示指定一覧
+// 
+//  33,強調1（大小文字の区別）（単語）
+//  49,強調1（大小文字の区別）（単語）(正規表現)
+//  97,強調2（大小文字の区別）（単語）
+// 113,強調2（大小文字の区別）（単語）(正規表現)
+// 161,強調3（大小文字の区別）（単語）
+// 177,強調3（大小文字の区別）（単語）(正規表現)
+// 225,強調4（大小文字の区別）（単語）
+// 241,強調4（大小文字の区別）（単語）(正規表現)
+// 291,強調5（大小文字の区別）（単語）
+// 307,強調5（大小文字の区別）（単語）(正規表現)
+// 355,強調6（大小文字の区別）（単語）
+// 371,強調6（大小文字の区別）（単語）(正規表現)
+// 419,強調7（大小文字の区別）（単語）
+// 435,強調7（大小文字の区別）（単語）(正規表現)
+// 483,強調8（大小文字の区別）（単語）
+// 499,強調8（大小文字の区別）（単語）(正規表現)
+// 
+//  35,特に強調1（大小文字の区別）（単語）
+//  51,特に強調1（大小文字の区別）（単語）(正規表現)
+//  99,特に強調2（大小文字の区別）（単語）
+// 115,特に強調2（大小文字の区別）（単語）(正規表現)
+// 163,特に強調3（大小文字の区別）（単語）
+// 179,特に強調3（大小文字の区別）（単語）(正規表現)
+// 227,特に強調4（大小文字の区別）（単語）
+// 243,特に強調4（大小文字の区別）（単語）(正規表現)

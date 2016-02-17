@@ -1,0 +1,135 @@
+// perl用強調表示定義ファイルです。
+// 一応perl 5.8に対応しているはずです。
+// 特殊変数の類も可能な限り強調します。
+//
+// QUOTE関係
+81,"([^"]|\\"|\\\\)*"
+209,'([^']|\\'|\\\\)*'
+209,`([^`]|\\`|\\\\)*`
+//
+// 特殊変数
+03,@_
+03,$^A
+03,$^D
+03,$^F
+03,$^I
+03,$^L
+03,$^O
+03,$^P
+03,$^T
+03,$^W
+03,$^X
+03,$ARGV
+19,$ARGV(?=\[)
+19,$ENV(?={)
+19,$INC(?={)
+19,$INC(?=\[)
+19,$SIG(?={)
+//
+// 関数
+49,(accept|alarm|atan2|bind|binmode|caller)
+49,(chdir|chmod|chown|chr|chroot|die|connect)
+49,(cos|crypt|dbm(close|open)|delete|dump)
+49,(each|eof|exec|system|exit|exp|fcntl)
+49,(eval|rand|srand|int|abs|sort|map)
+49,(fileno|flock|fork|formline|getc|seekdir)
+49,(grep|hex|import|index|ioctl|kill|lc|seek)
+49,(lcfirst|link|listen|log|lstat|scalar)
+49,(mkdir|msg(ctl|get|rcv|snd)|rindex|rmdir)
+49,(oct|ord|pack|pipe|prototype|pop|pos|quotemeta)
+49,(open|opendir|read|close|closedir|rename|unlink)
+49,(readdir|readline|readlink|readpipe|recv|reverse|rewinddir)
+49,(ref|glob|reset)
+49,(sem(ctl|get|op)|send|shutdown|sin|sleep)
+49,(socket|socketpair|sqrt|stat|study|symlink)
+49,(spli(t|ce)|join|localtime|gmtime|time|times|chom?p|defined)
+49,(sprintf?|substr|length|exists|keys|push|shift)
+49,(sys(call|read|write|seek|open)|write)
+49,(tell|telldir|tie|tied|truncate|uc|ucfirst)
+49,(umask|undef|unpack|untie|unshift|utime)
+49,(values|vec|wait|waitpid|wantarray|warn)
+49,end(pw|gr|host|proto|serv|net)ent
+49,get((peer|sock)name|sockopt)
+49,get(host|net)byaddr
+49,get(login|pgrp|ppid)
+49,get(priority|pwnam|grnam|grgit|pwuid)
+49,get(proto|serv|net|host)byname
+49,get(servbyport|protobynumber)
+49,[sg]et(pw|gr|host|proto|serv|net)ent
+49,select
+49,set(pgrp|priority|sockopt)
+49,shm(ctl|get|read|write)
+//
+// 標準エラー・標準入出力
+49,STD(ERR|OUT|IN)
+//
+// 制御文関係のキーワード
+51,(continue|do|else|elsif|for|foreach|goto|if)
+51,(last|local|my|our|next|redo|return|unless)
+51,(until|while)
+//
+// 制御文じゃないけど、特別扱いのキーワード
+51,bless
+51,@(_|ARGV|INC|ISA|EXPORT|EXPORT_OK|AUXILIARY)
+51,%(ENV|SIG|INC)
+//
+// 変数(完全ではない)
+145,[$@%]$?[a-zA-Z_][a-zA-Z0-9_]*
+//
+// 関数名を変数に使用した場合の魔よけ
+// （制御文キーワードの場合は、強調の優先度関係で魔よけできないので我慢してください）
+177,[$@%]$?(accept|alarm|atan2|bind|binmode|caller)
+177,[$@%]$?(chdir|chmod|chown|chr|chroot|die|connect)
+177,[$@%]$?(cos|crypt|dbm(close|open)|delete|dump)
+177,[$@%]$?(each|eof|exec|system|exit|exp|fcntl)
+177,[$@%]$?(eval|rand|srand|int|abs|sort|map)
+177,[$@%]$?(fileno|flock|fork|formline|getc|seekdir)
+177,[$@%]$?(grep|hex|import|index|ioctl|kill|lc|seek)
+177,[$@%]$?(lcfirst|link|listen|log|lstat|scalar)
+177,[$@%]$?(mkdir|msg(ctl|get|rcv|snd)|rindex|rmdir)
+177,[$@%]$?(oct|ord|pack|pipe|prototype|pop|pos|quotemeta)
+177,[$@%]$?(open|opendir|read|close|closedir|rename|unlink)
+177,[$@%]$?(readdir|readline|readlink|readpipe|recv|reverse|rewinddir)
+177,[$@%]$?(ref|glob|reset)
+177,[$@%]$?(sem(ctl|get|op)|send|shutdown|sin|sleep)
+177,[$@%]$?(socket|socketpair|sqrt|stat|study|symlink)
+177,[$@%]$?(spli(t|ce)|join|localtime|gmtime|time|times|chom?p|defined)
+177,[$@%]$?(sprintf?|substr|length|exists|keys|push|shift)
+177,[$@%]$?(sys(call|read|write|seek|open)|write)
+177,[$@%]$?(tell|telldir|tie|tied|truncate|uc|ucfirst)
+177,[$@%]$?(umask|undef|unpack|untie|unshift|utime)
+177,[$@%]$?(values|vec|wait|waitpid|wantarray|warn)
+177,[$@%]$?[sg]et(pw|gr|host|proto|serv|net)ent
+177,[$@%]$?end(pw|gr|host|proto|serv|net)ent
+177,[$@%]$?get((peer|sock)name|sockopt)
+177,[$@%]$?get(host|net)byaddr
+177,[$@%]$?get(login|pgrp|ppid)
+177,[$@%]$?get(priority|pwnam|grnam|grgit|pwuid)
+177,[$@%]$?get(proto|serv|net|host)byname
+177,[$@%]$?get(servbyport|protobynumber)
+177,[$@%]$?set(pgrp|priority|sockopt)
+177,[$@%]$?shm(ctl|get|read|write)
+//
+// printは出力なので特別扱い
+// (CGIではこの方が便利なので)
+117,[^s]*printf?[ ;]
+//
+// 特殊な宣言
+21,^[ \t]*(format|package|require|sub|use|no) 
+21,^[ \t]*BEGIN
+//
+// ラベル
+21,^[ \t]*[A-Za-z][A-Za-z_-0-9]*[ \t]*:
+//
+// ヒアドキュメントの終端用
+17,^[A-Z][A-Z_0-9]+$
+//
+// 特殊リテラル
+19,__(FILE|LINE|PACKAGE|END|DATA)__
+19,\\[0-9]{3}
+19,\\[tnrfvaeluLUEQwWsSdDbBAZG]
+19,\\x[0-9a-fA-F]{2}
+//
+// コメント関係（あまりうまくいかない）
+83,^#.*
+83,(?<=^("([^"]|\\"|\\\\)*"|'([^']|\\'|\\\\)*'|`([^`]|\\`|\\\\)*`|[^"'`#])*)#.*

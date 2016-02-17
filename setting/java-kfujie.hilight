@@ -1,0 +1,190 @@
+// Java言語のソースコードのための強調表示定義ファイル
+//
+// 強調表示1            キーワード + プリミティブタイプ
+// 強調表示2            java.lang の 通常クラス/インターフェース名
+// 強調表示3            java.lang の 例外 + エラー クラス
+// 強調表示4            JUnit のクラス/インターフェース名
+//                         + Assertion メソッド名
+//
+// 行の強調表示1	重要なメソッド名 - ex. main()
+//
+// 強調表示1
+// keyword + primitive type
+33,abstract
+33,boolean
+33,break
+33,byte
+33,byvalue
+33,case
+33,cast
+33,catch
+33,char
+33,class
+33,const
+33,continue
+33,default
+33,do
+33,double
+33,else
+33,extends
+33,false
+33,final
+33,finally
+33,float
+33,for
+33,future
+33,generic
+33,goto
+33,if
+33,implements
+33,import
+33,instanceof
+33,int
+33,interface
+33,long
+33,native
+33,new
+33,null
+33,operator
+33,outer
+33,package
+33,private
+33,protected
+33,public
+33,rest
+33,return
+33,short
+33,static
+33,super
+33,switch
+33,synchronized
+33,this
+33,throw
+33,throws
+33,transient
+33,true
+33,try
+33,var
+33,void
+33,volatile
+33,while
+// 強調表示2
+// Classes  
+97,Boolean
+97,Byte
+97,Character
+97,Character.Subset
+97,Character.UnicodeBlock
+97,Class
+97,ClassLoader
+97,Compiler
+97,Double
+97,Float
+97,InheritableThreadLocal
+97,Integer
+97,Long
+97,Math
+97,Number
+97,Object
+97,Package
+97,Process
+97,Runtime
+97,RuntimePermission
+97,SecurityManager
+97,Short
+97,StackTraceElement
+97,String
+97,StringBuffer
+97,System
+97,Thread
+97,ThreadGroup
+97,ThreadLocal
+97,Throwable
+97,Void
+// Interfaces
+97,CharSequence
+97,Cloneable
+97,Comparable
+97,Runnable
+// 強調表示3
+// Exceptions 
+161,ArithmeticException
+161,ArrayIndexOutOfBoundsException 
+161,ArrayStoreException 
+161,ClassCastException 
+161,ClassNotFoundException 
+161,CloneNotSupportedException 
+161,Exception 
+161,IllegalAccessException 
+161,IllegalArgumentException 
+161,IllegalMonitorStateException 
+161,IllegalStateException 
+161,IllegalThreadStateException 
+161,IndexOutOfBoundsException 
+161,InstantiationException 
+161,InterruptedException 
+161,NegativeArraySizeException 
+161,NoSuchFieldException 
+161,NoSuchMethodException 
+161,NullPointerException 
+161,NumberFormatException 
+161,RuntimeException 
+161,SecurityException 
+161,StringIndexOutOfBoundsException 
+161,UnsupportedOperationException
+// Errors  
+161,AbstractMethodError 
+161,AssertionError
+161,ClassCircularityError 
+161,ClassFormatError 
+161,Error 
+161,ExceptionInInitializerError 
+161,IllegalAccessError 
+161,IncompatibleClassChangeError 
+161,InstantiationError 
+161,InternalError 
+161,LinkageError 
+161,NoClassDefFoundError 
+161,NoSuchFieldError 
+161,NoSuchMethodError 
+161,OutOfMemoryError 
+161,StackOverflowError 
+161,ThreadDeath 
+161,UnknownError 
+161,UnsatisfiedLinkError 
+161,UnsupportedClassVersionError 
+161,VerifyError 
+161,VirtualMachineError
+// 強調表示4
+// JUnit Classes and Interfaces
+225,ActiveTestSuite
+225,Assert
+225,AssertionFailedError
+225,ComparisonFailure
+225,ExceptionTestCase
+225,Protectable
+225,RepeatedTest
+225,Test
+225,TestCase
+225,TestDecorator
+225,TestFailure
+225,TestListener
+225,TestResult
+225,TestSetup
+225,TestSuite
+// JUnit Assertion Methods
+225,assertEquals
+225,assertNotNull
+225,assertNull
+225,assertFalse
+225,assertSame
+225,assertTrue
+225,fail
+//225,setUp
+//225,tearDown
+// 行の強調表示1
+// method name
+21,main()
+// 行の強調表示2
+// 特に強調表示1
+// 特に強調表示2
